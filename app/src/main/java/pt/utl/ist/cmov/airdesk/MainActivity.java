@@ -1,17 +1,21 @@
-package pt.ulisboa.tecnico.cmov.airdesk;
+package pt.utl.ist.cmov.airdesk;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 
 public class MainActivity extends ActionBarActivity {
+
+    private static AirdeskManager airdeskManager = new AirdeskManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
     }
 
 

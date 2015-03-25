@@ -1,17 +1,37 @@
-package pt.utl.ist.airdesk.domain;
+package pt.utl.ist.cmov.airdesk.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by Diogo on 18/03/2015.
- */
 public class Workspace {
+    /**
+     * The maximum size of the workspace (in MB)
+     */
     private int quota;
+
+    /**
+     * The name of the workspace
+     */
     private String name;
+
+    /**
+     * The owner's/creator's nickname
+     */
     private String owner;
+
+    /**
+     * Mapping between user's nickname and their privileges regarding the workspace
+     */
     private HashMap<String, Privileges> accessLists;
+
+    /**
+     * A list of the topics that the workspace covers
+     */
     private ArrayList<String> topics;
+
+    /**
+     * If true, the workspace is private; false, if it is public
+     */
     private boolean isPrivate;
 
     public Workspace() {}
@@ -66,7 +86,7 @@ public class Workspace {
         return isPrivate;
     }
 
-    public void setPrivate(boolean isPrivate) {
+    public void setPrivacy(boolean isPrivate) {
         this.isPrivate = isPrivate;
     }
 }
