@@ -1,24 +1,22 @@
-package pt.utl.ist.airdesk.domain;
+package pt.utl.ist.cmov.airdesk.domain;
 
-/**
- * Created by Diogo on 18/03/2015.
- */
 public class Privileges {
 	private boolean read;
 	private boolean write;
 	private boolean create;
 	private boolean delete;
 
-	public Privileges() {}
+    public Privileges() {
+    }
 
-	public Privileges(boolean read, boolean write, boolean create, boolean delete) {
-		this.read = read;
-		this.write = write;
-		this.create = create;
-		this.delete = delete;
-	}
+    public Privileges(boolean read, boolean write, boolean create, boolean delete) {
+        this.read = read;
+        this.write = write;
+        this.create = create;
+        this.delete = delete;
+    }
 
-	public boolean canRead() {
+    public boolean canRead() {
 		return this.read;
 	}
 
@@ -49,4 +47,11 @@ public class Privileges {
 	public void setDeletePrivilege(boolean delete) {
 		this.delete = delete;
 	}
+
+    public void setAll(boolean accessPrivilege) {
+        setReadPrivilege(accessPrivilege);
+        setWritePrivilege(accessPrivilege);
+        setCreatePrivilege(accessPrivilege);
+        setDeletePrivilege(accessPrivilege);
+    }
 }
