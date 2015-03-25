@@ -34,6 +34,8 @@ public class Workspace {
      */
     private boolean isPrivate;
 
+    private ArrayList<File> files;
+
     public Workspace() {}
 
     public Workspace(int quota, String name, String owner) {
@@ -88,6 +90,14 @@ public class Workspace {
 
     public void setPrivacy(boolean isPrivate) {
         this.isPrivate = isPrivate;
+    }
+
+    public ArrayList<File> getFiles() {
+        return files;
+    }
+
+    public void setFiles(ArrayList<File> files) {
+        this.files = files;
     }
 
     @Override
