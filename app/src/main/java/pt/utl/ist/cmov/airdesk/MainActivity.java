@@ -1,31 +1,23 @@
-package pt.utl.ist.cmov.airdesk.activities;
+package pt.utl.ist.cmov.airdesk;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 
-import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 
 public class MainActivity extends ActionBarActivity {
 
-    EditText name;
-    EditText email;
+    private static AirdeskManager airdeskManager = new AirdeskManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences prefs = this.getSharedPreferences(
-                "pt.utl.ist.cmov.airdesk", Context.MODE_PRIVATE);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -34,6 +26,7 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -46,21 +39,5 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void startListWorkspaces(View v) {
-        register();
-        Intent intent = new Intent(this, ListWorkspaces.class);
-        startActivity(intent);
-    }
-
-    private void register() {
-        name = (EditText) findViewById(R.id.nameEditText);
-        email = (EditText) findViewById(R.id.emailEditText);
-        name.getText().toString();
-        email.getText().toString();
-
-        // NAME =/= NICKNAME ??
-        AirdeskManager.getInstance();
     }
 }

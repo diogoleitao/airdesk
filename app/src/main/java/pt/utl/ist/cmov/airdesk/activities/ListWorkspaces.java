@@ -64,14 +64,15 @@ public class ListWorkspaces extends ActionBarActivity {
 
     public void addWorkspace(View v) {
 
-    // TODO - HAVE A LOGGED IN USER, ADD WORKSPACE TO THAT USER
+        // TODO - HAVE A LOGGED IN USER, ADD WORKSPACE TO THAT USER
 
-    // HACK TO TRY LIST ADAPTER
-    User user = new User("Joao", "Jonny", "joao.jonny@badmails.com");
-    EditText name = (EditText) findViewById(R.id.workspaceNameText);
-    Workspace workspace = new Workspace(100, name.getText().toString(),"Jonny");
-    workspaceList.add(workspace);
-    adapter.notifyDataSetChanged();
+        // HACK TO TRY LIST ADAPTER
+        User user = new User("Joao", "Jonny", "joao.jonny@badmails.com");
+        EditText name = (EditText) findViewById(R.id.workspaceNameText);
 
-}
+        Workspace workspace = new Workspace(100, name.getText().toString(),"Jonny");
+        workspaceList.add(workspace);
+        adapter.notifyDataSetChanged();
+
+    }
 }
