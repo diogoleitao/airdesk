@@ -1,22 +1,37 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
 public class Privileges {
+
+	/**
+	 * True if a user can read a file; false otherwise
+	 */
 	private boolean read;
+
+	/**
+	 * True if a user can write to a file; false otherwise
+	 */
 	private boolean write;
+
+	/**
+	 * True if a user can create a file; false otherwise
+	 */
 	private boolean create;
+
+	/**
+	 * True if a user can delete a file; false otherwise
+	 */
 	private boolean delete;
 
-    public Privileges() {
-    }
+	public Privileges() {}
 
-    public Privileges(boolean read, boolean write, boolean create, boolean delete) {
-        this.read = read;
-        this.write = write;
-        this.create = create;
-        this.delete = delete;
-    }
+	public Privileges(boolean read, boolean write, boolean create, boolean delete) {
+		this.read = read;
+		this.write = write;
+		this.create = create;
+		this.delete = delete;
+	}
 
-    public boolean canRead() {
+	public boolean canRead() {
 		return this.read;
 	}
 
@@ -48,10 +63,10 @@ public class Privileges {
 		this.delete = delete;
 	}
 
-    public void setAll(boolean accessPrivilege) {
-        setReadPrivilege(accessPrivilege);
-        setWritePrivilege(accessPrivilege);
-        setCreatePrivilege(accessPrivilege);
-        setDeletePrivilege(accessPrivilege);
-    }
+	public void setAll(boolean accessPrivilege) {
+		setReadPrivilege(accessPrivilege);
+		setWritePrivilege(accessPrivilege);
+		setCreatePrivilege(accessPrivilege);
+		setDeletePrivilege(accessPrivilege);
+	}
 }
