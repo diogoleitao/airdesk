@@ -9,14 +9,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
 
 public class MainActivity extends ActionBarActivity {
 
     EditText name;
     EditText email;
+    EditText nickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +28,8 @@ public class MainActivity extends ActionBarActivity {
 
         SharedPreferences prefs = this.getSharedPreferences(
                 "pt.utl.ist.cmov.airdesk", Context.MODE_PRIVATE);
+
+        AirdeskManager.getInstance().populateAirdesk();
     }
 
     @Override
@@ -48,19 +53,49 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void startListWorkspaces(View v) {
-        register();
+    public void register(View v) {
+        name = (EditText) findViewById(R.id.nameEditText);
+        nickname = (EditText) findViewById(R.id.nicknameEditText);
+        email = (EditText) findViewById(R.id.emailEditText);
+
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast;
+        CharSequence text;
+        try {
+            AirdeskManager.getInstance().registerUser( name.getText().toString(),  nickname.getText().toString(),  email.getText().toString());
+        } catch (UserAlreadyExistsException e) {
+            text = "User Already Exists!";
+            toast= Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
         Intent intent = new Intent(this, ListWorkspaces.class);
+        intent.putExtra("nickname", nickname.getText().toString());
+        intent.putExtra("email", email.getText().toString());
         startActivity(intent);
     }
 
-    private void register() {
-        name = (EditText) findViewById(R.id.nameEditText);
+
+
+    public void login(View v) {
+        nickname = (EditText) findViewById(R.id.nicknameEditText);
         email = (EditText) findViewById(R.id.emailEditText);
-        name.getText().toString();
-        email.getText().toString();
 
         // NAME =/= NICKNAME ??
-        AirdeskManager.getInstance();
+
+        if(null == AirdeskManager.getInstance().login(nickname.getText().toString(), email.getText().toString())) {
+            Context context = getApplicationContext();
+            int duration = Toast.LENGTH_SHORT;
+            CharSequence text = "Login failed. Please register.";
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
+        Intent intent = new Intent(this, ListWorkspaces.class);
+        intent.putExtra("nickname", nickname.getText().toString());
+        intent.putExtra("email", email.getText().toString());
+        startActivity(intent);
     }
 }

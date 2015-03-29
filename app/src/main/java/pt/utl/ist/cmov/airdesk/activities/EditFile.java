@@ -68,4 +68,11 @@ public class EditFile extends ActionBarActivity {
         intent.putExtra("workspaceName", workspaceName);
         startActivity(intent);
     }
+
+    public void cancelFileEdit(View v) {
+
+        Intent intent = new Intent(this, ListFiles.class);
+        intent.putExtra("workspaceName", workspaceName);
+        startActivity(intent);
+    }
 }

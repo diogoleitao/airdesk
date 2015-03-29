@@ -41,6 +41,8 @@ public class User {
 		this.setName(name);
 		this.setNickname(nickname);
 		this.setEmail(email);
+        this.ownedWorkspaces = new HashMap<String, Workspace>();
+        this.foreignWorkspaces = new HashMap<String, Workspace>();
 	}
 
 	public String getName() {

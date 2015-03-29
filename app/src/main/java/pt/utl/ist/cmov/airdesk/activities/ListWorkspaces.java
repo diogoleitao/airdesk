@@ -1,5 +1,6 @@
 package pt.utl.ist.cmov.airdesk.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -7,36 +8,56 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import pt.utl.ist.cmov.airdesk.R;
+import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.User;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
 
 public class ListWorkspaces extends ActionBarActivity {
 
-    ArrayAdapter<Workspace> adapter;
+    ArrayAdapter<String> adapter;
     ListView workspaceListView;
-    List<Workspace> workspaceList;
+    ArrayList<String> workspaceList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_workspaces);
 
-        workspaceList = new ArrayList<Workspace>();
-        // TODO - get workspace list from the user that is logged in
+        AirdeskManager manager = AirdeskManager.getInstance();
 
-        ListView workspaceListView = (ListView) findViewById(R.id.workspaceList);
+        workspaceList = new ArrayList<String>();
+
+        String nickname = getIntent().getExtras().getString("nickname");
+        String email = getIntent().getExtras().getString("email");
+        workspaceList = manager.login(nickname, email);
+
+        workspaceListView = (ListView) findViewById(R.id.workspaceList);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, workspaceList );
         workspaceListView.setAdapter(adapter);
+        final Context that = this;
 
+        workspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent intent = new Intent(that, ListFiles.class);
+                intent.putExtra("workspaceName", workspaceList.get(position));
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -64,15 +85,20 @@ public class ListWorkspaces extends ActionBarActivity {
 
     public void addWorkspace(View v) {
 
-        // TODO - HAVE A LOGGED IN USER, ADD WORKSPACE TO THAT USER
-
-        // HACK TO TRY LIST ADAPTER
-        User user = new User("Joao", "Jonny", "joao.jonny@badmails.com");
+        AirdeskManager manager = AirdeskManager.getInstance();
+        User user = manager.getLoggedUser();
         EditText name = (EditText) findViewById(R.id.workspaceNameText);
+        try {
+            manager.addWorkspace(user.getNickname(), name.getText().toString());
+            workspaceList.add(name.getText().toString());
+            adapter.notifyDataSetChanged();
+        } catch (WorkspaceAlreadyExistsException e) {
+            Context context = getApplicationContext();
+            CharSequence text = "Workspace Already Exists!";
+            int duration = Toast.LENGTH_SHORT;
 
-        Workspace workspace = new Workspace(100, name.getText().toString(),"Jonny");
-        workspaceList.add(workspace);
-        adapter.notifyDataSetChanged();
-
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
     }
 }

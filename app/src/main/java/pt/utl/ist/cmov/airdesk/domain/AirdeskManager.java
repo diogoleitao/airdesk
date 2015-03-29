@@ -53,6 +53,8 @@ public class AirdeskManager {
 		return instance;
 	}
 
+    public User getLoggedUser(){ return registeredUsers.get(loggedUser);};
+
 	public static void populateAirdesk() {
 		ArrayList<String> newUsers = new ArrayList<String>();
 		ArrayList<String> newWorkspaces = new ArrayList<String>();
@@ -84,29 +86,36 @@ public class AirdeskManager {
 
             // CREATE FILE, ADD CONTENT AND ADD TO PREVIOUSLY CREATED WORKSPACE'S FILE SET
             File newFile = new File(newFiles.get(i));
-            newFile.setContent(newFileContents.get(i));
+            if (i % 2 == 0)
+                newFile.setContent(newFileContents.get(i/2));
             createdFiles.put(newFiles.get(i), newFile);
             newWorkspace.getFiles().put(newFiles.get(i), newFile);
         }
 	}
 
-	public ArrayList<String> login(String username, String email) {
+	public ArrayList<String> login(String nickname, String email) {
 		ArrayList<String> workspaceNames = new ArrayList<String>();
 
-		loggedUser = username;
-		workspaceNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().keySet());
-		workspaceNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().keySet());
+		loggedUser = nickname;
+        if(registeredUsers.get(loggedUser) != null){
+            workspaceNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().keySet());
+            workspaceNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().keySet());
+            return workspaceNames;
+        } else {
+            loggedUser = null;
+            return null;
+        }
 
-		return workspaceNames;
 	}
 
-	public void registerUser(String name, String nickname, String email) throws Exception {
+	public void registerUser(String name, String nickname, String email) throws UserAlreadyExistsException {
 		User user = new User(name, nickname, email);
-		if (getUserByNickname(nickname).equals(null)) {
+		if (getUserByNickname(nickname) == null) {
 			registeredUsers.put(nickname, user);
 		} else {
 			throw new UserAlreadyExistsException();
 		}
+        login(nickname, email);
 	}
 
 	public void addWorkspace(String nickname, String workspace) throws WorkspaceAlreadyExistsException {
@@ -138,8 +147,10 @@ public class AirdeskManager {
 		ArrayList<String> fileNames = new ArrayList<String>();
 
 		currentWorkspace = workspace;
-		fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
-		fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
+        if(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
+		    fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
+        if(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
+            fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
 
 		return fileNames;
 	}
