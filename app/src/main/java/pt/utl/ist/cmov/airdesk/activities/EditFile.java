@@ -61,7 +61,7 @@ public class EditFile extends ActionBarActivity {
 
         String text = ((EditText) findViewById(R.id.fileText)).getText().toString();
 
-        //file.delete(); ??
+        //file.delete();
         file.edit(text);
 
         Intent intent = new Intent(this, ListFiles.class);
