@@ -53,7 +53,9 @@ public class AirdeskManager {
 		return instance;
 	}
 
-    public User getLoggedUser(){ return registeredUsers.get(loggedUser);};
+	public User getLoggedUser() {
+		return registeredUsers.get(loggedUser);
+	}
 
 	public static void populateAirdesk() {
 		ArrayList<String> newUsers = new ArrayList<String>();
@@ -61,7 +63,7 @@ public class AirdeskManager {
 		ArrayList<String> newFiles = new ArrayList<String>();
 		ArrayList<String> newFileContents = new ArrayList<String>();
 
-        // CREATE SOME GIBBERISH DATA TO FILL THE "DATABASE"
+		// CREATE SOME GIBBERISH DATA TO FILL THE "DATABASE"
 		for (int i = 0; i < 10; i ++) {
 			newUsers.add("user" + i);
 			newWorkspaces.add("workspace" + i);
@@ -71,40 +73,40 @@ public class AirdeskManager {
 			}
 		}
 
-        // ADD THE GIBBERISH DATA TO "DATABASE";
-        // ALL DATA CREATION AND MANIPULATION IS DONE MANUALLY
-        // TO PREVENT (AND LATER, TO DETECT) ERRORS
-        for (int i = 0; i < 10; i++) {
-            // CREATE USER
-            User newUser = new User(newUsers.get(i), newUsers.get(i), newUsers.get(i));
-            registeredUsers.put(newUsers.get(i), newUser);
+		// ADD THE GIBBERISH DATA TO "DATABASE";
+		// ALL DATA CREATION AND MANIPULATION IS DONE MANUALLY
+		// TO PREVENT (AND LATER, TO DETECT) ERRORS
+		for (int i = 0; i < 10; i++) {
+			// CREATE USER
+			User newUser = new User(newUsers.get(i), newUsers.get(i), newUsers.get(i));
+			registeredUsers.put(newUsers.get(i), newUser);
 
-            // CREATE WORKSPACE AND ADD TO PREVIOUSLY CREATED USER'S WORKSPACE SET
-            Workspace newWorkspace = new Workspace(50, newWorkspaces.get(i), newUsers.get(i));
-            existingWorkspaces.put(newWorkspaces.get(i), newWorkspace);
-            newUser.getOwnedWorkspaces().put(newWorkspaces.get(i), newWorkspace);
+			// CREATE WORKSPACE AND ADD TO PREVIOUSLY CREATED USER'S WORKSPACE SET
+			Workspace newWorkspace = new Workspace(50, newWorkspaces.get(i), newUsers.get(i));
+			existingWorkspaces.put(newWorkspaces.get(i), newWorkspace);
+			newUser.getOwnedWorkspaces().put(newWorkspaces.get(i), newWorkspace);
 
-            // CREATE FILE, ADD CONTENT AND ADD TO PREVIOUSLY CREATED WORKSPACE'S FILE SET
-            File newFile = new File(newFiles.get(i));
-            if (i % 2 == 0)
-                newFile.setContent(newFileContents.get(i/2));
-            createdFiles.put(newFiles.get(i), newFile);
-            newWorkspace.getFiles().put(newFiles.get(i), newFile);
-        }
+			// CREATE FILE, ADD CONTENT AND ADD TO PREVIOUSLY CREATED WORKSPACE'S FILE SET
+			File newFile = new File(newFiles.get(i));
+			if (i % 2 == 0)
+				newFile.setContent(newFileContents.get(i/2));
+			createdFiles.put(newFiles.get(i), newFile);
+			newWorkspace.getFiles().put(newFiles.get(i), newFile);
+		}
 	}
 
 	public ArrayList<String> login(String nickname, String email) {
 		ArrayList<String> workspaceNames = new ArrayList<String>();
 
 		loggedUser = nickname;
-        if(registeredUsers.get(loggedUser) != null){
-            workspaceNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().keySet());
-            workspaceNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().keySet());
-            return workspaceNames;
-        } else {
-            loggedUser = null;
-            return null;
-        }
+		if (registeredUsers.get(loggedUser) != null) {
+			workspaceNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().keySet());
+			workspaceNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().keySet());
+			return workspaceNames;
+		} else {
+			loggedUser = null;
+			return null;
+		}
 
 	}
 
@@ -115,7 +117,7 @@ public class AirdeskManager {
 		} else {
 			throw new UserAlreadyExistsException();
 		}
-        login(nickname, email);
+		login(nickname, email);
 	}
 
 	public void addWorkspace(String nickname, String workspace) throws WorkspaceAlreadyExistsException {
@@ -147,10 +149,10 @@ public class AirdeskManager {
 		ArrayList<String> fileNames = new ArrayList<String>();
 
 		currentWorkspace = workspace;
-        if(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
-		    fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
-        if(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
-            fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
+		if (registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
+			fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
+		if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
+			fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
 
 		return fileNames;
 	}

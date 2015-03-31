@@ -42,11 +42,12 @@ public class File {
         }
     }
 
-	public void edit(String content) {
-		this.content += content;
+	public void save(String content) {
+		this.content = content;
 	}
 
-	public void delete() {
+	public String delete() {
         this.content = this.content.substring(0, this.content.length() - 1);
+        return this.content;
 	}
 }
