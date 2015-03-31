@@ -160,4 +160,9 @@ public class AirdeskManager {
 	public File getFile(String name) {
 		return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
 	}
+
+
+    public void changeUserPrivileges(String workspaceName, String nickname, boolean[] choices) {
+        /// TODO
+    }
 }

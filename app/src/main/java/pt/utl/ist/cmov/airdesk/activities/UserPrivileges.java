@@ -1,10 +1,13 @@
 package pt.utl.ist.cmov.airdesk.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,16 +48,36 @@ public class UserPrivileges extends ActionBarActivity {
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, userNameList );
         userListView.setAdapter(adapter);
         final Context that = this;
+        final boolean[] choices = new boolean[4];
 
         userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                //fixme DIALOG NOT ACTIVITY
-                Intent intent = new Intent(that, EditFile.class);
-                intent.putExtra("workspaceName", workspaceName);
-                intent.putExtra("username", userNameList.get(position));
-                startActivity(intent);
+                                    final int position, long id) {
+                new AlertDialog.Builder(that)
+                        .setTitle("Edit " + userNameList.get(position) + "'s Privileges")
+                        .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"},  new boolean[]{false,false,false,false}, new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which,
+                                                boolean isChecked) {
+                                    // If the user checked the item, add it to the selected items
+                                choices[which] = isChecked;
+                            }
+
+                        })
+                        .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                AirdeskManager.getInstance().changeUserPrivileges(workspaceName, userNameList.get(position), choices);
+
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
             }
         });
     }
