@@ -15,11 +15,17 @@ public class File {
 	 */
 	private String content;
 
+    /**
+     * The size of the file in kB (each char is 4kB)
+     */
+    private int size;
+
 	public File() {}
 
 	public File(String name) {
 		this.name = name;
 		this.content = "";
+        this.size = 0;
 	}
 
 	public String getName() {
@@ -42,13 +48,13 @@ public class File {
         }
     }
 
+    public int getSize() {
+        return this.size;
+    }
+
 	public void save(String content) {
 		this.content = content;
-	}
-
-	public String delete() {
-        this.content = this.content.substring(0, this.content.length() - 1);
-        return this.content;
+        this.size = this.content.length() * 4;
 	}
 
     public int getSize() {
