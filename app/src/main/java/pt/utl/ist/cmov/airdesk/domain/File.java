@@ -57,7 +57,4 @@ public class File {
         this.size = this.content.length() * 4;
 	}
 
-    public int getSize() {
-        return content.length() * 8;
-    }
 }
