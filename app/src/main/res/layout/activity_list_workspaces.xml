@@ -33,7 +33,7 @@
         android:layout_toLeftOf="@+id/bt_addworkspace"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:text="New name" />
+        android:hint="New name" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -44,6 +44,6 @@
         android:layout_above="@+id/workspaceNameText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:text="Quota" />
+        android:hint="Quota (in kB)" />
 
 </RelativeLayout>

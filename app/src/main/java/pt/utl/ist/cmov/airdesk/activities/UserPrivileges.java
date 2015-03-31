@@ -4,71 +4,66 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.File;
-import pt.utl.ist.cmov.airdesk.domain.Workspace;
+import pt.utl.ist.cmov.airdesk.domain.User;
 
-public class ListFiles extends ActionBarActivity {
+public class UserPrivileges extends ActionBarActivity {
 
-    ArrayAdapter<File> adapter;
-    ListView fileListView;
-    ArrayList<String> fileNameList;
+    ArrayAdapter<User> adapter;
+    ListView userListView;
+    ArrayList<String> userNameList;
     String workspaceName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_files);
+        setContentView(R.layout.activity_user_privileges);
+
         workspaceName = getIntent().getExtras().getString("workspaceName");
 
-        fileNameList = AirdeskManager.getInstance().getFilesFromWorkspace(workspaceName);
+        TextView workspaceNameView = (TextView)findViewById(R.id.workspaceNameText);
+        workspaceNameView.setText(workspaceName);
 
-        fileListView = (ListView) findViewById(R.id.filelist);
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, fileNameList );
-        fileListView.setAdapter(adapter);
+        //fixe me get users from workspace
+        userNameList = AirdeskManager.getInstance().getFilesFromWorkspace(workspaceName);
+
+        userListView = (ListView) findViewById(R.id.userListView);
+        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, userNameList );
+        userListView.setAdapter(adapter);
         final Context that = this;
 
-        fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                //fixme DIALOG NOT ACTIVITY
                 Intent intent = new Intent(that, EditFile.class);
                 intent.putExtra("workspaceName", workspaceName);
-                intent.putExtra("filename", fileNameList.get(position));
+                intent.putExtra("username", userNameList.get(position));
                 startActivity(intent);
             }
         });
-
-        this.fileListView.setLongClickable(true);
-        this.fileListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
-                Intent intent = new Intent(that, fileSettings.class);
-                intent.putExtra("filename", fileNameList.get(position));
-                startActivity(intent);
-                return true;
-            }
-        });
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_list_files, menu);
+        getMenuInflater().inflate(R.menu.menu_user_privileges, menu);
         return true;
     }
 
@@ -85,17 +80,5 @@ public class ListFiles extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void addFile(View v) {
-
-        AirdeskManager manager = AirdeskManager.getInstance();
-
-        String name = ((EditText) findViewById(R.id.fileNameText)).getText().toString();
-
-        manager.getLoggedUser().getOwnedWorkspaces().get(workspaceName).getFiles().put(name, new File(name));
-
-        fileNameList.add(name);
-        adapter.notifyDataSetChanged();
     }
 }

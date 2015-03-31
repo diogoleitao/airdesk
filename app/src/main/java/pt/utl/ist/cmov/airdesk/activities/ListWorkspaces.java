@@ -39,6 +39,8 @@ public class ListWorkspaces extends ActionBarActivity {
         AirdeskManager manager = AirdeskManager.getInstance();
 
         workspaceList = new ArrayList<String>();
+        
+
 
         String nickname = getIntent().getExtras().getString("nickname");
         String email = getIntent().getExtras().getString("email");
@@ -56,6 +58,16 @@ public class ListWorkspaces extends ActionBarActivity {
                 Intent intent = new Intent(that, ListFiles.class);
                 intent.putExtra("workspaceName", workspaceList.get(position));
                 startActivity(intent);
+            }
+        });
+
+        this.workspaceListView.setLongClickable(true);
+        this.workspaceListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+                Intent intent = new Intent(that, workspaceSettings.class);
+                intent.putExtra("workspaceName", workspaceList.get(position));
+                startActivity(intent);
+                return true;
             }
         });
     }

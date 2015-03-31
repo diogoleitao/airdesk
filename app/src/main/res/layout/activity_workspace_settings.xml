@@ -1,0 +1,137 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="pt.utl.ist.cmov.airdesk.activities.workspaceSettings">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/workspaceNameText"
+        android:editable="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quota used/total: "
+        android:id="@+id/quotaText"
+        android:layout_marginTop="48dp"
+        android:layout_below="@+id/workspaceNameText"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/inviteUserText"
+        android:layout_marginTop="55dp"
+        android:hint="User nickname"
+        android:layout_alignRight="@+id/bt_editUserPrivileges"
+        android:layout_alignEnd="@+id/bt_editUserPrivileges"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/quotaText" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Invite User"
+        android:id="@+id/bt_invite"
+        android:layout_alignBottom="@+id/inviteUserText"
+        android:layout_toRightOf="@+id/quotaText"
+        android:layout_toEndOf="@+id/quotaText" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bt_invite"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="64dp"
+        android:id="@+id/linearLayout"
+        android:layout_alignRight="@+id/button"
+        android:layout_alignEnd="@+id/button">
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Write to Files"
+            android:id="@+id/writeFilesBox"
+            android:layout_below="@+id/readFilesBox"
+            android:layout_centerHorizontal="true"
+            android:checked="false" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete Files"
+            android:id="@+id/checkBox"
+            android:checked="false"
+            android:layout_below="@+id/createFilesBox"
+            android:layout_centerHorizontal="true" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Read Files"
+            android:id="@+id/readFilesBox"
+            android:layout_centerHorizontal="true"
+            android:checked="false"
+            android:layout_centerVertical="true" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create Files"
+            android:id="@+id/createFilesBox"
+            android:layout_below="@+id/writeFilesBox"
+            android:layout_centerHorizontal="true"
+            android:checked="false" />
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit User Privileges"
+        android:id="@+id/bt_editUserPrivileges"
+        android:layout_below="@+id/linearLayout"
+        android:layout_centerHorizontal="true"
+        android:onClick="startUserPrivileges" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete this Workspace"
+        android:id="@+id/button"
+        android:layout_below="@+id/bt_editUserPrivileges"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Global Privileges"
+        android:id="@+id/globalPrivilegeText"
+        android:layout_gravity="center_horizontal"
+        android:layout_above="@+id/bt_apply"
+        android:layout_alignLeft="@+id/quotaText"
+        android:layout_alignStart="@+id/quotaText" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply"
+        android:id="@+id/bt_apply"
+        android:layout_alignTop="@+id/linearLayout"
+        android:layout_alignRight="@+id/workspaceNameText"
+        android:layout_alignEnd="@+id/workspaceNameText" />
+
+</RelativeLayout>

@@ -1,42 +1,38 @@
 package pt.utl.ist.cmov.airdesk.activities;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.File;
 
-public class EditFile extends ActionBarActivity {
-
-    String filename;
+public class fileSettings extends ActionBarActivity {
     File file;
-    String workspaceName;
+    String filename;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_file);
-
-        workspaceName = getIntent().getExtras().getString("workspaceName");
+        setContentView(R.layout.activity_file_settings);
         filename = getIntent().getExtras().getString("filename");
         file = AirdeskManager.getInstance().getFile(filename);
 
-        TextView textView = (TextView)findViewById(R.id.fileText);
-        textView.setText(file.getContent());
+        TextView fileNameView = (TextView) findViewById(R.id.fileNameText);
+        fileNameView.setText(filename);
+
+        TextView fileSizeView = (TextView) findViewById(R.id.quotaText);
+        fileSizeView.setText("File size " + file.getSize());
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_edit_file, menu);
+        getMenuInflater().inflate(R.menu.menu_file_settings, menu);
         return true;
     }
 
@@ -53,25 +49,5 @@ public class EditFile extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void save(View v) {
-
-        AirdeskManager manager = AirdeskManager.getInstance();
-
-        String text = ((EditText) findViewById(R.id.fileText)).getText().toString();
-
-        file.save(text);
-
-        Intent intent = new Intent(this, ListFiles.class);
-        intent.putExtra("workspaceName", workspaceName);
-        startActivity(intent);
-    }
-
-    public void cancelFileEdit(View v) {
-
-        Intent intent = new Intent(this, ListFiles.class);
-        intent.putExtra("workspaceName", workspaceName);
-        startActivity(intent);
     }
 }
