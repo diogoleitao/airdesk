@@ -41,11 +41,7 @@ public class File {
     }
 
     public void setContent(String content) {
-        if (this.content.equals("")) {
-            this.content = content;
-        } else {
-            this.content += content;
-        }
+        this.content = content;
     }
 
     public int getSize() {
@@ -56,5 +52,4 @@ public class File {
 		this.content = content;
         this.size = this.content.length() * 4;
 	}
-
 }

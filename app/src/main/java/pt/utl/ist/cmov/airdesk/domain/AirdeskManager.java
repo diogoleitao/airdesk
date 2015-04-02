@@ -107,7 +107,6 @@ public class AirdeskManager {
 			loggedUser = null;
 			return null;
 		}
-
 	}
 
 	public void registerUser(String name, String nickname, String email) throws UserAlreadyExistsException {
@@ -138,6 +137,10 @@ public class AirdeskManager {
 		}
 	}
 
+    public ArrayList<String> getUsersFromWorkspace() {
+        return existingWorkspaces.get(currentWorkspace).getUsers();
+    }
+
 	// TODO
 	public void mountWorkspace(ArrayList<String> nicknames, String workspace) {
 		for (String nickname : nicknames) {
@@ -157,12 +160,25 @@ public class AirdeskManager {
 		return fileNames;
 	}
 
+    public void addNewFile(String fileName) {
+        File newFile = new File(fileName);
+        existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, newFile);
+    }
+
 	public File getFile(String name) {
 		return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
 	}
 
+    public void saveFile(String fileName, String content) {
+        existingWorkspaces.get(currentWorkspace).getFiles().get(fileName).save(content);
+        existingWorkspaces.get(currentWorkspace).updateQuotaOccupied(content.length());
+    }
 
-    public void changeUserPrivileges(String workspaceName, String nickname, boolean[] choices) {
-        /// TODO
+    public void changeUserPrivileges(String workspaceName, String nickname, boolean[] privileges) {
+        existingWorkspaces.get(workspaceName).getAccessLists().get(nickname).setAll(privileges);
+    }
+
+    public boolean[] getUserPrivileges(String workspaceName, String nickname) {
+        return existingWorkspaces.get(workspaceName).getAccessLists().get(nickname).getAll();
     }
 }

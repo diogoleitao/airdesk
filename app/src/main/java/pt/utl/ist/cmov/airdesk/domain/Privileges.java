@@ -63,10 +63,20 @@ public class Privileges {
 		this.delete = delete;
 	}
 
-	public void setAll(boolean accessPrivilege) {
-		setReadPrivilege(accessPrivilege);
-		setWritePrivilege(accessPrivilege);
-		setCreatePrivilege(accessPrivilege);
-		setDeletePrivilege(accessPrivilege);
+	public void setAll(boolean[] privileges) {
+		setReadPrivilege(privileges[0]);
+		setWritePrivilege(privileges[1]);
+		setCreatePrivilege(privileges[2]);
+		setDeletePrivilege(privileges[3]);
 	}
+
+    public boolean[] getAll() {
+        boolean[] privileges = new boolean[4];
+        privileges[0] = read;
+        privileges[1] = write;
+        privileges[2] = create;
+        privileges[3] = delete;
+
+        return privileges;
+    }
 }
