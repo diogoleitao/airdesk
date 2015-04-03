@@ -93,7 +93,7 @@ public class ListFiles extends ActionBarActivity {
 
         String name = ((EditText) findViewById(R.id.fileNameText)).getText().toString();
 
-        manager.getLoggedUser().getOwnedWorkspaces().get(workspaceName).getFiles().put(name, new File(name));
+        manager.addNewFile(name);
 
         fileNameList.add(name);
         adapter.notifyDataSetChanged();

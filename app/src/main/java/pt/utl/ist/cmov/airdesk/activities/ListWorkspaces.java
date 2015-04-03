@@ -102,8 +102,15 @@ public class ListWorkspaces extends ActionBarActivity {
         AirdeskManager manager = AirdeskManager.getInstance();
         User user = manager.getLoggedUser();
         EditText name = (EditText) findViewById(R.id.workspaceNameText);
+        String quotaText = ((EditText) findViewById(R.id.quotaText)).getText().toString();
+        int quota;
+        if (!quotaText.equals("")) {
+            quota = Integer.parseInt(quotaText);
+        } else
+            return;
+
         try {
-            manager.addWorkspace(user.getNickname(), name.getText().toString());
+            manager.addWorkspace(user.getNickname(), name.getText().toString(), quota );
             workspaceList.add(name.getText().toString());
             adapter.notifyDataSetChanged();
         } catch (WorkspaceAlreadyExistsException e) {

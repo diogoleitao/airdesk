@@ -30,8 +30,8 @@ public class workspaceSettings extends ActionBarActivity {
         workspaceNameView.setText(workspaceName);
 
         TextView QuotaView = (TextView) findViewById(R.id.quotaText);
-        //fix me: get real values from manager
-        QuotaView.setText("Quota used/total: " + "100/1000");
+
+        QuotaView.setText("Quota used/total: " + AirdeskManager.getInstance().getTotalQuota(workspaceName) + "/" + AirdeskManager.getInstance().getUsedQuota(workspaceName));
     }
 
 

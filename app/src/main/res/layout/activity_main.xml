@@ -12,7 +12,7 @@
         android:id="@+id/bt_register"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:onClick="cancelFileEdit" />
+        android:onClick="register" />
 
     <EditText
         android:layout_width="wrap_content"

@@ -112,23 +112,24 @@ public class AirdeskManager {
 	}
 
 	public void registerUser(String name, String nickname, String email) throws UserAlreadyExistsException {
-		User user = new User(name, nickname, email);
-		if (getUserByNickname(nickname) == null) {
-			registeredUsers.put(nickname, user);
+        User user = new User(name, nickname, email);
+        if (getUserByNickname(nickname) == null) {
+            registeredUsers.put(nickname, user);
 		} else {
 			throw new UserAlreadyExistsException();
 		}
-		login(nickname, email);
+        loggedUser = nickname;
 	}
 
-	public void addWorkspace(String nickname, String workspace) throws WorkspaceAlreadyExistsException {
+	public void addWorkspace(String nickname, String workspace, int quota) throws WorkspaceAlreadyExistsException {
 		for (String workspaceName : existingWorkspaces.keySet()) {
 			if (workspaceName.equals(workspace)) {
 				throw new WorkspaceAlreadyExistsException();
 			}
 		}
+        existingWorkspaces.put(workspace, new Workspace(quota, workspace, nickname));
 		User user = getUserByNickname(nickname);
-		user.createWorkspace(50, workspace);
+		user.createWorkspace(quota, workspace);
 	}
 
 	public User getUserByNickname(String nickname) {
@@ -154,6 +155,7 @@ public class AirdeskManager {
 		ArrayList<String> fileNames = new ArrayList<String>();
 
 		currentWorkspace = workspace;
+
 		if (registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
 			fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
 		if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
@@ -193,6 +195,18 @@ public class AirdeskManager {
     public void deleteWorkspace(String workspaceName) {
         //TODO
         Log.d("deleteWorkspace", "deleteWorkspace");
+    }
+
+    public int getTotalQuota(String workspaceName) {
+        //TODO
+        Log.d("getQuota", "getQuota");
+        return 0;
+    }
+
+    public int getUsedQuota(String workspaceName) {
+        //TODO
+        Log.d("getQuota", "getQuota");
+        return 0;
     }
 
     public boolean[] getUserPrivileges(String workspaceName, String nickname) {

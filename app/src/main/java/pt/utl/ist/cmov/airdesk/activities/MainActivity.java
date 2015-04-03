@@ -64,7 +64,7 @@ public class MainActivity extends ActionBarActivity {
         CharSequence text;
         try {
             AirdeskManager.getInstance().registerUser( name.getText().toString(),  nickname.getText().toString(),  email.getText().toString());
-        } catch (UserAlreadyExistsException e) {
+        } catch (UserAlreadyExistsException e) {    // excepçoes para controlo ?? mudar
             text = "User Already Exists!";
             toast= Toast.makeText(context, text, duration);
             toast.show();
@@ -77,14 +77,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-
     public void login(View v) {
         nickname = (EditText) findViewById(R.id.nicknameEditText);
         email = (EditText) findViewById(R.id.emailEditText);
 
-        // NAME =/= NICKNAME ??
-
-        if(null == AirdeskManager.getInstance().login(nickname.getText().toString(), email.getText().toString())) {
+       if(null == AirdeskManager.getInstance().login(nickname.getText().toString(), email.getText().toString())) {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             CharSequence text = "Login failed. Please register.";
