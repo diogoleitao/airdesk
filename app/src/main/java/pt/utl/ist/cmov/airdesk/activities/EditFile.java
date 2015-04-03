@@ -68,6 +68,7 @@ public class EditFile extends ActionBarActivity {
         startActivity(intent);
     }
 
+    
     public void cancelFileEdit(View v) {
 
         Intent intent = new Intent(this, ListFiles.class);
