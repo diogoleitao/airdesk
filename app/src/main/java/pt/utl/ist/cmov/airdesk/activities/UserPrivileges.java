@@ -3,17 +3,13 @@ package pt.utl.ist.cmov.airdesk.activities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,12 +17,10 @@ import java.util.ArrayList;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
-import pt.utl.ist.cmov.airdesk.domain.File;
-import pt.utl.ist.cmov.airdesk.domain.User;
 
 public class UserPrivileges extends ActionBarActivity {
 
-    ArrayAdapter<User> adapter;
+    ArrayAdapter<String> adapter;
     ListView userListView;
     ArrayList<String> userNameList;
     String workspaceName;
@@ -44,7 +38,7 @@ public class UserPrivileges extends ActionBarActivity {
         userNameList = AirdeskManager.getInstance().getUsersFromWorkspace(workspaceName);
 
         userListView = (ListView) findViewById(R.id.userListView);
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, userNameList );
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, userNameList );
         userListView.setAdapter(adapter);
         final Context that = this;
         final boolean[] choices = new boolean[4];
