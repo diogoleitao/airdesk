@@ -41,8 +41,7 @@ public class UserPrivileges extends ActionBarActivity {
         TextView workspaceNameView = (TextView)findViewById(R.id.workspaceNameText);
         workspaceNameView.setText(workspaceName);
 
-        //fixe me get users from workspace
-        userNameList = AirdeskManager.getInstance().getFilesFromWorkspace(workspaceName);
+        userNameList = AirdeskManager.getInstance().getUsersFromWorkspace(workspaceName);
 
         userListView = (ListView) findViewById(R.id.userListView);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, userNameList );
@@ -56,7 +55,7 @@ public class UserPrivileges extends ActionBarActivity {
                                     final int position, long id) {
                 new AlertDialog.Builder(that)
                         .setTitle("Edit " + userNameList.get(position) + "'s Privileges")
-                        .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"},  new boolean[]{false,false,false,false}, new DialogInterface.OnMultiChoiceClickListener() {
+                        .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"},  AirdeskManager.getInstance().getUserPrivileges(workspaceName, userNameList.get(position)), new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which,
                                                 boolean isChecked) {
