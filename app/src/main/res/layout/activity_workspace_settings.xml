@@ -45,7 +45,8 @@
         android:id="@+id/bt_invite"
         android:layout_alignBottom="@+id/inviteUserText"
         android:layout_toRightOf="@+id/quotaText"
-        android:layout_toEndOf="@+id/quotaText" />
+        android:layout_toEndOf="@+id/quotaText"
+        android:onClick="inviteUser" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -56,8 +57,8 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="64dp"
         android:id="@+id/linearLayout"
-        android:layout_alignRight="@+id/button"
-        android:layout_alignEnd="@+id/button">
+        android:layout_alignRight="@+id/bt_deleteWorkspace"
+        android:layout_alignEnd="@+id/bt_deleteWorkspace">
 
         <CheckBox
             android:layout_width="wrap_content"
@@ -72,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Delete Files"
-            android:id="@+id/checkBox"
+            android:id="@+id/deleteFilesBox"
             android:checked="false"
             android:layout_below="@+id/createFilesBox"
             android:layout_centerHorizontal="true" />
@@ -110,9 +111,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Delete this Workspace"
-        android:id="@+id/button"
+        android:id="@+id/bt_deleteWorkspace"
         android:layout_below="@+id/bt_editUserPrivileges"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="deleteThis" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -132,6 +134,7 @@
         android:id="@+id/bt_apply"
         android:layout_alignTop="@+id/linearLayout"
         android:layout_alignRight="@+id/workspaceNameText"
-        android:layout_alignEnd="@+id/workspaceNameText" />
+        android:layout_alignEnd="@+id/workspaceNameText"
+        android:onClick="applyGlobalPrivileges" />
 
 </RelativeLayout>

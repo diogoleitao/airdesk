@@ -1,15 +1,20 @@
 package pt.utl.ist.cmov.airdesk.activities;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
+import pt.utl.ist.cmov.airdesk.domain.User;
 
 public class workspaceSettings extends ActionBarActivity {
     String workspaceName;
@@ -56,5 +61,46 @@ public class workspaceSettings extends ActionBarActivity {
         Intent intent = new Intent(this, UserPrivileges.class);
         intent.putExtra("workspaceName", workspaceName);
         startActivity(intent);
+    }
+
+    public void applyGlobalPrivileges(View v){
+        boolean[] choices = new boolean[4];
+
+        choices[0] = ((CheckBox) findViewById(R.id.writeFilesBox)).isChecked();
+        choices[2] = ((CheckBox) findViewById(R.id.deleteFilesBox)).isChecked();
+        choices[3] = ((CheckBox) findViewById(R.id.readFilesBox)).isChecked();
+        choices[4] = ((CheckBox) findViewById(R.id.createFilesBox)).isChecked();
+
+        AirdeskManager.getInstance().applyGlobalPrivileges(workspaceName, choices);
+    }
+
+    public void inviteUser(View v){
+
+        String username = ((TextView)findViewById(R.id.inviteUserText)).getText().toString();
+        AirdeskManager.getInstance().inviteUser(workspaceName, username);
+    }
+
+    public void deleteThis(View v){
+        final Context that = this;
+        new AlertDialog.Builder(this)
+                .setTitle("Delete " + workspaceName + "?")
+                .setMessage("This action is irreversible.")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        AirdeskManager.getInstance().deleteWorkspace(workspaceName);
+                        User user =  AirdeskManager.getInstance().getLoggedUser();
+                        Intent intent = new Intent(that, ListWorkspaces.class);
+                        intent.putExtra("nickname", user.getNickname());
+                        intent.putExtra("email", user.getEmail());
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

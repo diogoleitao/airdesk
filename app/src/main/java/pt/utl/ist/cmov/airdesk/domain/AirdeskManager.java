@@ -1,5 +1,7 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -163,6 +165,22 @@ public class AirdeskManager {
 
 
     public void changeUserPrivileges(String workspaceName, String nickname, boolean[] choices) {
-        /// TODO
+        // TODO
+        Log.d("changeUserPrivileges","changeUserPrivileges");
+    }
+
+    public void applyGlobalPrivileges(String workspaceName, boolean[] choices) {
+        //TODO
+        Log.d("applyGlobalPrivileges","applyGlobalPrivileges");
+    }
+
+    public void inviteUser(String workspaceName, String username) {
+        //TODO
+        Log.d("inviteUser","inviteUser");
+    }
+
+    public void deleteWorkspace(String workspaceName) {
+        //TODO
+        Log.d("deleteWorkspace","deleteWorkspace");
     }
 }

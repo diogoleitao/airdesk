@@ -39,12 +39,14 @@ public class ListWorkspaces extends ActionBarActivity {
         AirdeskManager manager = AirdeskManager.getInstance();
 
         workspaceList = new ArrayList<String>();
-        
-
 
         String nickname = getIntent().getExtras().getString("nickname");
         String email = getIntent().getExtras().getString("email");
-        workspaceList = manager.login(nickname, email);
+
+        if( manager.login(nickname, email) != null)
+            workspaceList = manager.login(nickname, email);
+        else
+            Log.d("NULL USER","NULL USER");
 
         workspaceListView = (ListView) findViewById(R.id.workspaceList);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, workspaceList );
