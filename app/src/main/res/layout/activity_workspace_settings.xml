@@ -33,7 +33,9 @@
         android:layout_below="@+id/quotaText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="58dp" />
+        android:layout_marginTop="58dp"
+        android:layout_alignRight="@+id/bt_editUserPrivileges"
+        android:layout_alignEnd="@+id/bt_editUserPrivileges" />
 
     <Button
         android:layout_width="wrap_content"
@@ -109,8 +111,8 @@
         android:id="@+id/bt_deleteWorkspace"
         android:onClick="deleteThis"
         android:layout_above="@+id/bt_addtopic"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="63dp" />
+        android:layout_toLeftOf="@+id/bt_addtopic"
+        android:layout_toStartOf="@+id/bt_addtopic" />
 
     <TextView
         android:layout_width="wrap_content"

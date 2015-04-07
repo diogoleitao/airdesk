@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
@@ -37,7 +38,8 @@ public class UserPrivileges extends ActionBarActivity {
         TextView workspaceNameView = (TextView)findViewById(R.id.workspaceNameText);
         workspaceNameView.setText(workspaceName);
 
-        userNameList = AirdeskManager.getInstance().getUsersFromWorkspace();
+        userNameList = new ArrayList<String>(AirdeskManager.getInstance().getUsersFromWorkspace());
+        userNameList.remove(AirdeskManager.getInstance().getLoggedUser());
 
         userListView = (ListView) findViewById(R.id.userListView);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, userNameList );
