@@ -97,7 +97,7 @@ public class AirdeskManager {
 		}
 	}
 
-	public ArrayList<String> login(String nickname, String email) {
+	public ArrayList<String> login(String nickname) {
 		ArrayList<String> workspaceNames = new ArrayList<String>();
 
 		loggedUser = nickname;
@@ -121,14 +121,14 @@ public class AirdeskManager {
         loggedUser = nickname;
 	}
 
-	public void addWorkspace(String nickname, String workspace, int quota) throws WorkspaceAlreadyExistsException {
+	public void addWorkspace(String workspace, int quota) throws WorkspaceAlreadyExistsException {
 		for (String workspaceName : existingWorkspaces.keySet()) {
 			if (workspaceName.equals(workspace)) {
 				throw new WorkspaceAlreadyExistsException();
 			}
 		}
-        existingWorkspaces.put(workspace, new Workspace(quota, workspace, nickname));
-		User user = getUserByNickname(nickname);
+        existingWorkspaces.put(workspace, new Workspace(quota, workspace, loggedUser));
+		User user = getUserByNickname(loggedUser);
 		user.createWorkspace(quota, workspace);
 	}
 
@@ -140,8 +140,8 @@ public class AirdeskManager {
 		}
 	}
 
-    public ArrayList<String> getUsersFromWorkspace(String workspaceName) {
-        return existingWorkspaces.get(workspaceName).getUsers();
+    public ArrayList<String> getUsersFromWorkspace() {
+        return existingWorkspaces.get(currentWorkspace).getUsers();
     }
 
 	// TODO
@@ -170,16 +170,17 @@ public class AirdeskManager {
     }
 
 	public File getFile(String name) {
+        currentFile = name;
 		return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
 	}
 
-    public void saveFile(String fileName, String content) {
-        existingWorkspaces.get(currentWorkspace).getFiles().get(fileName).save(content);
+    public void saveFile(String content) {
+        existingWorkspaces.get(currentWorkspace).getFiles().get(currentFile).save(content);
         existingWorkspaces.get(currentWorkspace).updateQuotaOccupied(content.length());
     }
 
-    public void changeUserPrivileges(String workspaceName, String nickname, boolean[] privileges) {
-        existingWorkspaces.get(workspaceName).getAccessLists().get(nickname).setAll(privileges);
+    public void changeUserPrivileges(String nickname, boolean[] privileges) {
+        existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname).setAll(privileges);
     }
 
     public void applyGlobalPrivileges(String workspaceName, boolean[] choices) {
