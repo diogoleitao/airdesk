@@ -31,6 +31,11 @@ public class ListWorkspaces extends ActionBarActivity {
     ArrayList<String> workspaceList;
 
     @Override
+    public void onBackPressed() {
+        logout(findViewById(R.id.bt_logout));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_workspaces);
@@ -41,11 +46,10 @@ public class ListWorkspaces extends ActionBarActivity {
 
         String nickname = manager.getLoggedUser();
 
-        assert( manager.login(nickname) != null);
         workspaceList = manager.login(nickname);
 
         workspaceListView = (ListView) findViewById(R.id.workspaceList);
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, workspaceList );
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, workspaceList );
         workspaceListView.setAdapter(adapter);
         final Context that = this;
 
@@ -98,7 +102,8 @@ public class ListWorkspaces extends ActionBarActivity {
         AirdeskManager manager = AirdeskManager.getInstance();
         EditText name = (EditText) findViewById(R.id.workspaceNameText);
         String workspaceName = name.getText().toString();
-        String quotaText = ((EditText) findViewById(R.id.quotaText)).getText().toString();
+        EditText quotaView = (EditText) findViewById(R.id.quotaText);
+        String quotaText = quotaView.getText().toString();
         int quota;
         if (!quotaText.equals("")) {
             quota = Integer.parseInt(quotaText);
@@ -113,6 +118,9 @@ public class ListWorkspaces extends ActionBarActivity {
 
             workspaceList.add(name.getText().toString());
             adapter.notifyDataSetChanged();
+            name.setText("");
+            quotaView.setText("");
+
         } catch (WorkspaceAlreadyExistsException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();

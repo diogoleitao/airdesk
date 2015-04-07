@@ -79,15 +79,16 @@ public class AirdeskManager {
 			registeredUsers.put(newUsers.get(i), newUser);
 
 			// CREATE WORKSPACE AND ADD TO PREVIOUSLY CREATED USER'S WORKSPACE SET
-			Workspace newWorkspace = new Workspace(50, newWorkspaces.get(i), newUsers.get(i));
+			Workspace newWorkspace = new Workspace(5000, newWorkspaces.get(i), newUsers.get(i));
 			existingWorkspaces.put(newWorkspaces.get(i), newWorkspace);
 			newUser.getOwnedWorkspaces().put(newWorkspaces.get(i), newWorkspace);
 
 			// CREATE FILE, ADD CONTENT AND ADD TO PREVIOUSLY CREATED WORKSPACE'S FILE SET
 			File newFile = new File(newFiles.get(i));
 			if (i % 2 == 0)
-				newFile.setContent(newFileContents.get(i/2));
+				newFile.save(newFileContents.get(i/2));
 			newWorkspace.getFiles().put(newFiles.get(i), newFile);
+            newWorkspace.updateQuotaOccupied(newFile.getSize());
 		}
 	}
 
@@ -128,7 +129,7 @@ public class AirdeskManager {
 		}
 
         User user = getUserByNickname(loggedUser);
-		existingWorkspaces.put(workspaceName, user.createWorkspace(quota, workspaceName));
+		existingWorkspaces.put(workspaceName, user.createWorkspace(quota*1024, workspaceName));
 	}
 
     public void deleteWorkspace(String workspaceName) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
@@ -185,12 +186,12 @@ public class AirdeskManager {
     }
 
 	public void changeUserPrivileges(String nickname, boolean[] privileges) {
-        // TODO: change this to be apllied from a user's perspective
+        // TODO: change this to be applied from a user's perspective
 		existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname).setAll(privileges);
 	}
 
 	public void applyGlobalPrivileges(String workspaceName, boolean[] choices) {
-        // TODO: change this to be apllied from a user's perspective
+        // TODO: change this to be applied from a user's perspective
 		for (Privileges userPrivileges : existingWorkspaces.get(workspaceName).getAccessLists().values())
             userPrivileges.setAll(choices);
 	}
@@ -201,7 +202,7 @@ public class AirdeskManager {
         else {
             registeredUsers.get(loggedUser).addUserToWorkspace(username, workspaceName);
             registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(workspaceName));
-            existingWorkspaces.get(workspaceName).getUsers().add(username);
+            existingWorkspaces.get(workspaceName).addUser(username);
         }
 	}
 

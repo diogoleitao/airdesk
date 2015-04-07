@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,12 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 
 public class workspaceSettings extends ActionBarActivity {
     String workspaceName;
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, ListWorkspaces.class);
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +89,13 @@ public class workspaceSettings extends ActionBarActivity {
         String username = ((TextView)findViewById(R.id.inviteUserText)).getText().toString();
         try {
             AirdeskManager.getInstance().inviteUser(workspaceName, username);
+            Context context = getApplicationContext();
+            CharSequence text = "Invitation sent.";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            ((TextView)findViewById(R.id.inviteUserText)).setText("");
         } catch (UserDoesNotExistException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();
@@ -120,5 +134,12 @@ public class workspaceSettings extends ActionBarActivity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    public void addTopic(View v){
+        EditText topicView = ((EditText)findViewById(R.id.newTopicText));
+        String topicname = topicView.getText().toString();
+        AirdeskManager.getInstance().addTopicToWorkspace(topicname);
+        topicView.setText("");
     }
 }

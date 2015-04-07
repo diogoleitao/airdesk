@@ -22,7 +22,6 @@
         android:layout_height="wrap_content"
         android:text="Quota used/total: "
         android:id="@+id/quotaText"
-        android:layout_marginTop="48dp"
         android:layout_below="@+id/workspaceNameText"
         android:layout_centerHorizontal="true" />
 
@@ -30,35 +29,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/inviteUserText"
-        android:layout_marginTop="55dp"
         android:hint="User nickname"
+        android:layout_below="@+id/quotaText"
         android:layout_alignRight="@+id/bt_editUserPrivileges"
         android:layout_alignEnd="@+id/bt_editUserPrivileges"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/quotaText" />
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Invite User"
         android:id="@+id/bt_invite"
+        android:onClick="inviteUser"
         android:layout_alignBottom="@+id/inviteUserText"
-        android:layout_toRightOf="@+id/quotaText"
-        android:layout_toEndOf="@+id/quotaText"
-        android:onClick="inviteUser" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/bt_invite"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="64dp"
         android:id="@+id/linearLayout"
-        android:layout_alignRight="@+id/bt_deleteWorkspace"
-        android:layout_alignEnd="@+id/bt_deleteWorkspace">
+        android:layout_below="@+id/globalPrivilegeText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <CheckBox
             android:layout_width="wrap_content"
@@ -122,7 +117,7 @@
         android:text="Global Privileges"
         android:id="@+id/globalPrivilegeText"
         android:layout_gravity="center_horizontal"
-        android:layout_above="@+id/bt_apply"
+        android:layout_below="@+id/inviteUserText"
         android:layout_alignLeft="@+id/quotaText"
         android:layout_alignStart="@+id/quotaText" />
 
@@ -136,5 +131,27 @@
         android:layout_alignRight="@+id/workspaceNameText"
         android:layout_alignEnd="@+id/workspaceNameText"
         android:onClick="applyGlobalPrivileges" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Topic"
+        android:id="@+id/bt_addtopic"
+        android:layout_below="@+id/bt_deleteWorkspace"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="addTopic" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/newTopicText"
+        android:layout_alignBottom="@+id/bt_addtopic"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/bt_addtopic"
+        android:layout_toStartOf="@+id/bt_addtopic"
+        android:hint="New topic" />
 
 </RelativeLayout>

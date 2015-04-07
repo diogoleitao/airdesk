@@ -3,6 +3,7 @@ package pt.utl.ist.cmov.airdesk.activities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,6 +25,12 @@ public class UserPrivileges extends ActionBarActivity {
     ListView userListView;
     ArrayList<String> userNameList;
     String workspaceName;
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, ListWorkspaces.class);
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -29,11 +29,16 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 
 public class ListFiles extends ActionBarActivity {
 
-    ArrayAdapter<File> adapter;
+    ArrayAdapter<String> adapter;
     ListView fileListView;
     ArrayList<String> fileNameList;
     String workspaceName;
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, ListWorkspaces.class);
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +51,7 @@ public class ListFiles extends ActionBarActivity {
         fileNameList = manager.getFilesFromWorkspace(workspaceName);
 
         fileListView = (ListView) findViewById(R.id.filelist);
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, fileNameList );
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileNameList );
         fileListView.setAdapter(adapter);
         final Context that = this;
 
@@ -65,6 +70,7 @@ public class ListFiles extends ActionBarActivity {
                     toast.show();
                 } else {
                     Intent intent = new Intent(that, EditFile.class);
+                    manager.getFile(fileNameList.get(position));
                     startActivity(intent);
                 }
             }
@@ -80,6 +86,8 @@ public class ListFiles extends ActionBarActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
                                     AirdeskManager.getInstance().deleteFile(fileNameList.get(position));
+                                    fileNameList.remove(position);
+                                    adapter.notifyDataSetChanged();
                                 } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
                                     Context context = getApplicationContext();
                                     CharSequence text = e.getMessage();
@@ -88,8 +96,6 @@ public class ListFiles extends ActionBarActivity {
                                     Toast toast = Toast.makeText(context, text, duration);
                                     toast.show();
                                 }
-                                Intent intent = new Intent(that, ListFiles.class);
-                                startActivity(intent);
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -131,16 +137,8 @@ public class ListFiles extends ActionBarActivity {
 
         AirdeskManager manager = AirdeskManager.getInstance();
 
-        boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
-
-        if(!privileges[2]) { // create privilege
-            Context context = getApplicationContext();
-            CharSequence text = "You don't have privilege to add files!";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        } else {
-            String name = ((EditText) findViewById(R.id.fileNameText)).getText().toString();
+            EditText filenameView = (EditText) findViewById(R.id.fileNameText);
+            String name = filenameView.getText().toString();
 
             if(name.equals(""))
                 return;
@@ -155,6 +153,7 @@ public class ListFiles extends ActionBarActivity {
             } else {
                 try {
                     manager.addNewFile(name);
+                    filenameView.setText("");
                 } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
                     Context context = getApplicationContext();
                     CharSequence text = e.getMessage();
@@ -169,4 +168,4 @@ public class ListFiles extends ActionBarActivity {
             }
         }
     }
-}
+

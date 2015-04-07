@@ -138,7 +138,7 @@ public class Workspace {
     }
 
     public void updateQuotaOccupied(int fileSize) {
-        this.quota += fileSize;
+        this.quotaOccupied += fileSize;
     }
 
     public void addTopic(String topic) {
