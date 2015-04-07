@@ -55,9 +55,9 @@ public class AirdeskManager {
 		return instance;
 	}
 
-	public User getLoggedUser() {
-		return registeredUsers.get(loggedUser);
-	}
+    public User getLoggedUser() {
+        return registeredUsers.get(loggedUser);
+    }
 
 	public static void populateAirdesk() {
 		ArrayList<String> newUsers = new ArrayList<String>();
@@ -121,15 +121,19 @@ public class AirdeskManager {
         loggedUser = nickname;
 	}
 
-	public void addWorkspace(String workspace, int quota) throws WorkspaceAlreadyExistsException {
-		for (String workspaceName : existingWorkspaces.keySet()) {
-			if (workspaceName.equals(workspace)) {
+	public void addWorkspace(String workspaceName, int quota) throws WorkspaceAlreadyExistsException {
+		for (String w : existingWorkspaces.keySet()) {
+			if (w.equals(workspaceName)) {
 				throw new WorkspaceAlreadyExistsException();
 			}
 		}
-        existingWorkspaces.put(workspace, new Workspace(quota, workspace, loggedUser));
+        Workspace workspace = new Workspace(quota, workspaceName, loggedUser);
+        HashMap<String, Privileges> accessList = new HashMap<String, Privileges>();
+        accessList.put(loggedUser, new Privileges(true,true,true,true));
+        workspace.setAccessLists(accessList);
+        existingWorkspaces.put(workspaceName, workspace);
 		User user = getUserByNickname(loggedUser);
-		user.createWorkspace(quota, workspace);
+		user.createWorkspace(quota, workspaceName);
 	}
 
 	public User getUserByNickname(String nickname) {
@@ -154,12 +158,10 @@ public class AirdeskManager {
 	public ArrayList<String> getFilesFromWorkspace(String workspace) {
 		ArrayList<String> fileNames = new ArrayList<String>();
 
-		currentWorkspace = workspace;
-
-		if (registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
-			fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
-		if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
-			fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
+		if (registeredUsers.get(loggedUser).getOwnedWorkspaces().get(workspace) != null)
+			fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(workspace).getFiles().keySet());
+		if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(workspace) != null)
+			fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(workspace).getFiles().keySet());
 
 		return fileNames;
 	}
@@ -167,6 +169,7 @@ public class AirdeskManager {
     public void addNewFile(String fileName) {
         File newFile = new File(fileName);
         existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, newFile);
+        getLoggedUser().getOwnedWorkspaces().get(currentWorkspace).getFiles().put(fileName, newFile);
     }
 
 	public File getFile(String name) {
@@ -199,18 +202,43 @@ public class AirdeskManager {
     }
 
     public int getTotalQuota(String workspaceName) {
-        //TODO
-        Log.d("getQuota", "getQuota");
-        return 0;
+        return existingWorkspaces.get(workspaceName).getQuota();
     }
 
     public int getUsedQuota(String workspaceName) {
-        //TODO
-        Log.d("getQuota", "getQuota");
-        return 0;
+        return existingWorkspaces.get(workspaceName).getQuotaOccupied();
     }
 
-    public boolean[] getUserPrivileges(String workspaceName, String nickname) {
-        return existingWorkspaces.get(workspaceName).getAccessLists().get(nickname).getAll();
+    public boolean[] getUserPrivileges(String nickname) {
+        if (existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname) == null)
+            return new boolean[] {false,false,false,false};
+        return existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname).getAll();
+    }
+
+    public void logout() {
+        loggedUser="";
+    }
+
+    public void deleteFile(String filename) {
+    }
+
+    public void renameFile(String filename, String newfilename) {
+
+    }
+
+    public String getCurrentFile() {
+        return currentFile;
+    }
+
+    public String getCurrentWorkspace() {
+        return currentWorkspace;
+    }
+
+    public void setCurrentWorkspace(String currentWorkspace) {
+        this.currentWorkspace = currentWorkspace;
+    }
+
+    public void setCurrentFile(String currentFile) {
+        this.currentFile = currentFile;
     }
 }

@@ -27,12 +27,12 @@ public class Workspace {
 	/**
 	 * Mapping between user's nickname and their privileges regarding the workspace
 	 */
-	private HashMap<String, Privileges> accessLists;
+	private HashMap<String, Privileges> accessLists = new HashMap<String, Privileges>();
 
 	/**
 	 * A list of the topics that the workspace covers
 	 */
-	private ArrayList<String> topics;
+	private ArrayList<String> topics = new ArrayList<String>();
 
 	/**
 	 * If true, the workspace is private; false, if it is public

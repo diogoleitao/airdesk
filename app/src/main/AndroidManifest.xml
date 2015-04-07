@@ -32,11 +32,6 @@
             android:parentActivityName=".activities.ListFiles" >
         </activity>
         <activity
-            android:name=".activities.fileSettings"
-            android:label="@string/title_activity_file_settings"
-            android:parentActivityName=".activities.ListFiles" >
-        </activity>
-        <activity
             android:name=".activities.workspaceSettings"
             android:label="@string/title_activity_workspace_settings"
             android:parentActivityName=".activities.ListWorkspaces" >

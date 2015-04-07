@@ -24,9 +24,10 @@ public class EditFile extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_file);
 
-        workspaceName = getIntent().getExtras().getString("workspaceName");
-        filename = getIntent().getExtras().getString("filename");
-        file = AirdeskManager.getInstance().getFile(filename);
+        AirdeskManager manager = AirdeskManager.getInstance();
+        workspaceName = manager.getCurrentWorkspace();
+        filename = manager.getCurrentFile();
+        file = manager.getFile(filename);
 
         TextView textView = (TextView)findViewById(R.id.fileText);
         textView.setText(file.getContent());
@@ -61,18 +62,16 @@ public class EditFile extends ActionBarActivity {
 
         String text = ((EditText) findViewById(R.id.fileText)).getText().toString();
 
-        manager.saveFile(filename, text);
+        manager.saveFile(text);
 
         Intent intent = new Intent(this, ListFiles.class);
-        intent.putExtra("workspaceName", workspaceName);
         startActivity(intent);
     }
 
-    
-    public void cancelFileEdit(View v) {
 
+
+    public void cancelFileEdit(View v) {
         Intent intent = new Intent(this, ListFiles.class);
-        intent.putExtra("workspaceName", workspaceName);
         startActivity(intent);
     }
 }

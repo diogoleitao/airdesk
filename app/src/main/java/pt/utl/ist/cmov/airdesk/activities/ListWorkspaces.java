@@ -30,23 +30,19 @@ public class ListWorkspaces extends ActionBarActivity {
     ListView workspaceListView;
     ArrayList<String> workspaceList;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_workspaces);
 
-        AirdeskManager manager = AirdeskManager.getInstance();
+        final AirdeskManager manager = AirdeskManager.getInstance();
 
         workspaceList = new ArrayList<String>();
 
-        String nickname = getIntent().getExtras().getString("nickname");
-        String email = getIntent().getExtras().getString("email");
+        String nickname = manager.getLoggedUser().getNickname();
 
-        if( manager.login(nickname, email) != null)
-            workspaceList = manager.login(nickname, email);
-        else
-            Log.d("NULL USER","NULL USER");
+        assert( manager.login(nickname) != null);
+        workspaceList = manager.login(nickname);
 
         workspaceListView = (ListView) findViewById(R.id.workspaceList);
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, workspaceList );
@@ -58,7 +54,7 @@ public class ListWorkspaces extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 Intent intent = new Intent(that, ListFiles.class);
-                intent.putExtra("workspaceName", workspaceList.get(position));
+                manager.setCurrentWorkspace(workspaceList.get(position));
                 startActivity(intent);
             }
         });
@@ -67,7 +63,7 @@ public class ListWorkspaces extends ActionBarActivity {
         this.workspaceListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent = new Intent(that, workspaceSettings.class);
-                intent.putExtra("workspaceName", workspaceList.get(position));
+                manager.setCurrentWorkspace(workspaceList.get(position));
                 startActivity(intent);
                 return true;
             }
@@ -102,6 +98,7 @@ public class ListWorkspaces extends ActionBarActivity {
         AirdeskManager manager = AirdeskManager.getInstance();
         User user = manager.getLoggedUser();
         EditText name = (EditText) findViewById(R.id.workspaceNameText);
+        String workspaceName = name.getText().toString();
         String quotaText = ((EditText) findViewById(R.id.quotaText)).getText().toString();
         int quota;
         if (!quotaText.equals("")) {
@@ -109,8 +106,12 @@ public class ListWorkspaces extends ActionBarActivity {
         } else
             return;
 
+        if(workspaceName.equals(""))
+            return;
+
         try {
-            manager.addWorkspace(user.getNickname(), name.getText().toString(), quota );
+            manager.addWorkspace(workspaceName, quota);
+
             workspaceList.add(name.getText().toString());
             adapter.notifyDataSetChanged();
         } catch (WorkspaceAlreadyExistsException e) {
@@ -121,5 +122,11 @@ public class ListWorkspaces extends ActionBarActivity {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
+    }
+
+    public void logout(View v) {
+        AirdeskManager.getInstance().logout();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

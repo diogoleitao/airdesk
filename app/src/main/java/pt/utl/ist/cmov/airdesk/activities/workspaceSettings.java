@@ -24,14 +24,15 @@ public class workspaceSettings extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workspace_settings);
 
-        workspaceName = getIntent().getExtras().getString("workspaceName");
+        AirdeskManager manager = AirdeskManager.getInstance();
+        workspaceName = manager.getCurrentWorkspace();
 
         TextView workspaceNameView = (TextView) findViewById(R.id.workspaceNameText);
         workspaceNameView.setText(workspaceName);
 
         TextView QuotaView = (TextView) findViewById(R.id.quotaText);
 
-        QuotaView.setText("Quota used/total: " + AirdeskManager.getInstance().getTotalQuota(workspaceName) + "/" + AirdeskManager.getInstance().getUsedQuota(workspaceName));
+        QuotaView.setText("Quota used/total: " + manager.getUsedQuota(workspaceName) + "/" + manager.getTotalQuota(workspaceName));
     }
 
 
@@ -59,7 +60,6 @@ public class workspaceSettings extends ActionBarActivity {
 
     public void startUserPrivileges(View v){
         Intent intent = new Intent(this, UserPrivileges.class);
-        intent.putExtra("workspaceName", workspaceName);
         startActivity(intent);
     }
 
@@ -88,10 +88,7 @@ public class workspaceSettings extends ActionBarActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         AirdeskManager.getInstance().deleteWorkspace(workspaceName);
-                        User user =  AirdeskManager.getInstance().getLoggedUser();
                         Intent intent = new Intent(that, ListWorkspaces.class);
-                        intent.putExtra("nickname", user.getNickname());
-                        intent.putExtra("email", user.getEmail());
                         startActivity(intent);
                     }
                 })

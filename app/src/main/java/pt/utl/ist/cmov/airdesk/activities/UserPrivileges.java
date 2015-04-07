@@ -30,12 +30,13 @@ public class UserPrivileges extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_privileges);
 
-        workspaceName = getIntent().getExtras().getString("workspaceName");
+        AirdeskManager manager = AirdeskManager.getInstance();
+        workspaceName = manager.getCurrentWorkspace();
 
         TextView workspaceNameView = (TextView)findViewById(R.id.workspaceNameText);
         workspaceNameView.setText(workspaceName);
 
-        userNameList = AirdeskManager.getInstance().getUsersFromWorkspace(workspaceName);
+        userNameList = AirdeskManager.getInstance().getUsersFromWorkspace();
 
         userListView = (ListView) findViewById(R.id.userListView);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, userNameList );
@@ -49,7 +50,7 @@ public class UserPrivileges extends ActionBarActivity {
                                     final int position, long id) {
                 new AlertDialog.Builder(that)
                         .setTitle("Edit " + userNameList.get(position) + "'s Privileges")
-                        .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"},  AirdeskManager.getInstance().getUserPrivileges(workspaceName, userNameList.get(position)), new DialogInterface.OnMultiChoiceClickListener() {
+                        .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"},  AirdeskManager.getInstance().getUserPrivileges(userNameList.get(position)), new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which,
                                                 boolean isChecked) {
@@ -60,7 +61,7 @@ public class UserPrivileges extends ActionBarActivity {
                         })
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                AirdeskManager.getInstance().changeUserPrivileges(workspaceName, userNameList.get(position), choices);
+                                AirdeskManager.getInstance().changeUserPrivileges(userNameList.get(position), choices);
 
                             }
                         })

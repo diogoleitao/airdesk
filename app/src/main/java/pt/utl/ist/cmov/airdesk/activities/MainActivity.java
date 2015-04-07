@@ -71,17 +71,14 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
         Intent intent = new Intent(this, ListWorkspaces.class);
-        intent.putExtra("nickname", nickname.getText().toString());
-        intent.putExtra("email", email.getText().toString());
         startActivity(intent);
     }
 
 
     public void login(View v) {
         nickname = (EditText) findViewById(R.id.nicknameEditText);
-        email = (EditText) findViewById(R.id.emailEditText);
 
-       if(null == AirdeskManager.getInstance().login(nickname.getText().toString(), email.getText().toString())) {
+       if(null == AirdeskManager.getInstance().login(nickname.getText().toString())) {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             CharSequence text = "Login failed. Please register.";
@@ -91,8 +88,6 @@ public class MainActivity extends ActionBarActivity {
         }
 
         Intent intent = new Intent(this, ListWorkspaces.class);
-        intent.putExtra("nickname", nickname.getText().toString());
-        intent.putExtra("email", email.getText().toString());
         startActivity(intent);
     }
 }

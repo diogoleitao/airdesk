@@ -10,10 +10,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/workspaceList"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/quotaText" />
+        android:layout_above="@+id/quotaText"
+        android:layout_below="@+id/bt_logout" />
 
     <Button
         android:layout_width="wrap_content"
@@ -45,5 +45,14 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:hint="Quota (in kB)" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:id="@+id/bt_logout"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="logout" />
 
 </RelativeLayout>
