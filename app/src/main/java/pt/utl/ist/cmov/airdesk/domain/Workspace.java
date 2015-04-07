@@ -3,6 +3,8 @@ package pt.utl.ist.cmov.airdesk.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
+
 public class Workspace {
 	/**
 	 * The maximum size of the workspace (in kB)
@@ -137,5 +139,19 @@ public class Workspace {
 
     public void updateQuotaOccupied(int fileSize) {
         this.quota += fileSize;
+    }
+
+    public void addTopic(String topic) {
+        topics.add(topic);
+    }
+
+    public void saveFile(String currentFile, String content) throws WorkspaceQuotaReachedException {
+        int size = content.length() * 4;
+        if ((quotaOccupied + size) > quota) {
+            throw new WorkspaceQuotaReachedException();
+        } else {
+            files.get(currentFile).save(content);
+            updateQuotaOccupied(size);
+        }
     }
 }

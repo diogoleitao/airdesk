@@ -10,6 +10,7 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCre
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
 public class AirdeskManager {
 
@@ -148,6 +149,11 @@ public class AirdeskManager {
         return fileNames;
     }
 
+    public void addTopicToWorkspace(String topic) {
+        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).addTopic(topic); // ????
+        //existingWorkspaces.get(currentWorkspace).addTopic(topic);
+    }
+
 	public User getUserByNickname(String nickname) {
 		if (registeredUsers.keySet().contains(nickname)) {
 			return registeredUsers.get(nickname);
@@ -169,9 +175,8 @@ public class AirdeskManager {
 		return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
 	}
 
-	public void saveFile(String content) {
-		existingWorkspaces.get(currentWorkspace).getFiles().get(currentFile).save(content);
-		existingWorkspaces.get(currentWorkspace).updateQuotaOccupied(content.length());
+	public void saveFile(String content) throws WorkspaceQuotaReachedException {
+        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).saveFile(currentFile, content);
 	}
 
     public void deleteFile(String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
