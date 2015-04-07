@@ -3,6 +3,9 @@ package pt.utl.ist.cmov.airdesk.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
+
 public class User {
 
 	/**
@@ -98,24 +101,31 @@ public class User {
 	 *
 	 * @param quota the maximum size assigned to the workspace
 	 * @param name the workspace's identifier
-	 * @return a new workspace object with size 'quota' and identifier 'name'
 	 */
-	public void createWorkspace(int quota, String name) {
+	public Workspace createWorkspace(int quota, String name) {
 		Workspace workspace = new Workspace(quota, name, getNickname());
 		ownedWorkspaces.put(name, workspace);
+        return workspace;
 	}
 
 	/**
 	 * Delete a specific workspace
 	 *
 	 * @param name the workspace's identifier to be deleted from the user's set
-	 * @return the deleted workspace's identifier
 	 */
-	public void deleteWorkspace(String name) {
-		if (getOwnedWorkspaces().containsKey(name)) {
-			Workspace workspace = getOwnedWorkspaces().get(name);
-			ownedWorkspaces.remove(name);
-		}
+	public void deleteWorkspace(String name) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
+		if (getOwnedWorkspaces().containsKey(name))
+            ownedWorkspaces.remove(name);
+        else {
+            if (getForeignWorkspaces().containsKey(name)) {
+                if (getForeignWorkspaces().get(name).getAccessLists().get(getNickname()).canDelete()) {
+                    foreignWorkspaces.remove(name);
+                }
+                else {
+                    throw new UserDoesNotHavePermissionsToDeleteWorkspaceException();
+                }
+            }
+        }
 	}
 
 	/**
@@ -131,7 +141,7 @@ public class User {
 	}
 
 	/**
-	 * Remove a giver user from a given workspace
+	 * Remove a given user from a given workspace
 	 *
 	 * @param nickname
 	 * @param workspace
@@ -169,7 +179,7 @@ public class User {
 	 * @param canWrite true if the user can edit files on this workspace; false, otherwise
 	 */
 	public void setUserWritePrivileges(String nickname, String workspace, boolean canWrite) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setReadPrivilege(canWrite);
+		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setWritePrivilege(canWrite);
 	}
 
 	/**
@@ -180,7 +190,7 @@ public class User {
 	 * @param canCreate true if the user can create files on this workspace; false, otherwise
 	 */
 	public void setUserCreatePrivileges(String nickname, String workspace, boolean canCreate) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setReadPrivilege(canCreate);
+		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setCreatePrivilege(canCreate);
 	}
 
 	/**
@@ -191,7 +201,7 @@ public class User {
 	 * @param canDelete true if the user can delete files on this workspace; false, otherwise
 	 */
 	public void setUserDeletePrivileges(String nickname, String workspace, boolean canDelete) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setReadPrivilege(canDelete);
+		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setDeletePrivilege(canDelete);
 	}
 
 	public void mountWorkspace(Workspace workspace) {
@@ -199,4 +209,26 @@ public class User {
 			foreignWorkspaces.put(workspace.getName(), workspace);
 		}
 	}
+
+    public Workspace getWorkspace(String workspaceName) {
+        Workspace workspace;
+
+        if (getOwnedWorkspaces().containsKey(workspaceName))
+            workspace = getOwnedWorkspaces().get(workspaceName);
+        else if (getForeignWorkspaces().containsKey(workspaceName))
+            workspace = getForeignWorkspaces().get(workspaceName);
+        else
+            workspace = null;
+
+        return workspace;
+    }
+
+    public void deleteFile(String workspaceName, String filename) throws UserDoesNotHavePermissionsToDeleteFileException {
+        Workspace workspace = getWorkspace(workspaceName);
+        if (workspace.getAccessLists().get(getNickname()).canDelete()) {
+            workspace.getFiles().remove(filename);
+        } else {
+            throw new UserDoesNotHavePermissionsToDeleteFileException();
+        }
+    }
 }

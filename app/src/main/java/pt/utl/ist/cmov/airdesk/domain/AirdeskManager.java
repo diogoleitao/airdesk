@@ -1,11 +1,12 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
 
 public class AirdeskManager {
@@ -24,11 +25,6 @@ public class AirdeskManager {
 	 * Mapping between workspaces' names and Workspace objects
 	 */
 	private static HashMap<String, Workspace> existingWorkspaces = new HashMap<String, Workspace>();
-
-	/**
-	 * Mapping between files' names and File objects
-	 */
-	private static HashMap<String, File> createdFiles = new HashMap<String, File>();
 
 	/**
 	 * The currently logged in user nickname
@@ -53,10 +49,6 @@ public class AirdeskManager {
 			populateAirdesk();
 		}
 		return instance;
-	}
-
-	public User getLoggedUser() {
-		return registeredUsers.get(loggedUser);
 	}
 
 	public static void populateAirdesk() {
@@ -92,7 +84,6 @@ public class AirdeskManager {
 			File newFile = new File(newFiles.get(i));
 			if (i % 2 == 0)
 				newFile.setContent(newFileContents.get(i/2));
-			createdFiles.put(newFiles.get(i), newFile);
 			newWorkspace.getFiles().put(newFiles.get(i), newFile);
 		}
 	}
@@ -101,24 +92,29 @@ public class AirdeskManager {
 		ArrayList<String> workspaceNames = new ArrayList<String>();
 
 		loggedUser = nickname;
-		if (registeredUsers.get(loggedUser) != null) {
+		if (registeredUsers.keySet().contains(loggedUser)) {
 			workspaceNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().keySet());
 			workspaceNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().keySet());
 			return workspaceNames;
 		} else {
-			loggedUser = null;
+			loggedUser = "";
 			return null;
 		}
 	}
 
+    public void logout() {
+        loggedUser = "";
+        currentWorkspace = "";
+        currentFile = "";
+    }
+
 	public void registerUser(String name, String nickname, String email) throws UserAlreadyExistsException {
-        User user = new User(name, nickname, email);
-        if (getUserByNickname(nickname) == null) {
-            registeredUsers.put(nickname, user);
+		if (getUserByNickname(nickname) == null) {
+			registeredUsers.put(nickname, new User(name, nickname, email));
+            loggedUser = nickname;
 		} else {
 			throw new UserAlreadyExistsException();
 		}
-        loggedUser = nickname;
 	}
 
 	public void addWorkspace(String workspace, int quota) throws WorkspaceAlreadyExistsException {
@@ -127,10 +123,30 @@ public class AirdeskManager {
 				throw new WorkspaceAlreadyExistsException();
 			}
 		}
-        existingWorkspaces.put(workspace, new Workspace(quota, workspace, loggedUser));
-		User user = getUserByNickname(loggedUser);
-		user.createWorkspace(quota, workspace);
+        User user = getUserByNickname(loggedUser);
+		existingWorkspaces.put(workspace, user.createWorkspace(quota, workspace));
 	}
+
+    public void deleteWorkspace(String workspaceName) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
+        registeredUsers.get(loggedUser).deleteWorkspace(workspaceName);
+        existingWorkspaces.remove(workspaceName);
+    }
+
+    // TODO
+    public void mountWorkspace() {}
+
+    public ArrayList<String> getFilesFromWorkspace(String workspace) {
+        ArrayList<String> fileNames = new ArrayList<String>();
+
+        currentWorkspace = workspace;
+
+        if (registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
+            fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
+        if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
+            fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
+
+        return fileNames;
+    }
 
 	public User getUserByNickname(String nickname) {
 		if (registeredUsers.keySet().contains(nickname)) {
@@ -140,77 +156,71 @@ public class AirdeskManager {
 		}
 	}
 
-    public ArrayList<String> getUsersFromWorkspace() {
-        return existingWorkspaces.get(currentWorkspace).getUsers();
-    }
-
-	// TODO
-	public void mountWorkspace(ArrayList<String> nicknames, String workspace) {
-		for (String nickname : nicknames) {
-
-		}
+	public ArrayList<String> getUsersFromWorkspace() {
+		return existingWorkspaces.get(currentWorkspace).getUsers();
 	}
 
-	public ArrayList<String> getFilesFromWorkspace(String workspace) {
-		ArrayList<String> fileNames = new ArrayList<String>();
-
-		currentWorkspace = workspace;
-
-		if (registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
-			fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
-		if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
-			fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
-
-		return fileNames;
+	public void addNewFile(String fileName) {
+		File newFile = new File(fileName);
+		existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, newFile);
 	}
-
-    public void addNewFile(String fileName) {
-        File newFile = new File(fileName);
-        existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, newFile);
-    }
 
 	public File getFile(String name) {
-        currentFile = name;
+		currentFile = name;
 		return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
 	}
 
-    public void saveFile(String content) {
-        existingWorkspaces.get(currentWorkspace).getFiles().get(currentFile).save(content);
-        existingWorkspaces.get(currentWorkspace).updateQuotaOccupied(content.length());
+	public void saveFile(String content) {
+		existingWorkspaces.get(currentWorkspace).getFiles().get(currentFile).save(content);
+		existingWorkspaces.get(currentWorkspace).updateQuotaOccupied(content.length());
+	}
+
+    public void deleteFile() throws UserDoesNotHavePermissionsToDeleteFileException {
+        registeredUsers.get(loggedUser).deleteFile(currentWorkspace, currentFile);
+        existingWorkspaces.get(currentWorkspace).getFiles().remove(currentFile);
     }
 
-    public void changeUserPrivileges(String nickname, boolean[] privileges) {
-        existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname).setAll(privileges);
+	public void changeUserPrivileges(String nickname, boolean[] privileges) {
+        // TODO: change this to be apllied from a user's perspective
+		existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname).setAll(privileges);
+	}
+
+	public void applyGlobalPrivileges(String workspaceName, boolean[] choices) {
+        // TODO: change this to be apllied from a user's perspective
+		for (Privileges userPrivileges : existingWorkspaces.get(workspaceName).getAccessLists().values())
+            userPrivileges.setAll(choices);
+	}
+
+	public void inviteUser(String workspaceName, String username) throws UserDoesNotExistException {
+        if (!registeredUsers.containsKey(username))
+            throw new UserDoesNotExistException();
+        else {
+            registeredUsers.get(loggedUser).addUserToWorkspace(username, workspaceName);
+            existingWorkspaces.get(workspaceName).getUsers().add(username);
+        }
+	}
+
+	public int getTotalQuota(String workspaceName) {
+		return existingWorkspaces.get(workspaceName).getQuota();
+	}
+
+	public int getUsedQuota(String workspaceName) {
+		return existingWorkspaces.get(workspaceName).getQuotaOccupied();
+	}
+
+	public boolean[] getUserPrivileges(String nickname) {
+		return existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname).getAll();
+	}
+
+    public String getLoggedUser() {
+        return loggedUser;
     }
 
-    public void applyGlobalPrivileges(String workspaceName, boolean[] choices) {
-        //TODO
-        Log.d("applyGlobalPrivileges","applyGlobalPrivileges");
-    }
+	public String getCurrentWorkspace() {
+		return currentWorkspace;
+	}
 
-    public void inviteUser(String workspaceName, String username) {
-        //TODO
-        Log.d("inviteUser","inviteUser");
-    }
-
-    public void deleteWorkspace(String workspaceName) {
-        //TODO
-        Log.d("deleteWorkspace", "deleteWorkspace");
-    }
-
-    public int getTotalQuota(String workspaceName) {
-        //TODO
-        Log.d("getQuota", "getQuota");
-        return 0;
-    }
-
-    public int getUsedQuota(String workspaceName) {
-        //TODO
-        Log.d("getQuota", "getQuota");
-        return 0;
-    }
-
-    public boolean[] getUserPrivileges(String workspaceName, String nickname) {
-        return existingWorkspaces.get(workspaceName).getAccessLists().get(nickname).getAll();
-    }
+	public String getCurrentFile() {
+		return currentFile;
+	}
 }

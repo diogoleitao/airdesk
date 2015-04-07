@@ -15,14 +15,17 @@ public class Privileges {
 	/**
 	 * True if a user can create a file; false otherwise
 	 */
-	private boolean create;
+	private boolean create = false;
 
 	/**
 	 * True if a user can delete a file; false otherwise
 	 */
-	private boolean delete;
+	private boolean delete = false;
 
-	public Privileges() {}
+	public Privileges() {
+        this.read = true;
+        this.write = true;
+    }
 
 	public Privileges(boolean read, boolean write, boolean create, boolean delete) {
 		this.read = read;

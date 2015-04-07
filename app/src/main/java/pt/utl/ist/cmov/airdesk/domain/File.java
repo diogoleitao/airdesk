@@ -49,7 +49,7 @@ public class File {
     }
 
 	public void save(String content) {
-		this.content = content;
+		this.setContent(content);
         this.size = this.content.length() * 4;
 	}
 }
