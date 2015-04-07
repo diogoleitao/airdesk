@@ -135,9 +135,6 @@ public class AirdeskManager {
         existingWorkspaces.remove(workspaceName);
     }
 
-    // TODO
-    public void mountWorkspace() {}
-
     public ArrayList<String> getFilesFromWorkspace(String workspace) {
         ArrayList<String> fileNames = new ArrayList<String>();
 
@@ -165,7 +162,6 @@ public class AirdeskManager {
 
 	public void addNewFile(String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
 		existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, registeredUsers.get(loggedUser).createFile(currentWorkspace, fileName));
-
 	}
 
 	public File getFile(String name) {
@@ -177,7 +173,6 @@ public class AirdeskManager {
 		existingWorkspaces.get(currentWorkspace).getFiles().get(currentFile).save(content);
 		existingWorkspaces.get(currentWorkspace).updateQuotaOccupied(content.length());
 	}
-
 
     public void deleteFile(String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
         registeredUsers.get(loggedUser).deleteFile(currentWorkspace, fileName);
@@ -200,6 +195,7 @@ public class AirdeskManager {
             throw new UserDoesNotExistException();
         else {
             registeredUsers.get(loggedUser).addUserToWorkspace(username, workspaceName);
+            registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(workspaceName));
             existingWorkspaces.get(workspaceName).getUsers().add(username);
         }
 	}
