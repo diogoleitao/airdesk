@@ -3,8 +3,10 @@ package pt.utl.ist.cmov.airdesk.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
@@ -161,10 +163,9 @@ public class AirdeskManager {
 		return existingWorkspaces.get(currentWorkspace).getUsers();
 	}
 
+	public void addNewFile(String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
+		existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, registeredUsers.get(loggedUser).createFile(currentWorkspace, fileName));
 
-	public void addNewFile(String fileName) {
-		File newFile = new File(fileName);
-		existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, newFile);
 	}
 
 	public File getFile(String name) {
@@ -178,8 +179,8 @@ public class AirdeskManager {
 	}
 
 
-    public void deleteFile() throws UserDoesNotHavePermissionsToDeleteFileException {
-        registeredUsers.get(loggedUser).deleteFile(currentWorkspace, currentFile);
+    public void deleteFile(String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
+        registeredUsers.get(loggedUser).deleteFile(currentWorkspace, fileName);
         existingWorkspaces.get(currentWorkspace).getFiles().remove(currentFile);
     }
 

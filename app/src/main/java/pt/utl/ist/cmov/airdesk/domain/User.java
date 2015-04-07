@@ -3,6 +3,8 @@ package pt.utl.ist.cmov.airdesk.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
@@ -229,6 +231,21 @@ public class User {
             workspace.getFiles().remove(filename);
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
+        }
+    }
+
+    public File createFile(String currentWorkspace, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
+        Workspace workspace = getWorkspace(currentWorkspace);
+        if (workspace.getAccessLists().get(getNickname()).canCreate()) {
+            if (workspace.getFiles().containsKey(fileName))
+                throw new FileAlreadyExistsException();
+            else {
+                File file = new File(fileName);
+                workspace.getFiles().put(fileName, file);
+                return file;
+            }
+        } else {
+            throw new UserDoesNotHavePermissionsToCreateFilesException();
         }
     }
 }

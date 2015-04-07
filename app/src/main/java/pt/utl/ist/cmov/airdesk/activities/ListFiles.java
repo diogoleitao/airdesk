@@ -23,6 +23,9 @@ import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.File;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 
 public class ListFiles extends ActionBarActivity {
 
@@ -75,7 +78,16 @@ public class ListFiles extends ActionBarActivity {
                         .setMessage("This action is irreversible. This file uses "+ manager.getFile(fileNameList.get(position)).getSize() +" of space.")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                AirdeskManager.getInstance().deleteFile(fileNameList.get(position));
+                                try {
+                                    AirdeskManager.getInstance().deleteFile(fileNameList.get(position));
+                                } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
+                                    Context context = getApplicationContext();
+                                    CharSequence text = e.getMessage();
+                                    int duration = Toast.LENGTH_SHORT;
+
+                                    Toast toast = Toast.makeText(context, text, duration);
+                                    toast.show();
+                                }
                                 Intent intent = new Intent(that, ListFiles.class);
                                 startActivity(intent);
                             }
@@ -141,7 +153,16 @@ public class ListFiles extends ActionBarActivity {
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
             } else {
-                manager.addNewFile(name);
+                try {
+                    manager.addNewFile(name);
+                } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
+                    Context context = getApplicationContext();
+                    CharSequence text = e.getMessage();
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }
 
                 fileNameList.add(name);
                 adapter.notifyDataSetChanged();
