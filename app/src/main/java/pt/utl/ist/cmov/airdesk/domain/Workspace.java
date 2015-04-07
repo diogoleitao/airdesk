@@ -55,6 +55,12 @@ public class Workspace {
 		this.setQuota(quota);
 		this.setName(name);
 		this.setOwner(owner);
+
+        Privileges p = new Privileges(true, true, true, true);
+        HashMap<String, Privileges> al = new HashMap<String, Privileges>();
+        al.put(owner, p);
+
+        this.setAccessLists(al);
 	}
 
 	public int getQuota() {
