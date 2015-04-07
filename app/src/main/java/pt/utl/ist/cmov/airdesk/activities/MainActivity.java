@@ -29,7 +29,7 @@ public class MainActivity extends ActionBarActivity {
         SharedPreferences prefs = this.getSharedPreferences(
                 "pt.utl.ist.cmov.airdesk", Context.MODE_PRIVATE);
 
-        AirdeskManager.getInstance().populateAirdesk();
+        AirdeskManager.getInstance();
     }
 
     @Override

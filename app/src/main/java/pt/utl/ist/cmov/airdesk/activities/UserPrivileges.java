@@ -3,7 +3,6 @@ package pt.utl.ist.cmov.airdesk.activities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
@@ -25,12 +25,6 @@ public class UserPrivileges extends ActionBarActivity {
     ListView userListView;
     ArrayList<String> userNameList;
     String workspaceName;
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(this, ListWorkspaces.class);
-        startActivity(intent);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,19 +43,19 @@ public class UserPrivileges extends ActionBarActivity {
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, userNameList );
         userListView.setAdapter(adapter);
         final Context that = this;
-        final boolean[] choices = new boolean[4];
 
         userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     final int position, long id) {
+                final boolean[] choices;
+                choices = AirdeskManager.getInstance().getUserPrivileges(userNameList.get(position));
                 new AlertDialog.Builder(that)
                         .setTitle("Edit " + userNameList.get(position) + "'s Privileges")
-                        .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"},  AirdeskManager.getInstance().getUserPrivileges(userNameList.get(position)), new DialogInterface.OnMultiChoiceClickListener() {
+                        .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"}, choices, new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which,
                                                 boolean isChecked) {
-                                    // If the user checked the item, add it to the selected items
                                 choices[which] = isChecked;
                             }
 
