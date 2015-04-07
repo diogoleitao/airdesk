@@ -11,10 +11,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.User;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
 public class workspaceSettings extends ActionBarActivity {
     String workspaceName;
@@ -77,7 +80,16 @@ public class workspaceSettings extends ActionBarActivity {
     public void inviteUser(View v){
 
         String username = ((TextView)findViewById(R.id.inviteUserText)).getText().toString();
-        AirdeskManager.getInstance().inviteUser(workspaceName, username);
+        try {
+            AirdeskManager.getInstance().inviteUser(workspaceName, username);
+        } catch (UserDoesNotExistException e) {
+            Context context = getApplicationContext();
+            CharSequence text = e.getMessage();
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
     }
 
     public void deleteThis(View v){
@@ -87,7 +99,16 @@ public class workspaceSettings extends ActionBarActivity {
                 .setMessage("This action is irreversible.")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        AirdeskManager.getInstance().deleteWorkspace(workspaceName);
+                        try {
+                            AirdeskManager.getInstance().deleteWorkspace(workspaceName);
+                        } catch (UserDoesNotHavePermissionsToDeleteWorkspaceException e) {
+                            Context context = getApplicationContext();
+                            CharSequence text = e.getMessage();
+                            int duration = Toast.LENGTH_SHORT;
+
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                        }
                         Intent intent = new Intent(that, ListWorkspaces.class);
                         startActivity(intent);
                     }

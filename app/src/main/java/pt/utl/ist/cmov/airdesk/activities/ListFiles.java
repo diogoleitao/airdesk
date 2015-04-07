@@ -53,7 +53,7 @@ public class ListFiles extends ActionBarActivity {
                                     int position, long id) {
 
                 AirdeskManager manager = AirdeskManager.getInstance();
-                boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser().getNickname());
+                boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
                 if(!privileges[1]) { // write privilege
                     Context context = getApplicationContext();
                     CharSequence text = "You don't have privilege to edit files!";
@@ -119,7 +119,7 @@ public class ListFiles extends ActionBarActivity {
 
         AirdeskManager manager = AirdeskManager.getInstance();
 
-        boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser().getNickname());
+        boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
 
         if(!privileges[2]) { // create privilege
             Context context = getApplicationContext();

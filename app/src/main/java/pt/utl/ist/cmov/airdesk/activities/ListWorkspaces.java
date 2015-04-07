@@ -39,7 +39,7 @@ public class ListWorkspaces extends ActionBarActivity {
 
         workspaceList = new ArrayList<String>();
 
-        String nickname = manager.getLoggedUser().getNickname();
+        String nickname = manager.getLoggedUser();
 
         assert( manager.login(nickname) != null);
         workspaceList = manager.login(nickname);
@@ -96,7 +96,6 @@ public class ListWorkspaces extends ActionBarActivity {
     public void addWorkspace(View v) {
 
         AirdeskManager manager = AirdeskManager.getInstance();
-        User user = manager.getLoggedUser();
         EditText name = (EditText) findViewById(R.id.workspaceNameText);
         String workspaceName = name.getText().toString();
         String quotaText = ((EditText) findViewById(R.id.quotaText)).getText().toString();
@@ -116,7 +115,7 @@ public class ListWorkspaces extends ActionBarActivity {
             adapter.notifyDataSetChanged();
         } catch (WorkspaceAlreadyExistsException e) {
             Context context = getApplicationContext();
-            CharSequence text = "Workspace Already Exists!";
+            CharSequence text = e.getMessage();
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, text, duration);
