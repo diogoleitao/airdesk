@@ -127,8 +127,7 @@ public class AirdeskManager {
 			}
 		}
 
-        User user = getUserByNickname(loggedUser);
-		existingWorkspaces.put(workspaceName, user.createWorkspace(quota, workspaceName));
+		existingWorkspaces.put(workspaceName, getUserByNickname(loggedUser).createWorkspace(quota*1024, workspaceName));
 	}
 
     public void deleteWorkspace(String workspaceName) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
