@@ -27,8 +27,11 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException
 public class ListWorkspaces extends ActionBarActivity {
 
     ArrayAdapter<String> adapter;
+    ArrayAdapter<String> adapterForeign;
     ListView workspaceListView;
+    ListView foreignWorkspaceListView;
     ArrayList<String> workspaceList;
+    ArrayList<String> foreignWorkspaceList;
 
     @Override
     public void onBackPressed() {
@@ -43,14 +46,19 @@ public class ListWorkspaces extends ActionBarActivity {
         final AirdeskManager manager = AirdeskManager.getInstance();
 
         workspaceList = new ArrayList<String>();
+        foreignWorkspaceList = new ArrayList<String>();
 
         String nickname = manager.getLoggedUser();
 
-        workspaceList = manager.login(nickname);
+        workspaceList = manager.getWorkspaces(nickname);
+        foreignWorkspaceList = manager.getForeignWorkspaces(nickname);
 
         workspaceListView = (ListView) findViewById(R.id.workspaceList);
+        foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, workspaceList );
+        adapterForeign = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, foreignWorkspaceList );
         workspaceListView.setAdapter(adapter);
+        foreignWorkspaceListView.setAdapter(adapterForeign);
         final Context that = this;
 
         workspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -63,11 +71,31 @@ public class ListWorkspaces extends ActionBarActivity {
             }
         });
 
+        foreignWorkspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent intent = new Intent(that, ListFiles.class);
+                manager.setCurrentWorkspace(foreignWorkspaceList.get(position));
+                startActivity(intent);
+            }
+        });
+
         this.workspaceListView.setLongClickable(true);
         this.workspaceListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent = new Intent(that, workspaceSettings.class);
                 manager.setCurrentWorkspace(workspaceList.get(position));
+                startActivity(intent);
+                return true;
+            }
+        });
+
+        this.foreignWorkspaceListView.setLongClickable(true);
+        this.foreignWorkspaceListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+                Intent intent = new Intent(that, workspaceSettings.class);
+                manager.setCurrentWorkspace(foreignWorkspaceList.get(position));
                 startActivity(intent);
                 return true;
             }

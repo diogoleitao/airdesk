@@ -92,18 +92,28 @@ public class AirdeskManager {
 		}
 	}
 
-	public ArrayList<String> login(String nickname) {
-		ArrayList<String> workspaceNames = new ArrayList<String>();
+    public ArrayList<String> getWorkspaces(String nickname){
+        ArrayList<String> workspaceNames = new ArrayList<String>();
+        if (registeredUsers.keySet().contains(nickname)) {
+            workspaceNames.addAll(registeredUsers.get(nickname).getOwnedWorkspaces().keySet());
+            return workspaceNames;
+        } else {
+            return null;
+        }
+    }
+    public ArrayList<String> getForeignWorkspaces(String nickname){
+        ArrayList<String> workspaceNames = new ArrayList<String>();
+        if (registeredUsers.keySet().contains(nickname)) {
+            workspaceNames.addAll(registeredUsers.get(nickname).getForeignWorkspaces().keySet());
+            return workspaceNames;
+        } else {
+            return null;
+        }
+    }
 
+	public boolean login(String nickname) {
 		loggedUser = nickname;
-		if (registeredUsers.keySet().contains(loggedUser)) {
-			workspaceNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().keySet());
-			workspaceNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().keySet());
-			return workspaceNames;
-		} else {
-			loggedUser = "";
-			return null;
-		}
+        return registeredUsers.keySet().contains(nickname);
 	}
 
     public void logout() {

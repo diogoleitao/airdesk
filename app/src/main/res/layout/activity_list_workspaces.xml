@@ -10,20 +10,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/workspaceList"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/quotaText"
-        android:layout_below="@+id/bt_logout" />
+        android:layout_below="@+id/bt_logout"
+        android:layout_toStartOf="@+id/bt_logout"
+        android:layout_above="@+id/foreignWorkspacesText"
+        android:layout_alignRight="@+id/foreignWorkspaceList"
+        android:layout_alignEnd="@+id/foreignWorkspaceList" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add workspace"
         android:id="@+id/bt_addworkspace"
+        android:onClick="addWorkspace"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/workspaceList"
-        android:layout_alignEnd="@+id/workspaceList"
-        android:onClick="addWorkspace" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -54,5 +55,23 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:onClick="logout" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/foreignWorkspaceList"
+        android:layout_above="@+id/quotaText"
+        android:layout_toStartOf="@+id/bt_logout"
+        android:layout_below="@+id/foreignWorkspacesText"
+        android:layout_alignRight="@+id/bt_addworkspace"
+        android:layout_alignEnd="@+id/bt_addworkspace" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/foreignWorkspacesText"
+        android:text="Foreign Workspaces"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

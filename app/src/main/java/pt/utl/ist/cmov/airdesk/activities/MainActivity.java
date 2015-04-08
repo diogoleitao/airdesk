@@ -78,7 +78,7 @@ public class MainActivity extends ActionBarActivity {
     public void login(View v) {
         nickname = (EditText) findViewById(R.id.nicknameEditText);
 
-       if(null == AirdeskManager.getInstance().login(nickname.getText().toString())) {
+       if(! AirdeskManager.getInstance().login(nickname.getText().toString())) {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             CharSequence text = "Login failed. Please register.";
