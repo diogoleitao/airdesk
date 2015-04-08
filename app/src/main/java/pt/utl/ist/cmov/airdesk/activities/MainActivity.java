@@ -19,7 +19,7 @@ public class MainActivity extends ActionBarActivity {
 
     String name;
     String email;
-    String nickname;
+    String registerEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +55,11 @@ public class MainActivity extends ActionBarActivity {
 
     public void register(View v) {
         EditText nameView = (EditText) findViewById(R.id.nameEditText);
-        EditText nicknameView = (EditText) findViewById(R.id.nicknameEditText);
+        EditText emailRegisterView = (EditText) findViewById(R.id.registerEmailText);
         EditText emailView = (EditText) findViewById(R.id.emailEditText);
 
         name = nameView.getText().toString();
-        nickname = nicknameView.getText().toString();
+        registerEmail = emailRegisterView.getText().toString();
         email = emailView.getText().toString();
 
         Context context = getApplicationContext();
@@ -67,14 +67,14 @@ public class MainActivity extends ActionBarActivity {
         Toast toast;
         CharSequence text;
 
-        if(name.contains(" ") || nickname.contains(" ") || email.contains(" ") || name.contains("\n") || nickname.contains("\n") || email.contains("\n")) {
+        if(name.contains(" ") || registerEmail.contains(" ") || name.contains("\n") || registerEmail.contains("\n")) {
             text = "No spaces or line breaks allowed!";
             toast= Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
 
-        if(name.equals("") || nickname.equals("") || email.equals("")) {
+        if(name.equals("") || registerEmail.equals("")) {
             text = "Please fill in all fields!";
             toast= Toast.makeText(context, text, duration);
             toast.show();
@@ -82,7 +82,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         try {
-            AirdeskManager.getInstance().registerUser( name,  nickname,  email);
+            AirdeskManager.getInstance().registerUser( name, registerEmail);
         } catch (UserAlreadyExistsException e) {
             text = "User Already Exists!";
             toast= Toast.makeText(context, text, duration);
@@ -94,10 +94,10 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void login(View v) {
-        EditText nicknameView = (EditText) findViewById(R.id.nicknameEditText);
-        nickname = nicknameView.getText().toString();
+        EditText emailView = (EditText) findViewById(R.id.emailEditText);
+        email = emailView.getText().toString();
 
-       if(! AirdeskManager.getInstance().login(nickname)) {
+       if(! AirdeskManager.getInstance().login(email)) {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             CharSequence text = "Login failed. Please register.";

@@ -163,17 +163,11 @@ public class ListFiles extends ActionBarActivity {
                 return;
             }
 
-            if(manager.getFile(name) != null){
-                Context context = getApplicationContext();
-                CharSequence text = "File Already Exists!";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-            } else {
                 try {
                     manager.addNewFile(name);
                     filenameView.setText("");
+                    fileNameList.add(name);
+                    adapter.notifyDataSetChanged();
                 } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
                     Context context = getApplicationContext();
                     CharSequence text = e.getMessage();
@@ -182,10 +176,7 @@ public class ListFiles extends ActionBarActivity {
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
                 }
-
-                fileNameList.add(name);
-                adapter.notifyDataSetChanged();
             }
         }
-    }
+
 

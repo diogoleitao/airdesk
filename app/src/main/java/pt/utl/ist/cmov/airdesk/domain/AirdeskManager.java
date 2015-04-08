@@ -20,7 +20,7 @@ public class AirdeskManager {
 	private static AirdeskManager instance = null;
 
 	/**
-	 * Mapping between users' nicknames and User objects
+	 * Mapping between users' emails and User objects
 	 */
 	private static HashMap<String, User> registeredUsers = new HashMap<String, User>();
 
@@ -30,7 +30,7 @@ public class AirdeskManager {
 	private static HashMap<String, Workspace> existingWorkspaces = new HashMap<String, Workspace>();
 
 	/**
-	 * The currently logged in user nickname
+	 * The currently logged in user email
 	 */
 	private String loggedUser = "";
 
@@ -75,7 +75,7 @@ public class AirdeskManager {
 		// TO PREVENT (AND LATER, TO DETECT) ERRORS
 		for (int i = 0; i < 10; i++) {
 			// CREATE USER
-			User newUser = new User(newUsers.get(i), newUsers.get(i), newUsers.get(i));
+			User newUser = new User(newUsers.get(i), newUsers.get(i));
 			registeredUsers.put(newUsers.get(i), newUser);
 
 			// CREATE WORKSPACE AND ADD TO PREVIOUSLY CREATED USER'S WORKSPACE SET
@@ -92,28 +92,28 @@ public class AirdeskManager {
 		}
 	}
 
-    public ArrayList<String> getWorkspaces(String nickname){
+    public ArrayList<String> getWorkspaces(String email){
         ArrayList<String> workspaceNames = new ArrayList<String>();
-        if (registeredUsers.keySet().contains(nickname)) {
-            workspaceNames.addAll(registeredUsers.get(nickname).getOwnedWorkspaces().keySet());
+        if (registeredUsers.keySet().contains(email)) {
+            workspaceNames.addAll(registeredUsers.get(email).getOwnedWorkspaces().keySet());
             return workspaceNames;
         } else {
             return null;
         }
     }
-    public ArrayList<String> getForeignWorkspaces(String nickname){
+    public ArrayList<String> getForeignWorkspaces(String email){
         ArrayList<String> workspaceNames = new ArrayList<String>();
-        if (registeredUsers.keySet().contains(nickname)) {
-            workspaceNames.addAll(registeredUsers.get(nickname).getForeignWorkspaces().keySet());
+        if (registeredUsers.keySet().contains(email)) {
+            workspaceNames.addAll(registeredUsers.get(email).getForeignWorkspaces().keySet());
             return workspaceNames;
         } else {
             return null;
         }
     }
 
-	public boolean login(String nickname) {
-		loggedUser = nickname;
-        return registeredUsers.keySet().contains(nickname);
+	public boolean login(String email) {
+		loggedUser = email;
+        return registeredUsers.keySet().contains(email);
 	}
 
     public void logout() {
@@ -122,10 +122,10 @@ public class AirdeskManager {
         currentFile = "";
     }
 
-	public void registerUser(String name, String nickname, String email) throws UserAlreadyExistsException {
-		if (getUserByNickname(nickname) == null) {
-			registeredUsers.put(nickname, new User(name, nickname, email));
-            loggedUser = nickname;
+	public void registerUser(String name, String email) throws UserAlreadyExistsException {
+		if (getUserByEmail(email) == null) {
+			registeredUsers.put(email, new User(name, email));
+            loggedUser = email;
 		} else {
 			throw new UserAlreadyExistsException();
 		}
@@ -137,7 +137,7 @@ public class AirdeskManager {
 				throw new WorkspaceAlreadyExistsException();
 			}
 		}
-		existingWorkspaces.put(workspaceName, getUserByNickname(loggedUser).createWorkspace(quota*1024, workspaceName));
+		existingWorkspaces.put(workspaceName, getUserByEmail(loggedUser).createWorkspace(quota*1024, workspaceName));
 	}
 
     public void deleteWorkspace(String workspaceName) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
@@ -163,9 +163,9 @@ public class AirdeskManager {
         //existingWorkspaces.get(currentWorkspace).addTopic(topic);
     }
 
-	public User getUserByNickname(String nickname) {
-		if (registeredUsers.keySet().contains(nickname)) {
-			return registeredUsers.get(nickname);
+	public User getUserByEmail(String email) {
+		if (registeredUsers.keySet().contains(email)) {
+			return registeredUsers.get(email);
 		} else {
 			return null;
 		}
@@ -193,9 +193,9 @@ public class AirdeskManager {
         existingWorkspaces.get(currentWorkspace).getFiles().remove(currentFile);
     }
 
-	public void changeUserPrivileges(String nickname, boolean[] privileges) {
+	public void changeUserPrivileges(String email, boolean[] privileges) {
         // TODO: change this to be applied from a user's perspective
-		existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname).setAll(privileges);
+		existingWorkspaces.get(currentWorkspace).getAccessLists().get(email).setAll(privileges);
 	}
 
 	public void applyGlobalPrivileges(String workspaceName, boolean[] choices) {
@@ -222,8 +222,8 @@ public class AirdeskManager {
 		return existingWorkspaces.get(workspaceName).getQuotaOccupied();
 	}
 
-	public boolean[] getUserPrivileges(String nickname) {
-		return existingWorkspaces.get(currentWorkspace).getAccessLists().get(nickname).getAll();
+	public boolean[] getUserPrivileges(String email) {
+		return existingWorkspaces.get(currentWorkspace).getAccessLists().get(email).getAll();
 	}
 
     public String getLoggedUser() {

@@ -15,17 +15,9 @@ public class User {
 	 */
 	private String name;
 
-	/**
-	 * The user's nickname (derived from the email)
-	 */
-	private String nickname;
-
-	/**
-	 * The user's email
-	 */
 	private String email;
 
-	/**
+    /**
 	 * Mapping between the user's workspaces' names that he created and the Workspace objects
 	 */
 	private HashMap<String, Workspace> ownedWorkspaces;
@@ -42,9 +34,8 @@ public class User {
 
 	public User() {}
 
-	public User(String name, String nickname, String email) {
+	public User(String name, String email) {
 		this.setName(name);
-		this.setNickname(nickname);
 		this.setEmail(email);
 		this.ownedWorkspaces = new HashMap<String, Workspace>();
 		this.foreignWorkspaces = new HashMap<String, Workspace>();
@@ -58,14 +49,6 @@ public class User {
 		this.name = name;
 	}
 
-	public String getNickname() {
-		return nickname;
-	}
-
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
-
 	public String getEmail() {
 		return email;
 	}
@@ -74,7 +57,7 @@ public class User {
 		this.email = email;
 	}
 
-	public HashMap<String, Workspace> getOwnedWorkspaces() {
+    public HashMap<String, Workspace> getOwnedWorkspaces() {
 		return ownedWorkspaces;
 	}
 
@@ -105,7 +88,7 @@ public class User {
 	 * @param name the workspace's identifier
 	 */
 	public Workspace createWorkspace(int quota, String name) {
-		Workspace workspace = new Workspace(quota, name, getNickname());
+		Workspace workspace = new Workspace(quota, name, getEmail());
 		ownedWorkspaces.put(name, workspace);
         return workspace;
 	}
@@ -120,7 +103,7 @@ public class User {
             ownedWorkspaces.remove(name);
         else {
             if (getForeignWorkspaces().containsKey(name)) {
-                if (getForeignWorkspaces().get(name).getAccessLists().get(getNickname()).canDelete()) {
+                if (getForeignWorkspaces().get(name).getAccessLists().get(getEmail()).canDelete()) {
                     foreignWorkspaces.remove(name);
                 }
                 else {
@@ -134,22 +117,22 @@ public class User {
 	 * Add a user to a given workspace when the owner doesn't specify
 	 * the user's privileges
 	 *
-	 * @param nickname
+	 * @param email
 	 * @param workspace
 	 */
-	public void addUserToWorkspace(String nickname, String workspace) {
+	public void addUserToWorkspace(String email, String workspace) {
 		Privileges privileges = new Privileges();
-		getOwnedWorkspaces().get(workspace).getAccessLists().put(nickname, privileges);
+		getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
 	}
 
 	/**
 	 * Remove a given user from a given workspace
 	 *
-	 * @param nickname
+	 * @param email
 	 * @param workspace
 	 */
-	public void removeUserFromWorkspace(String nickname, String workspace) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().remove(nickname);
+	public void removeUserFromWorkspace(String email, String workspace) {
+		getOwnedWorkspaces().get(workspace).getAccessLists().remove(email);
 	}
 
 	/**
@@ -165,49 +148,49 @@ public class User {
 	/**
 	 * Set a user's read privileges for a given workspace
 	 *
-	 * @param nickname the user's nickname
+	 * @param email the user's email
 	 * @param workspace the workspace identifier (its name)
 	 * @param canRead true if the user can read files on this workspace; false, otherwise
 	 */
-	public void setUserReadPrivileges(String nickname, String workspace, boolean canRead) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setReadPrivilege(canRead);
+	public void setUserReadPrivileges(String email, String workspace, boolean canRead) {
+		getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setReadPrivilege(canRead);
 	}
 
 	/**
 	 * Set a user's read privileges for a given workspace
 	 *
-	 * @param nickname the user's nickname
+	 * @param email the user's email
 	 * @param workspace the workspace identifier (its name)
 	 * @param canWrite true if the user can edit files on this workspace; false, otherwise
 	 */
-	public void setUserWritePrivileges(String nickname, String workspace, boolean canWrite) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setWritePrivilege(canWrite);
+	public void setUserWritePrivileges(String email, String workspace, boolean canWrite) {
+		getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setWritePrivilege(canWrite);
 	}
 
 	/**
 	 * Set a user's create privileges for a given workspace
 	 *
-	 * @param nickname the user's nickname
+	 * @param email the user's email
 	 * @param workspace the workspace identifier (its name)
 	 * @param canCreate true if the user can create files on this workspace; false, otherwise
 	 */
-	public void setUserCreatePrivileges(String nickname, String workspace, boolean canCreate) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setCreatePrivilege(canCreate);
+	public void setUserCreatePrivileges(String email, String workspace, boolean canCreate) {
+		getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setCreatePrivilege(canCreate);
 	}
 
 	/**
 	 * Set a user's delete privilege for a given workspace
 	 *
-	 * @param nickname the user's nickname
+	 * @param email the user's email
 	 * @param workspace the workspace identifier (its name)
 	 * @param canDelete true if the user can delete files on this workspace; false, otherwise
 	 */
-	public void setUserDeletePrivileges(String nickname, String workspace, boolean canDelete) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(nickname).setDeletePrivilege(canDelete);
+	public void setUserDeletePrivileges(String email, String workspace, boolean canDelete) {
+		getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setDeletePrivilege(canDelete);
 	}
 
 	public void mountWorkspace(Workspace workspace) {
-		if (!workspace.getOwner().equals(getNickname())) {
+		if (!workspace.getOwner().equals(getEmail())) {
 			foreignWorkspaces.put(workspace.getName(), workspace);
 		}
 	}
@@ -227,7 +210,7 @@ public class User {
 
     public void deleteFile(String workspaceName, String filename) throws UserDoesNotHavePermissionsToDeleteFileException {
         Workspace workspace = getWorkspace(workspaceName);
-        if (workspace.getAccessLists().get(getNickname()).canDelete()) {
+        if (workspace.getAccessLists().get(getEmail()).canDelete()) {
             workspace.getFiles().remove(filename);
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
@@ -236,7 +219,7 @@ public class User {
 
     public File createFile(String currentWorkspace, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
         Workspace workspace = getWorkspace(currentWorkspace);
-        if (workspace.getAccessLists().get(getNickname()).canCreate()) {
+        if (workspace.getAccessLists().get(getEmail()).canCreate()) {
             if (workspace.getFiles().containsKey(fileName))
                 throw new FileAlreadyExistsException();
             else {

@@ -49,10 +49,10 @@ public class ListWorkspaces extends ActionBarActivity {
         workspaceList = new ArrayList<String>();
         foreignWorkspaceList = new ArrayList<String>();
 
-        String nickname = manager.getLoggedUser();
+        String email = manager.getLoggedUser();
 
-        workspaceList = manager.getWorkspaces(nickname);
-        foreignWorkspaceList = manager.getForeignWorkspaces(nickname);
+        workspaceList = manager.getWorkspaces(email);
+        foreignWorkspaceList = manager.getForeignWorkspaces(email);
 
         workspaceListView = (ListView) findViewById(R.id.workspaceList);
         foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);
