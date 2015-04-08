@@ -180,6 +180,7 @@
         android:checked="false"
         android:layout_below="@+id/bt_editUserPrivileges"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp"
+        android:onClick="privateSwitch" />
 
 </RelativeLayout>

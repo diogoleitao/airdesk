@@ -10,8 +10,11 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
@@ -50,18 +53,18 @@ public class workspaceSettings extends ActionBarActivity {
         QuotaView.setText("Quota used/total: " + manager.getUsedQuota(workspaceName) + "/" + manager.getTotalQuota(workspaceName));
 
         TextView topicsView = (TextView) findViewById(R.id.topicsText);
-
-
         String topics = "";
-
         for(String s : manager.getTopics()) {
             topics +=  s + ", ";
         }
         if(topics.length() > 0)
             topics = topics.substring(0,topics.length() - 2);
-
         topicsView.setText("Topics: " + topics);
 
+        Switch privateSwitch = ((Switch)findViewById(R.id.privateSwitch));
+        boolean isprivate = manager.getWorkspacePrivacy(workspaceName);
+
+        privateSwitch.setChecked(isprivate);
     }
 
 
@@ -73,8 +76,6 @@ public class workspaceSettings extends ActionBarActivity {
     }
 
     public void startUserPrivileges(View v){
-
-
         Intent intent = new Intent(this, UserPrivileges.class);
         startActivity(intent);
     }
@@ -192,4 +193,14 @@ public class workspaceSettings extends ActionBarActivity {
         }
         topicView.setText("");
     }
+
+    public void privateSwitch(View v) {
+        Switch privateSwitch = ((Switch)findViewById(R.id.privateSwitch));
+        boolean isprivate = privateSwitch.isChecked();
+
+        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
+
+        manager.setWorkspacePrivacy(workspaceName, isprivate);
+    }
+
 }
