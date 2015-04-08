@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
@@ -101,6 +102,7 @@ public class AirdeskManager {
             return null;
         }
     }
+
     public ArrayList<String> getForeignWorkspaces(String email){
         ArrayList<String> workspaceNames = new ArrayList<String>();
         if (registeredUsers.keySet().contains(email)) {
@@ -158,7 +160,7 @@ public class AirdeskManager {
         return fileNames;
     }
 
-    public void addTopicToWorkspace(String topic) {
+    public void addTopicToWorkspace(String topic) throws TopicAlreadyAddedException {
         registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).addTopic(topic); // ????
         //existingWorkspaces.get(currentWorkspace).addTopic(topic);
     }
