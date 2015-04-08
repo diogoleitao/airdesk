@@ -17,9 +17,9 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
 
 public class MainActivity extends ActionBarActivity {
 
-    EditText name;
-    EditText email;
-    EditText nickname;
+    String name;
+    String email;
+    String nickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,17 +54,29 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void register(View v) {
-        name = (EditText) findViewById(R.id.nameEditText);
-        nickname = (EditText) findViewById(R.id.nicknameEditText);
-        email = (EditText) findViewById(R.id.emailEditText);
+        EditText nameView = (EditText) findViewById(R.id.nameEditText);
+        EditText nicknameView = (EditText) findViewById(R.id.nicknameEditText);
+        EditText emailView = (EditText) findViewById(R.id.emailEditText);
+
+        name = nameView.getText().toString();
+        nickname = nicknameView.getText().toString();
+        email = emailView.getText().toString();
 
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
         Toast toast;
         CharSequence text;
+
+        if(name.equals("") || nickname.equals("") || email.equals("")) {
+            text = "Please fill in all fields!";
+            toast= Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
         try {
-            AirdeskManager.getInstance().registerUser( name.getText().toString(),  nickname.getText().toString(),  email.getText().toString());
-        } catch (UserAlreadyExistsException e) {    // excepçoes para controlo ?? mudar
+            AirdeskManager.getInstance().registerUser( name,  nickname,  email);
+        } catch (UserAlreadyExistsException e) {
             text = "User Already Exists!";
             toast= Toast.makeText(context, text, duration);
             toast.show();
@@ -76,9 +88,10 @@ public class MainActivity extends ActionBarActivity {
 
 
     public void login(View v) {
-        nickname = (EditText) findViewById(R.id.nicknameEditText);
+        EditText nicknameView = (EditText) findViewById(R.id.nicknameEditText);
+        nickname = nicknameView.getText().toString();
 
-       if(! AirdeskManager.getInstance().login(nickname.getText().toString())) {
+       if(! AirdeskManager.getInstance().login(nickname)) {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             CharSequence text = "Login failed. Please register.";
