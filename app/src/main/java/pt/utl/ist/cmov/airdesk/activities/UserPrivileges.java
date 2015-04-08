@@ -11,11 +11,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 
 public class UserPrivileges extends ActionBarActivity {
 
@@ -66,7 +68,15 @@ public class UserPrivileges extends ActionBarActivity {
                         })
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                AirdeskManager.getInstance(getApplicationContext()).changeUserPrivileges(userNameList.get(position), choices);
+                                try {
+                                    AirdeskManager.getInstance(getApplicationContext()).changeUserPrivileges(userNameList.get(position), choices);
+                                } catch (UserDoesNotHavePermissionsToChangePrivilegesException e) {
+                                    Context context = getApplicationContext();
+                                    CharSequence text = e.getMessage();
+                                    int duration = Toast.LENGTH_SHORT;
+                                    Toast toast = Toast.makeText(context, text, duration);
+                                    toast.show();
+                                }
 
                             }
                         })

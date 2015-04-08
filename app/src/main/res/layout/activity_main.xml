@@ -56,15 +56,4 @@
         android:layout_alignLeft="@+id/nameEditText"
         android:layout_alignStart="@+id/nameEditText" />
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="save"
-        android:id="@+id/bt_save"
-        android:layout_below="@+id/bt_register"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="88dp"
-        android:onClick="save" />
-
 </RelativeLayout>

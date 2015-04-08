@@ -18,6 +18,7 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
@@ -228,15 +229,13 @@ public class AirdeskManager implements Serializable {
         existingWorkspaces.get(currentWorkspace).getFiles().remove(currentFile);
     }
 
-	public void changeUserPrivileges(String email, boolean[] privileges) {
+	public void changeUserPrivileges(String email, boolean[] privileges) throws UserDoesNotHavePermissionsToChangePrivilegesException {
         // TODO: change this to be applied from a user's perspective
-		existingWorkspaces.get(currentWorkspace).getAccessLists().get(email).setAll(privileges);
+        registeredUsers.get(loggedUser).changeUserPrivileges(email, privileges, currentWorkspace);
 	}
 
-	public void applyGlobalPrivileges(String workspaceName, boolean[] choices) {
-        // TODO: change this to be applied from a user's perspective
-		for (Privileges userPrivileges : existingWorkspaces.get(workspaceName).getAccessLists().values())
-            userPrivileges.setAll(choices);
+	public void applyGlobalPrivileges(String workspaceName, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
+        registeredUsers.get(loggedUser).applyGlobalPrivileges(workspaceName, choices);
 	}
 
 	public void inviteUser(String workspaceName, String username) throws UserDoesNotExistException {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
@@ -232,5 +233,23 @@ public class User implements Serializable{
         } else {
             throw new UserDoesNotHavePermissionsToCreateFilesException();
         }
+    }
+
+    public void applyGlobalPrivileges(String workspaceName, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
+        Workspace workspace = getWorkspace(workspaceName);
+        if(workspace.getOwner().equals(this.getEmail())){
+            for (Privileges userPrivileges : workspace.getAccessLists().values())
+                userPrivileges.setAll(choices);
+        } else {
+            throw new UserDoesNotHavePermissionsToChangePrivilegesException();
+        }
+
+    }
+
+    public void changeUserPrivileges(String email, boolean[] privileges, String workspace) throws UserDoesNotHavePermissionsToChangePrivilegesException {
+        if(email.equals(this.getEmail())){
+            getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setAll(privileges);
+        } else
+            throw new UserDoesNotHavePermissionsToChangePrivilegesException();
     }
 }

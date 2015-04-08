@@ -75,7 +75,7 @@ public class MainActivity extends ActionBarActivity {
         try {
             AirdeskManager.getInstance(getApplicationContext()).registerUser( name, registerEmail);
         } catch (UserAlreadyExistsException e) {
-            text = "User Already Exists!";
+            text = e.getMessage();
             toast= Toast.makeText(context, text, duration);
             toast.show();
             return;
@@ -102,7 +102,4 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
-    public void save(View v){
-        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext());
-    }
 }

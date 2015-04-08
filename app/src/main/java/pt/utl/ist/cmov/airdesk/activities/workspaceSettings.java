@@ -17,6 +17,7 @@ import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
 public class workspaceSettings extends ActionBarActivity {
@@ -48,7 +49,7 @@ public class workspaceSettings extends ActionBarActivity {
 
         QuotaView.setText("Quota used/total: " + manager.getUsedQuota(workspaceName) + "/" + manager.getTotalQuota(workspaceName));
 
-        TextView TopicsView = (TextView) findViewById(R.id.topicsText);
+        TextView topicsView = (TextView) findViewById(R.id.topicsText);
 
 
         String topics = "";
@@ -59,7 +60,7 @@ public class workspaceSettings extends ActionBarActivity {
         if(topics.length() > 0)
             topics = topics.substring(0,topics.length() - 2);
 
-        TopicsView.setText("Topics: " + topics);
+        topicsView.setText("Topics: " + topics);
 
     }
 
@@ -72,6 +73,8 @@ public class workspaceSettings extends ActionBarActivity {
     }
 
     public void startUserPrivileges(View v){
+
+
         Intent intent = new Intent(this, UserPrivileges.class);
         startActivity(intent);
     }
@@ -80,11 +83,25 @@ public class workspaceSettings extends ActionBarActivity {
         boolean[] choices = new boolean[4];
 
         choices[0] = ((CheckBox) findViewById(R.id.writeFilesBox)).isChecked();
-        choices[2] = ((CheckBox) findViewById(R.id.deleteFilesBox)).isChecked();
-        choices[3] = ((CheckBox) findViewById(R.id.readFilesBox)).isChecked();
-        choices[4] = ((CheckBox) findViewById(R.id.createFilesBox)).isChecked();
+        choices[1] = ((CheckBox) findViewById(R.id.deleteFilesBox)).isChecked();
+        choices[2] = ((CheckBox) findViewById(R.id.readFilesBox)).isChecked();
+        choices[3] = ((CheckBox) findViewById(R.id.createFilesBox)).isChecked();
 
-        AirdeskManager.getInstance(getApplicationContext()).applyGlobalPrivileges(workspaceName, choices);
+        try {
+            AirdeskManager.getInstance(getApplicationContext()).applyGlobalPrivileges(workspaceName, choices);
+            Context context = getApplicationContext();
+            CharSequence text = "Privileges changed!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        } catch (UserDoesNotHavePermissionsToChangePrivilegesException e) {
+            Context context = getApplicationContext();
+            CharSequence text = e.getMessage();
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
     }
 
     public void inviteUser(View v){
@@ -155,6 +172,16 @@ public class workspaceSettings extends ActionBarActivity {
         String topicname = topicView.getText().toString();
         try {
             AirdeskManager.getInstance(getApplicationContext()).addTopicToWorkspace(topicname);
+
+            TextView topicsView = (TextView) findViewById(R.id.topicsText);
+            String topics = "";
+            for(String s : AirdeskManager.getInstance(getApplicationContext()).getTopics()) {
+                topics +=  s + ", ";
+            }
+            if(topics.length() > 0)
+                topics = topics.substring(0,topics.length() - 2);
+            topicsView.setText("Topics: " + topics);
+
         } catch (TopicAlreadyAddedException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();

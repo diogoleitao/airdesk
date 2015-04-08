@@ -30,12 +30,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/inviteUserText"
         android:hint="User email"
-        android:layout_below="@+id/quotaText"
+        android:layout_alignBottom="@+id/bt_invite"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="58dp"
-        android:layout_alignRight="@+id/bt_editUserPrivileges"
-        android:layout_alignEnd="@+id/bt_editUserPrivileges" />
+        android:layout_toLeftOf="@+id/bt_invite"
+        android:layout_toStartOf="@+id/bt_invite" />
 
     <Button
         android:layout_width="wrap_content"
@@ -43,16 +42,18 @@
         android:text="Invite User"
         android:id="@+id/bt_invite"
         android:onClick="inviteUser"
-        android:layout_alignBottom="@+id/inviteUserText"
+        android:layout_below="@+id/quotaText"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/globalPrivilegeText"
+        android:layout_toRightOf="@+id/globalPrivilegeText" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/linearLayout"
-        android:layout_centerVertical="true"
+        android:layout_below="@+id/globalPrivilegeText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
 
@@ -101,17 +102,19 @@
         android:id="@+id/bt_editUserPrivileges"
         android:onClick="startUserPrivileges"
         android:layout_below="@+id/linearLayout"
-        android:layout_toLeftOf="@+id/bt_invite"
-        android:layout_toStartOf="@+id/bt_invite" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="20dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Delete this Workspace"
+        android:text="Delete Workspace"
         android:id="@+id/bt_deleteWorkspace"
         android:onClick="deleteThis"
-        android:layout_below="@+id/bt_editUserPrivileges"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignTop="@+id/bt_editUserPrivileges"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -119,9 +122,10 @@
         android:text="Global Privileges"
         android:id="@+id/globalPrivilegeText"
         android:layout_gravity="center_horizontal"
-        android:layout_above="@+id/linearLayout"
+        android:layout_below="@+id/inviteUserText"
         android:layout_alignLeft="@+id/quotaText"
-        android:layout_alignStart="@+id/quotaText" />
+        android:layout_alignStart="@+id/quotaText"
+        android:layout_marginTop="20dp" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -141,30 +145,41 @@
         android:text="Add Topic"
         android:id="@+id/bt_addtopic"
         android:onClick="addTopic"
-        android:layout_below="@+id/bt_deleteWorkspace"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_above="@+id/topicsText"
+        android:layout_alignRight="@+id/bt_invite"
+        android:layout_alignEnd="@+id/bt_invite"
+        android:layout_toRightOf="@+id/newTopicText"
+        android:layout_toEndOf="@+id/newTopicText" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/newTopicText"
         android:hint="New topic"
-        android:layout_alignBottom="@+id/bt_addtopic"
+        android:layout_alignTop="@+id/bt_addtopic"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/bt_editUserPrivileges"
-        android:layout_alignEnd="@+id/bt_editUserPrivileges" />
+        android:layout_alignRight="@+id/quotaText"
+        android:layout_alignEnd="@+id/quotaText" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/topicsText"
-        android:layout_below="@+id/newTopicText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/bt_addtopic"
         android:layout_alignEnd="@+id/bt_addtopic" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Private Workspace"
+        android:id="@+id/privateSwitch"
+        android:checked="false"
+        android:layout_below="@+id/bt_editUserPrivileges"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
 
 </RelativeLayout>
