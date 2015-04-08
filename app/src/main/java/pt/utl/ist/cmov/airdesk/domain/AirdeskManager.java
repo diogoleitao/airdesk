@@ -16,6 +16,7 @@ import java.util.HashMap;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
@@ -236,7 +237,7 @@ public class AirdeskManager implements Serializable {
         registeredUsers.get(loggedUser).applyGlobalPrivileges(workspaceName, choices);
 	}
 
-	public void inviteUser(String workspaceName, String username) throws UserDoesNotExistException {
+	public void inviteUser(String workspaceName, String username) throws UserDoesNotExistException, UserAlreadyHasPermissionsInWorkspaceException {
         if (!registeredUsers.containsKey(username))
             throw new UserDoesNotExistException();
         else {

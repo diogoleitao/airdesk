@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
@@ -122,7 +123,9 @@ public class User implements Serializable{
 	 * @param email
 	 * @param workspace
 	 */
-	public void addUserToWorkspace(String email, String workspace) {
+	public void addUserToWorkspace(String email, String workspace) throws UserAlreadyHasPermissionsInWorkspaceException {
+        if(getOwnedWorkspaces().get(workspace).getAccessLists().containsKey(email))
+            throw new UserAlreadyHasPermissionsInWorkspaceException();
 		Privileges privileges = new Privileges();
 		getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
 	}

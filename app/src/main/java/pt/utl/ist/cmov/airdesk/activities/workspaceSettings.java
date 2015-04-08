@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
@@ -128,13 +129,14 @@ public class workspaceSettings extends ActionBarActivity {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             ((TextView)findViewById(R.id.inviteUserText)).setText("");
-        } catch (UserDoesNotExistException e) {
+        } catch (UserDoesNotExistException | UserAlreadyHasPermissionsInWorkspaceException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
+            ((TextView)findViewById(R.id.inviteUserText)).setText("");
         }
     }
 
