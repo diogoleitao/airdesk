@@ -1,7 +1,6 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
@@ -215,10 +214,10 @@ public class AirdeskManager implements Serializable {
 		existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, registeredUsers.get(loggedUser).createFile(currentWorkspace, fileName));
 	}
 
-	public File getFile(String name) {
-		currentFile = name;
-		return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
-	}
+    public File getFile(String name)  {
+        currentFile = name;
+        return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
+    }
 
 	public void saveFile(String content) throws WorkspaceQuotaReachedException {
         registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).saveFile(currentFile, content);

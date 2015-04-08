@@ -46,7 +46,7 @@ public class workspaceSettings extends ActionBarActivity {
         workspaceName = manager.getCurrentWorkspace();
 
         TextView workspaceNameView = (TextView) findViewById(R.id.workspaceNameText);
-        workspaceNameView.setText(workspaceName);
+        workspaceNameView.setText("Workspace name: " + workspaceName);
 
         TextView QuotaView = (TextView) findViewById(R.id.quotaText);
 

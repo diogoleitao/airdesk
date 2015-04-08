@@ -247,9 +247,10 @@ public class User implements Serializable{
     }
 
     public void changeUserPrivileges(String email, boolean[] privileges, String workspace) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        if(email.equals(this.getEmail())){
+        if(getOwnedWorkspaces().get(workspace)!= null){
             getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setAll(privileges);
         } else
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
     }
+
 }

@@ -60,6 +60,17 @@ public class EditFile extends ActionBarActivity {
 
         String content = ((EditText) findViewById(R.id.fileText)).getText().toString();
 
+        boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
+
+        if(!privileges[1]) { // read privilege
+            Context context = getApplicationContext();
+            CharSequence text = "You don't have privilege to edit files!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
         try {
             manager.saveFile(content);
             Intent intent = new Intent(this, ListFiles.class);

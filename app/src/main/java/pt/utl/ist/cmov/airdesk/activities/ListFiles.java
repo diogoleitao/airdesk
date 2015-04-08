@@ -63,9 +63,9 @@ public class ListFiles extends ActionBarActivity {
 
                 AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
                 boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
-                if(!privileges[1]) { // write privilege
+                if(!privileges[0]) { // read privilege
                     Context context = getApplicationContext();
-                    CharSequence text = "You don't have privilege to edit files!";
+                    CharSequence text = "You don't have privilege to read files!";
                     int duration = Toast.LENGTH_SHORT;
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
