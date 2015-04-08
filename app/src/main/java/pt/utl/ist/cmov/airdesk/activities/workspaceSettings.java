@@ -129,7 +129,7 @@ public class workspaceSettings extends ActionBarActivity {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             ((TextView)findViewById(R.id.inviteUserText)).setText("");
-        } catch (UserDoesNotExistException | UserAlreadyHasPermissionsInWorkspaceException e) {
+        } catch (UserDoesNotExistException | UserAlreadyHasPermissionsInWorkspaceException | UserDoesNotHavePermissionsToChangePrivilegesException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();
             int duration = Toast.LENGTH_SHORT;

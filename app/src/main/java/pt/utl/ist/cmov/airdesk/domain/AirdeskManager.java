@@ -237,9 +237,11 @@ public class AirdeskManager implements Serializable {
         registeredUsers.get(loggedUser).applyGlobalPrivileges(workspaceName, choices);
 	}
 
-	public void inviteUser(String workspaceName, String username) throws UserDoesNotExistException, UserAlreadyHasPermissionsInWorkspaceException {
+	public void inviteUser(String workspaceName, String username) throws UserDoesNotExistException, UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
         if (!registeredUsers.containsKey(username))
             throw new UserDoesNotExistException();
+        if(!existingWorkspaces.get(workspaceName).getOwner().equals(registeredUsers.get(loggedUser)))
+            throw new UserDoesNotHavePermissionsToChangePrivilegesException();
         else {
             registeredUsers.get(loggedUser).addUserToWorkspace(username, workspaceName);
             registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(workspaceName));
