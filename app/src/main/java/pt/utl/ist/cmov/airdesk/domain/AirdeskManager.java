@@ -226,11 +226,10 @@ public class AirdeskManager implements Serializable {
 
     public void deleteFile(String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
         registeredUsers.get(loggedUser).deleteFile(currentWorkspace, fileName);
-        existingWorkspaces.get(currentWorkspace).getFiles().remove(currentFile);
+        //existingWorkspaces.get(currentWorkspace).getFiles().remove(currentFile);  why delete twice
     }
 
 	public void changeUserPrivileges(String email, boolean[] privileges) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        // TODO: change this to be applied from a user's perspective
         registeredUsers.get(loggedUser).changeUserPrivileges(email, privileges, currentWorkspace);
 	}
 

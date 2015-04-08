@@ -213,8 +213,8 @@ public class User implements Serializable{
     public void deleteFile(String workspaceName, String filename) throws UserDoesNotHavePermissionsToDeleteFileException {
         Workspace workspace = getWorkspace(workspaceName);
         if (workspace.getAccessLists().get(getEmail()).canDelete()) {
-            workspace.getFiles().remove(filename);
             workspace.updateQuotaOccupied(-workspace.getFiles().get(filename).getSize());
+            workspace.getFiles().remove(filename);
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
         }
