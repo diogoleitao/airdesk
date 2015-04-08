@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
@@ -140,8 +141,27 @@ public class ListFiles extends ActionBarActivity {
             EditText filenameView = (EditText) findViewById(R.id.fileNameText);
             String name = filenameView.getText().toString();
 
-            if(name.equals(""))
+            if(name.equals("") || name.equals(" "))
                 return;
+
+            if(Pattern.compile("^\\s+$").matcher(name).matches()){
+                Context context = getApplicationContext();
+                CharSequence text = "File name must contain at least one meaningful character.";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                return;
+            }
+
+            if(name.contains("\n")) {
+                Context context = getApplicationContext();
+                CharSequence text = "No line breaks allowed!";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                return;
+            }
 
             if(manager.getFile(name) != null){
                 Context context = getApplicationContext();

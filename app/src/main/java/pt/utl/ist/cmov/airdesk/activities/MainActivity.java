@@ -67,6 +67,13 @@ public class MainActivity extends ActionBarActivity {
         Toast toast;
         CharSequence text;
 
+        if(name.contains(" ") || nickname.contains(" ") || email.contains(" ") || name.contains("\n") || nickname.contains("\n") || email.contains("\n")) {
+            text = "No spaces or line breaks allowed!";
+            toast= Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
         if(name.equals("") || nickname.equals("") || email.equals("")) {
             text = "Please fill in all fields!";
             toast= Toast.makeText(context, text, duration);
@@ -85,7 +92,6 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, ListWorkspaces.class);
         startActivity(intent);
     }
-
 
     public void login(View v) {
         EditText nicknameView = (EditText) findViewById(R.id.nicknameEditText);

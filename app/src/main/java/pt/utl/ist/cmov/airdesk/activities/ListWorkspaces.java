@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
@@ -133,13 +134,36 @@ public class ListWorkspaces extends ActionBarActivity {
         EditText quotaView = (EditText) findViewById(R.id.quotaText);
         String quotaText = quotaView.getText().toString();
         int quota;
-        if (!quotaText.equals("")) {
-            quota = Integer.parseInt(quotaText);
-        } else
-            return;
 
-        if(workspaceName.equals(""))
+        if (quotaText.equals("") || workspaceName.equals("")) {
+            Context context = getApplicationContext();
+            CharSequence text = "Please fill in all fields!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
             return;
+        }
+
+        quota = Integer.parseInt(quotaText);
+
+        if(Pattern.compile("^\\s+$").matcher(workspaceName).matches()){
+            Context context = getApplicationContext();
+            CharSequence text = "Workspace name must contain at least one meaningful character.";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
+        if(workspaceName.contains("\n")) {
+            Context context = getApplicationContext();
+            CharSequence text = "No line breaks allowed!";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
 
         try {
             manager.addWorkspace(workspaceName, quota);
