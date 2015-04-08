@@ -5,9 +5,9 @@
     <string name="title_activity_list_workspaces">List Workspaces</string>
     <string name="title_activity_list_files">List Files</string>
     <string name="title_activity_edit_file">Edit file</string>
-    <string name="title_activity_file_settings">fileSettings</string>
+    <string name="title_activity_file_settings">File Settings</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_workspace_settings">workspaceSettings</string>
-    <string name="title_activity_user_privileges">UserPrivileges</string>
+    <string name="title_activity_workspace_settings">Workspace Settings</string>
+    <string name="title_activity_user_privileges">User Privileges</string>
 </resources>

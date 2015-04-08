@@ -34,7 +34,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/bt_invite"
-        android:layout_toStartOf="@+id/bt_invite" />
+        android:layout_toStartOf="@+id/bt_invite"
+        android:singleLine="true"/>
 
     <Button
         android:layout_width="wrap_content"

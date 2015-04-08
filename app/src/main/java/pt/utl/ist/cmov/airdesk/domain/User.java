@@ -238,8 +238,10 @@ public class User implements Serializable{
     public void applyGlobalPrivileges(String workspaceName, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
         Workspace workspace = getWorkspace(workspaceName);
         if(workspace.getOwner().equals(this.getEmail())){
+            workspace.getAccessLists().values().remove(getEmail());
             for (Privileges userPrivileges : workspace.getAccessLists().values())
                 userPrivileges.setAll(choices);
+            workspace.getAccessLists().get(getEmail()).setAll(new boolean[]{true,true,true,true});
         } else {
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
         }
