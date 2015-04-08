@@ -35,7 +35,8 @@
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/bt_invite"
         android:layout_toStartOf="@+id/bt_invite"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:maxLines="1"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -161,7 +162,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/quotaText"
-        android:layout_alignEnd="@+id/quotaText" />
+        android:layout_alignEnd="@+id/quotaText"
+        android:maxLines="1"/>
 
     <TextView
         android:layout_width="wrap_content"

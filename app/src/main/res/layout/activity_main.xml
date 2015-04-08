@@ -22,7 +22,8 @@
         android:id="@+id/nameEditText"
         android:layout_above="@+id/bt_register"
         android:layout_centerHorizontal="true"
-        android:hint="Name" />
+        android:hint="Name"
+        android:maxLines="1"/>
 
     <EditText
         android:layout_width="wrap_content"
@@ -55,6 +56,7 @@
         android:hint="Email"
         android:layout_above="@+id/nameEditText"
         android:layout_alignLeft="@+id/nameEditText"
-        android:layout_alignStart="@+id/nameEditText" />
+        android:layout_alignStart="@+id/nameEditText"
+        android:maxLines="1"/>
 
 </RelativeLayout>
