@@ -229,6 +229,7 @@ public class User {
         Workspace workspace = getWorkspace(workspaceName);
         if (workspace.getAccessLists().get(getNickname()).canDelete()) {
             workspace.getFiles().remove(filename);
+            workspace.updateQuotaOccupied(-workspace.getFiles().get(filename).getSize());
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
         }

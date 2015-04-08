@@ -3,6 +3,7 @@ package pt.utl.ist.cmov.airdesk.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
 public class Workspace {
@@ -141,12 +142,17 @@ public class Workspace {
         this.quotaOccupied += fileSize;
     }
 
-    public void addTopic(String topic) {
-        topics.add(topic);
+    public void addTopic(String topic) throws TopicAlreadyAddedException {
+        if (topic.contains(topic)) {
+            throw new TopicAlreadyAddedException();
+        } else {
+            topics.add(topic);
+        }
     }
 
     public void saveFile(String currentFile, String content) throws WorkspaceQuotaReachedException {
-        int size = content.length() * 4;
+        int oldSize = files.get(currentFile).getSize();
+        int size = content.length() * 4 - oldSize;
         if ((quotaOccupied + size) > quota) {
             throw new WorkspaceQuotaReachedException();
         } else {
