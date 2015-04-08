@@ -26,10 +26,11 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 
 public class workspaceSettings extends ActionBarActivity {
     String workspaceName;
+    AirdeskManager manager;
 
     @Override
     protected void onPause() {
-        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext());super.onPause();
+        manager.saveAppState(getApplicationContext());super.onPause();
     }
 
     @Override
@@ -43,7 +44,7 @@ public class workspaceSettings extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workspace_settings);
 
-        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
+        manager = AirdeskManager.getInstance(getApplicationContext());
         workspaceName = manager.getCurrentWorkspace();
 
         TextView workspaceNameView = (TextView) findViewById(R.id.workspaceNameText);
@@ -66,6 +67,13 @@ public class workspaceSettings extends ActionBarActivity {
         boolean isprivate = manager.getWorkspacePrivacy(workspaceName);
 
         privateSwitch.setChecked(isprivate);
+
+        boolean[] currentGlobalPrivileges = manager.getAllPrivilegesFromWorkspace();
+
+        ((CheckBox) findViewById(R.id.readFilesBox)).setChecked(currentGlobalPrivileges[0]);
+        ((CheckBox) findViewById(R.id.writeFilesBox)).setChecked(currentGlobalPrivileges[1]);
+        ((CheckBox) findViewById(R.id.createFilesBox)).setChecked(currentGlobalPrivileges[2]);
+        ((CheckBox) findViewById(R.id.deleteFilesBox)).setChecked(currentGlobalPrivileges[3]);
     }
 
 
@@ -84,13 +92,13 @@ public class workspaceSettings extends ActionBarActivity {
     public void applyGlobalPrivileges(View v){
         boolean[] choices = new boolean[4];
 
-        choices[0] = ((CheckBox) findViewById(R.id.writeFilesBox)).isChecked();
-        choices[1] = ((CheckBox) findViewById(R.id.deleteFilesBox)).isChecked();
-        choices[2] = ((CheckBox) findViewById(R.id.readFilesBox)).isChecked();
-        choices[3] = ((CheckBox) findViewById(R.id.createFilesBox)).isChecked();
+        choices[0] = ((CheckBox) findViewById(R.id.readFilesBox)).isChecked();
+        choices[1] = ((CheckBox) findViewById(R.id.writeFilesBox)).isChecked();
+        choices[2] = ((CheckBox) findViewById(R.id.createFilesBox)).isChecked();
+        choices[3] = ((CheckBox) findViewById(R.id.deleteFilesBox)).isChecked();
 
         try {
-            AirdeskManager.getInstance(getApplicationContext()).applyGlobalPrivileges(workspaceName, choices);
+            manager.applyGlobalPrivileges(workspaceName, choices);
             Context context = getApplicationContext();
             CharSequence text = "Privileges changed!";
             int duration = Toast.LENGTH_SHORT;
@@ -110,7 +118,7 @@ public class workspaceSettings extends ActionBarActivity {
 
         String username = ((TextView)findViewById(R.id.inviteUserText)).getText().toString();
 
-        if(username.equals(AirdeskManager.getInstance(getApplicationContext()).getLoggedUser())){
+        if(username.equals(manager.getLoggedUser())){
             Context context = getApplicationContext();
             CharSequence text = "You can't invite yourself!";
             int duration = Toast.LENGTH_SHORT;
@@ -121,7 +129,7 @@ public class workspaceSettings extends ActionBarActivity {
         }
 
         try {
-            AirdeskManager.getInstance(getApplicationContext()).inviteUser(workspaceName, username);
+            manager.inviteUser(username);
             Context context = getApplicationContext();
             CharSequence text = "Invitation sent.";
             int duration = Toast.LENGTH_SHORT;
@@ -129,6 +137,14 @@ public class workspaceSettings extends ActionBarActivity {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             ((TextView)findViewById(R.id.inviteUserText)).setText("");
+            
+            boolean[] currentGlobalPrivileges = manager.getAllPrivilegesFromWorkspace();
+
+            ((CheckBox) findViewById(R.id.readFilesBox)).setChecked(currentGlobalPrivileges[0]);
+            ((CheckBox) findViewById(R.id.writeFilesBox)).setChecked(currentGlobalPrivileges[1]);
+            ((CheckBox) findViewById(R.id.createFilesBox)).setChecked(currentGlobalPrivileges[2]);
+            ((CheckBox) findViewById(R.id.deleteFilesBox)).setChecked(currentGlobalPrivileges[3]);
+            
         } catch (UserDoesNotExistException | UserAlreadyHasPermissionsInWorkspaceException | UserDoesNotHavePermissionsToChangePrivilegesException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();
@@ -148,7 +164,7 @@ public class workspaceSettings extends ActionBarActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                            AirdeskManager.getInstance(getApplicationContext()).deleteWorkspace(workspaceName);
+                            manager.deleteWorkspace(workspaceName);
                         } catch (UserDoesNotHavePermissionsToDeleteWorkspaceException e) {
                             Context context = getApplicationContext();
                             CharSequence text = e.getMessage();
@@ -174,11 +190,11 @@ public class workspaceSettings extends ActionBarActivity {
         EditText topicView = ((EditText)findViewById(R.id.newTopicText));
         String topicname = topicView.getText().toString();
         try {
-            AirdeskManager.getInstance(getApplicationContext()).addTopicToWorkspace(topicname);
+            manager.addTopicToWorkspace(topicname);
 
             TextView topicsView = (TextView) findViewById(R.id.topicsText);
             String topics = "";
-            for(String s : AirdeskManager.getInstance(getApplicationContext()).getTopics()) {
+            for(String s : manager.getTopics()) {
                 topics +=  s + ", ";
             }
             if(topics.length() > 0)
@@ -199,8 +215,6 @@ public class workspaceSettings extends ActionBarActivity {
     public void privateSwitch(View v) {
         Switch privateSwitch = ((Switch)findViewById(R.id.privateSwitch));
         boolean isprivate = privateSwitch.isChecked();
-
-        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
 
         manager.setWorkspacePrivacy(workspaceName, isprivate);
     }

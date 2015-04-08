@@ -20,10 +20,11 @@ public class EditFile extends ActionBarActivity {
     String filename;
     File file;
     String workspaceName;
+    AirdeskManager manager;
 
     @Override
     protected void onPause() {
-        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext()); super.onPause();
+        manager.saveAppState(getApplicationContext()); super.onPause();
     }
 
     @Override
@@ -37,7 +38,7 @@ public class EditFile extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_file);
 
-        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
+        manager = AirdeskManager.getInstance(getApplicationContext());
         workspaceName = manager.getCurrentWorkspace();
         filename = manager.getCurrentFile();
         file = manager.getFile(filename);
@@ -55,8 +56,6 @@ public class EditFile extends ActionBarActivity {
     }
 
     public void save(View v) {
-
-        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
 
         String content = ((EditText) findViewById(R.id.fileText)).getText().toString();
 

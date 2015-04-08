@@ -25,10 +25,11 @@ public class UserPrivileges extends ActionBarActivity {
     ListView userListView;
     ArrayList<String> userNameList;
     String workspaceName;
+    AirdeskManager manager;
 
     @Override
     protected void onPause() {
-        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext());super.onPause();
+        manager.saveAppState(getApplicationContext());super.onPause();
     }
 
     @Override
@@ -36,14 +37,14 @@ public class UserPrivileges extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_privileges);
 
-        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
+        manager = AirdeskManager.getInstance(getApplicationContext());
         workspaceName = manager.getCurrentWorkspace();
 
         TextView workspaceNameView = (TextView)findViewById(R.id.workspaceNameText);
         workspaceNameView.setText(workspaceName);
 
-        userNameList = new ArrayList<String>(AirdeskManager.getInstance(getApplicationContext()).getUsersFromWorkspace());
-        userNameList.remove(AirdeskManager.getInstance(getApplicationContext()).getLoggedUser());
+        userNameList = new ArrayList<String>(manager.getUsersFromWorkspace());
+        userNameList.remove(manager.getLoggedUser());
 
         userListView = (ListView) findViewById(R.id.userListView);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, userNameList );
@@ -55,7 +56,7 @@ public class UserPrivileges extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     final int position, long id) {
                 final boolean[] choices;
-                choices = AirdeskManager.getInstance(getApplicationContext()).getUserPrivileges(userNameList.get(position));
+                choices = manager.getUserPrivileges(userNameList.get(position));
                 new AlertDialog.Builder(that)
                         .setTitle("Edit " + userNameList.get(position) + "'s Privileges")
                         .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"}, choices, new DialogInterface.OnMultiChoiceClickListener() {
@@ -69,7 +70,7 @@ public class UserPrivileges extends ActionBarActivity {
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
-                                    AirdeskManager.getInstance(getApplicationContext()).changeUserPrivileges(userNameList.get(position), choices);
+                                    manager.changeUserPrivileges(userNameList.get(position), choices);
                                 } catch (UserDoesNotHavePermissionsToChangePrivilegesException e) {
                                     Context context = getApplicationContext();
                                     CharSequence text = e.getMessage();

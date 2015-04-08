@@ -237,15 +237,15 @@ public class AirdeskManager implements Serializable {
         registeredUsers.get(loggedUser).applyGlobalPrivileges(workspaceName, choices);
 	}
 
-	public void inviteUser(String workspaceName, String username) throws UserDoesNotExistException, UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
+	public void inviteUser(String username) throws UserDoesNotExistException, UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
         if (!registeredUsers.containsKey(username))
             throw new UserDoesNotExistException();
-        if(!existingWorkspaces.get(workspaceName).getOwner().equals(registeredUsers.get(loggedUser)))
+        if(!existingWorkspaces.get(currentWorkspace).getOwner().equals(loggedUser))
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
         else {
-            registeredUsers.get(loggedUser).addUserToWorkspace(username, workspaceName);
-            registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(workspaceName));
-            existingWorkspaces.get(workspaceName).addUser(username);
+            registeredUsers.get(loggedUser).addUserToWorkspace(username, currentWorkspace);
+            registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(currentWorkspace));
+            existingWorkspaces.get(currentWorkspace).addUser(username);
         }
 	}
 
@@ -306,5 +306,34 @@ public class AirdeskManager implements Serializable {
 
     public boolean getWorkspacePrivacy(String workspaceName) {
         return existingWorkspaces.get(workspaceName).isPrivate();
+    }
+
+    public boolean[] getAllPrivilegesFromWorkspace() {
+        boolean[] privileges = {true,true,true,true};
+        for(Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()){
+            if(!p.canRead()) {
+                privileges[0] = false;
+                break;
+            }
+        }
+        for(Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()){
+            if(!p.canWrite()) {
+                privileges[1] = false;
+                break;
+            }
+        }
+        for(Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()){
+            if(!p.canCreate()) {
+                privileges[2] = false;
+                break;
+            }
+        }
+        for(Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()){
+            if(!p.canDelete()) {
+                privileges[3] = false;
+                break;
+            }
+        }
+        return privileges;
     }
 }

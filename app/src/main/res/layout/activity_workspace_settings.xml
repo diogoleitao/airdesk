@@ -62,9 +62,27 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Read Files"
+            android:id="@+id/readFilesBox"
+            android:layout_centerHorizontal="true"
+            android:checked="false"
+            android:layout_centerVertical="true" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Write to Files"
             android:id="@+id/writeFilesBox"
             android:layout_below="@+id/readFilesBox"
+            android:layout_centerHorizontal="true"
+            android:checked="false" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create Files"
+            android:id="@+id/createFilesBox"
+            android:layout_below="@+id/writeFilesBox"
             android:layout_centerHorizontal="true"
             android:checked="false" />
 
@@ -76,24 +94,6 @@
             android:checked="false"
             android:layout_below="@+id/createFilesBox"
             android:layout_centerHorizontal="true" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Read Files"
-            android:id="@+id/readFilesBox"
-            android:layout_centerHorizontal="true"
-            android:checked="false"
-            android:layout_centerVertical="true" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Create Files"
-            android:id="@+id/createFilesBox"
-            android:layout_below="@+id/writeFilesBox"
-            android:layout_centerHorizontal="true"
-            android:checked="false" />
 
     </LinearLayout>
 
@@ -148,10 +148,9 @@
         android:id="@+id/bt_addtopic"
         android:onClick="addTopic"
         android:layout_above="@+id/topicsText"
-        android:layout_alignRight="@+id/bt_invite"
-        android:layout_alignEnd="@+id/bt_invite"
         android:layout_toRightOf="@+id/newTopicText"
-        android:layout_toEndOf="@+id/newTopicText" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"

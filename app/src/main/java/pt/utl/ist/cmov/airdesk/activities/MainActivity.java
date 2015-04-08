@@ -19,10 +19,11 @@ public class MainActivity extends ActionBarActivity {
     String name;
     String email;
     String registerEmail;
+    AirdeskManager manager;
 
     @Override
     protected void onPause() {
-        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext()); super.onPause();
+        manager.saveAppState(getApplicationContext()); super.onPause();
     }
 
     @Override
@@ -33,7 +34,7 @@ public class MainActivity extends ActionBarActivity {
         SharedPreferences prefs = this.getSharedPreferences(
                 "pt.utl.ist.cmov.airdesk", Context.MODE_PRIVATE);
 
-        AirdeskManager.getInstance(getApplicationContext());
+        manager = AirdeskManager.getInstance(getApplicationContext());
     }
 
     @Override
@@ -73,7 +74,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         try {
-            AirdeskManager.getInstance(getApplicationContext()).registerUser( name, registerEmail);
+            manager.registerUser( name, registerEmail);
         } catch (UserAlreadyExistsException e) {
             text = e.getMessage();
             toast= Toast.makeText(context, text, duration);
@@ -89,7 +90,7 @@ public class MainActivity extends ActionBarActivity {
         EditText emailView = (EditText) findViewById(R.id.emailEditText);
         email = emailView.getText().toString();
 
-       if(! AirdeskManager.getInstance(getApplicationContext()).login(email)) {
+       if(! manager.login(email)) {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             CharSequence text = "Login failed. Please register.";

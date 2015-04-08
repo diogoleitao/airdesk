@@ -29,10 +29,11 @@ public class ListFiles extends ActionBarActivity {
     ListView fileListView;
     ArrayList<String> fileNameList;
     String workspaceName;
+    AirdeskManager manager;
 
     @Override
     protected void onPause() {
-        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext());super.onPause();
+        manager.saveAppState(getApplicationContext());super.onPause();
     }
 
     @Override
@@ -46,7 +47,7 @@ public class ListFiles extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_files);
 
-        final AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
+        manager = AirdeskManager.getInstance(getApplicationContext());
         workspaceName = manager.getCurrentWorkspace();
 
         fileNameList = manager.getFilesFromWorkspace(workspaceName);
@@ -61,7 +62,6 @@ public class ListFiles extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
-                AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
                 boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
                 if(!privileges[0]) { // read privilege
                     Context context = getApplicationContext();
@@ -86,7 +86,7 @@ public class ListFiles extends ActionBarActivity {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
-                                    AirdeskManager.getInstance(getApplicationContext()).deleteFile(fileNameList.get(position));
+                                    manager.deleteFile(fileNameList.get(position));
                                     fileNameList.remove(position);
                                     adapter.notifyDataSetChanged();
                                 } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
@@ -121,47 +121,45 @@ public class ListFiles extends ActionBarActivity {
 
     public void addFile(View v) {
 
-        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
+        EditText filenameView = (EditText) findViewById(R.id.fileNameText);
+        String name = filenameView.getText().toString();
 
-            EditText filenameView = (EditText) findViewById(R.id.fileNameText);
-            String name = filenameView.getText().toString();
+        if(name.equals("") || name.equals(" "))
+            return;
 
-            if(name.equals("") || name.equals(" "))
-                return;
-
-            if(Pattern.compile("^\\s+$").matcher(name).matches()){
-                Context context = getApplicationContext();
-                CharSequence text = "File name must contain at least one meaningful character.";
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-                return;
-            }
-
-            if(name.contains("\n")) {
-                Context context = getApplicationContext();
-                CharSequence text = "No line breaks allowed!";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-                return;
-            }
-
-                try {
-                    manager.addNewFile(name);
-                    filenameView.setText("");
-                    fileNameList.add(name);
-                    adapter.notifyDataSetChanged();
-                } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
-                    Context context = getApplicationContext();
-                    CharSequence text = e.getMessage();
-                    int duration = Toast.LENGTH_SHORT;
-
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-                }
-            }
+        if(Pattern.compile("^\\s+$").matcher(name).matches()){
+            Context context = getApplicationContext();
+            CharSequence text = "File name must contain at least one meaningful character.";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
         }
+
+        if(name.contains("\n")) {
+            Context context = getApplicationContext();
+            CharSequence text = "No line breaks allowed!";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
+        try {
+            manager.addNewFile(name);
+            filenameView.setText("");
+            fileNameList.add(name);
+            adapter.notifyDataSetChanged();
+        } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
+            Context context = getApplicationContext();
+            CharSequence text = e.getMessage();
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+    }
+}
 
 

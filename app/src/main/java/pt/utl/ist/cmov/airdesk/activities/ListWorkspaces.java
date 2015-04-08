@@ -27,10 +27,11 @@ public class ListWorkspaces extends ActionBarActivity {
     ListView foreignWorkspaceListView;
     ArrayList<String> workspaceList;
     ArrayList<String> foreignWorkspaceList;
+    AirdeskManager manager;
 
     @Override
     protected void onPause() {
-        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext());super.onPause();
+        manager.saveAppState(getApplicationContext());super.onPause();
     }
 
     @Override
@@ -43,7 +44,7 @@ public class ListWorkspaces extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_workspaces);
 
-        final AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
+        manager = AirdeskManager.getInstance(getApplicationContext());
 
         workspaceList = new ArrayList<String>();
         foreignWorkspaceList = new ArrayList<String>();
@@ -112,7 +113,6 @@ public class ListWorkspaces extends ActionBarActivity {
 
     public void addWorkspace(View v) {
 
-        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
         EditText name = (EditText) findViewById(R.id.workspaceNameText);
         String workspaceName = name.getText().toString();
         EditText quotaView = (EditText) findViewById(R.id.quotaText);
@@ -168,7 +168,7 @@ public class ListWorkspaces extends ActionBarActivity {
     }
 
     public void logout(View v) {
-        AirdeskManager.getInstance(getApplicationContext()).logout();
+        manager.logout();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
