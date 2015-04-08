@@ -4,25 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
-import pt.utl.ist.cmov.airdesk.domain.User;
-import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
 
 public class ListWorkspaces extends ActionBarActivity {
@@ -35,6 +29,11 @@ public class ListWorkspaces extends ActionBarActivity {
     ArrayList<String> foreignWorkspaceList;
 
     @Override
+    protected void onPause() {
+        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext());super.onPause();
+    }
+
+    @Override
     public void onBackPressed() {
         logout(findViewById(R.id.bt_logout));
     }
@@ -44,7 +43,7 @@ public class ListWorkspaces extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_workspaces);
 
-        final AirdeskManager manager = AirdeskManager.getInstance();
+        final AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
 
         workspaceList = new ArrayList<String>();
         foreignWorkspaceList = new ArrayList<String>();
@@ -113,7 +112,7 @@ public class ListWorkspaces extends ActionBarActivity {
 
     public void addWorkspace(View v) {
 
-        AirdeskManager manager = AirdeskManager.getInstance();
+        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
         EditText name = (EditText) findViewById(R.id.workspaceNameText);
         String workspaceName = name.getText().toString();
         EditText quotaView = (EditText) findViewById(R.id.quotaText);
@@ -169,7 +168,7 @@ public class ListWorkspaces extends ActionBarActivity {
     }
 
     public void logout(View v) {
-        AirdeskManager.getInstance().logout();
+        AirdeskManager.getInstance(getApplicationContext()).logout();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

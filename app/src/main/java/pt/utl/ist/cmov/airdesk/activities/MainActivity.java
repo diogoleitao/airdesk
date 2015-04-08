@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,6 +21,11 @@ public class MainActivity extends ActionBarActivity {
     String registerEmail;
 
     @Override
+    protected void onPause() {
+        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext()); super.onPause();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -29,7 +33,7 @@ public class MainActivity extends ActionBarActivity {
         SharedPreferences prefs = this.getSharedPreferences(
                 "pt.utl.ist.cmov.airdesk", Context.MODE_PRIVATE);
 
-        AirdeskManager.getInstance();
+        AirdeskManager.getInstance(getApplicationContext());
     }
 
     @Override
@@ -69,13 +73,14 @@ public class MainActivity extends ActionBarActivity {
         }
 
         try {
-            AirdeskManager.getInstance().registerUser( name, registerEmail);
+            AirdeskManager.getInstance(getApplicationContext()).registerUser( name, registerEmail);
         } catch (UserAlreadyExistsException e) {
             text = "User Already Exists!";
             toast= Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
+
         Intent intent = new Intent(this, ListWorkspaces.class);
         startActivity(intent);
     }
@@ -84,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
         EditText emailView = (EditText) findViewById(R.id.emailEditText);
         email = emailView.getText().toString();
 
-       if(! AirdeskManager.getInstance().login(email)) {
+       if(! AirdeskManager.getInstance(getApplicationContext()).login(email)) {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             CharSequence text = "Login failed. Please register.";
@@ -95,5 +100,9 @@ public class MainActivity extends ActionBarActivity {
 
         Intent intent = new Intent(this, ListWorkspaces.class);
         startActivity(intent);
+    }
+
+    public void save(View v){
+        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext());
     }
 }

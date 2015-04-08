@@ -6,9 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,13 +15,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
-import pt.utl.ist.cmov.airdesk.domain.File;
-import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
@@ -36,6 +31,11 @@ public class ListFiles extends ActionBarActivity {
     String workspaceName;
 
     @Override
+    protected void onPause() {
+        AirdeskManager.getInstance(getApplicationContext()).saveAppState(getApplicationContext());super.onPause();
+    }
+
+    @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, ListWorkspaces.class);
         startActivity(intent);
@@ -46,7 +46,7 @@ public class ListFiles extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_files);
 
-        final AirdeskManager manager = AirdeskManager.getInstance();
+        final AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
         workspaceName = manager.getCurrentWorkspace();
 
         fileNameList = manager.getFilesFromWorkspace(workspaceName);
@@ -61,7 +61,7 @@ public class ListFiles extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
-                AirdeskManager manager = AirdeskManager.getInstance();
+                AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
                 boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
                 if(!privileges[1]) { // write privilege
                     Context context = getApplicationContext();
@@ -86,7 +86,7 @@ public class ListFiles extends ActionBarActivity {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
-                                    AirdeskManager.getInstance().deleteFile(fileNameList.get(position));
+                                    AirdeskManager.getInstance(getApplicationContext()).deleteFile(fileNameList.get(position));
                                     fileNameList.remove(position);
                                     adapter.notifyDataSetChanged();
                                 } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
@@ -121,7 +121,7 @@ public class ListFiles extends ActionBarActivity {
 
     public void addFile(View v) {
 
-        AirdeskManager manager = AirdeskManager.getInstance();
+        AirdeskManager manager = AirdeskManager.getInstance(getApplicationContext());
 
             EditText filenameView = (EditText) findViewById(R.id.fileNameText);
             String name = filenameView.getText().toString();

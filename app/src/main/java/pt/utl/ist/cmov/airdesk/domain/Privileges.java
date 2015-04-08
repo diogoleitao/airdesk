@@ -1,6 +1,8 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
-public class Privileges {
+import java.io.Serializable;
+
+public class Privileges implements Serializable {
 
 	/**
 	 * True if a user can read a file; false otherwise

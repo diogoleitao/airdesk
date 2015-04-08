@@ -1,12 +1,13 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
-public class Workspace {
+public class Workspace implements Serializable {
 	/**
 	 * The maximum size of the workspace (in kB)
 	 */

@@ -1,5 +1,16 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,7 +24,9 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
-public class AirdeskManager {
+public class AirdeskManager implements Serializable {
+
+    static String filename = "AirdeskState";
 
 	/**
 	 * This class' singleton
@@ -47,10 +60,31 @@ public class AirdeskManager {
 
 	private AirdeskManager() {}
 
-	public static AirdeskManager getInstance() {
+	public static AirdeskManager getInstance(Context context) {
 		if (instance == null) {
 			instance = new AirdeskManager();
-			populateAirdesk();
+
+            try {
+
+                FileInputStream fileInputStream = context.openFileInput(filename);
+
+                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
+                int duration = Toast.LENGTH_SHORT;
+
+                existingWorkspaces = (HashMap<String, Workspace>)objectInputStream.readObject();
+                registeredUsers = (HashMap<String, User>)objectInputStream.readObject();
+
+                objectInputStream.close();
+                fileInputStream.close();
+
+            } catch (FileNotFoundException e) {
+                populateAirdesk();
+            }  catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }  catch (IOException e) {
+                e.printStackTrace();
+            }
 		}
 		return instance;
 	}
@@ -161,8 +195,7 @@ public class AirdeskManager {
     }
 
     public void addTopicToWorkspace(String topic) throws TopicAlreadyAddedException {
-        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).addTopic(topic); // ????
-        //existingWorkspaces.get(currentWorkspace).addTopic(topic);
+        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).addTopic(topic);
     }
 
 	public User getUserByEmail(String email) {
@@ -242,5 +275,28 @@ public class AirdeskManager {
 
     public void setCurrentWorkspace(String currentWorkspace) {
         this.currentWorkspace = currentWorkspace;
+    }
+
+    public void saveAppState(Context context) {
+
+        try {
+            FileOutputStream fileOutputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+
+            objectOutputStream.writeObject(existingWorkspaces);
+            objectOutputStream.writeObject(registeredUsers);
+
+            objectOutputStream.close();
+            fileOutputStream.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<String> getTopics() {
+        return existingWorkspaces.get(currentWorkspace).getTopics();
     }
 }

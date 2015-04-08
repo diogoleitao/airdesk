@@ -1,9 +1,11 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by Diogo on 25/03/2015.
  */
-public class File {
+public class File implements Serializable {
 
 	/**
 	 * The name of the file
