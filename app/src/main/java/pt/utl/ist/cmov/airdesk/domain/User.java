@@ -35,8 +35,6 @@ public class User implements Serializable{
 	 */
 	private ArrayList<String> subscriptions;
 
-	public User() {}
-
 	public User(String name, String email) {
 		this.setName(name);
 		this.setEmail(email);
@@ -124,7 +122,7 @@ public class User implements Serializable{
 	 * @param workspace
 	 */
 	public void addUserToWorkspace(String email, String workspace) throws UserAlreadyHasPermissionsInWorkspaceException {
-        if(getOwnedWorkspaces().get(workspace).getAccessLists().containsKey(email))
+        if (getOwnedWorkspaces().get(workspace).getAccessLists().containsKey(email))
             throw new UserAlreadyHasPermissionsInWorkspaceException();
 		Privileges privileges = new Privileges();
 		getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
@@ -148,50 +146,6 @@ public class User implements Serializable{
 	 */
 	public void changeWorkspacePrivacy(String workspace, boolean privacy) {
 		getOwnedWorkspaces().get(workspace).setPrivacy(privacy);
-	}
-
-	/**
-	 * Set a user's read privileges for a given workspace
-	 *
-	 * @param email the user's email
-	 * @param workspace the workspace identifier (its name)
-	 * @param canRead true if the user can read files on this workspace; false, otherwise
-	 */
-	public void setUserReadPrivileges(String email, String workspace, boolean canRead) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setReadPrivilege(canRead);
-	}
-
-	/**
-	 * Set a user's read privileges for a given workspace
-	 *
-	 * @param email the user's email
-	 * @param workspace the workspace identifier (its name)
-	 * @param canWrite true if the user can edit files on this workspace; false, otherwise
-	 */
-	public void setUserWritePrivileges(String email, String workspace, boolean canWrite) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setWritePrivilege(canWrite);
-	}
-
-	/**
-	 * Set a user's create privileges for a given workspace
-	 *
-	 * @param email the user's email
-	 * @param workspace the workspace identifier (its name)
-	 * @param canCreate true if the user can create files on this workspace; false, otherwise
-	 */
-	public void setUserCreatePrivileges(String email, String workspace, boolean canCreate) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setCreatePrivilege(canCreate);
-	}
-
-	/**
-	 * Set a user's delete privilege for a given workspace
-	 *
-	 * @param email the user's email
-	 * @param workspace the workspace identifier (its name)
-	 * @param canDelete true if the user can delete files on this workspace; false, otherwise
-	 */
-	public void setUserDeletePrivileges(String email, String workspace, boolean canDelete) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setDeletePrivilege(canDelete);
 	}
 
 	public void mountWorkspace(Workspace workspace) {
@@ -240,22 +194,20 @@ public class User implements Serializable{
 
     public void applyGlobalPrivileges(String workspaceName, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
         Workspace workspace = getWorkspace(workspaceName);
-        if(workspace.getOwner().equals(this.getEmail())){
-            workspace.getAccessLists().values().remove(getEmail());
+        if (workspace.getOwner().equals(this.getEmail())) {
+            workspace.getAccessLists().values().remove(this.getEmail());
             for (Privileges userPrivileges : workspace.getAccessLists().values())
                 userPrivileges.setAll(choices);
             workspace.getAccessLists().get(getEmail()).setAll(new boolean[]{true,true,true,true});
         } else {
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
         }
-
     }
 
     public void changeUserPrivileges(String email, boolean[] privileges, String workspace) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        if(getOwnedWorkspaces().get(workspace)!= null){
+        if (getOwnedWorkspaces().get(workspace)!= null) {
             getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setAll(privileges);
         } else
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
     }
-
 }

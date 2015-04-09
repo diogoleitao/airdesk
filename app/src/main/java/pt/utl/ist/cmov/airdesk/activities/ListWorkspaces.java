@@ -31,7 +31,8 @@ public class ListWorkspaces extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        manager.saveAppState(getApplicationContext());super.onPause();
+        manager.saveAppState(getApplicationContext());
+        super.onPause();
     }
 
     @Override
@@ -64,8 +65,7 @@ public class ListWorkspaces extends ActionBarActivity {
 
         workspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(that, ListFiles.class);
                 manager.setCurrentWorkspace(workspaceList.get(position));
                 startActivity(intent);
@@ -74,8 +74,7 @@ public class ListWorkspaces extends ActionBarActivity {
 
         foreignWorkspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(that, ListFiles.class);
                 manager.setCurrentWorkspace(foreignWorkspaceList.get(position));
                 startActivity(intent);
@@ -103,7 +102,6 @@ public class ListWorkspaces extends ActionBarActivity {
         });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -112,7 +110,6 @@ public class ListWorkspaces extends ActionBarActivity {
     }
 
     public void addWorkspace(View v) {
-
         EditText name = (EditText) findViewById(R.id.workspaceNameText);
         String workspaceName = name.getText().toString();
         EditText quotaView = (EditText) findViewById(R.id.quotaText);
@@ -130,16 +127,16 @@ public class ListWorkspaces extends ActionBarActivity {
 
         quota = Integer.parseInt(quotaText);
 
-        if(Pattern.compile("^\\s+$").matcher(workspaceName).matches()){
+        if (Pattern.compile("^\\s+$").matcher(workspaceName).matches()) {
             Context context = getApplicationContext();
-            CharSequence text = "Workspace name must contain at least one meaningful character.";
+            CharSequence text = "Workspace name must contain at least one meaningful character!";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
 
-        if(workspaceName.contains("\n")) {
+        if (workspaceName.contains("\n")) {
             Context context = getApplicationContext();
             CharSequence text = "No line breaks allowed!";
             int duration = Toast.LENGTH_SHORT;
@@ -156,7 +153,6 @@ public class ListWorkspaces extends ActionBarActivity {
             adapter.notifyDataSetChanged();
             name.setText("");
             quotaView.setText("");
-
         } catch (WorkspaceAlreadyExistsException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();

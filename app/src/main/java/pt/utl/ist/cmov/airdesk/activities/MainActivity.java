@@ -2,7 +2,6 @@ package pt.utl.ist.cmov.airdesk.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,17 +22,14 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        manager.saveAppState(getApplicationContext()); super.onPause();
+        manager.saveAppState(getApplicationContext());
+        super.onPause();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        SharedPreferences prefs = this.getSharedPreferences(
-                "pt.utl.ist.cmov.airdesk", Context.MODE_PRIVATE);
-
         manager = AirdeskManager.getInstance(getApplicationContext());
     }
 
@@ -43,7 +39,6 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
 
     public void register(View v) {
         EditText nameView = (EditText) findViewById(R.id.nameEditText);
@@ -59,25 +54,25 @@ public class MainActivity extends ActionBarActivity {
         Toast toast;
         CharSequence text;
 
-        if(name.contains(" ") || registerEmail.contains(" ") || name.contains("\n") || registerEmail.contains("\n")) {
+        if (name.contains(" ") || registerEmail.contains(" ") || name.contains("\n") || registerEmail.contains("\n")) {
             text = "No spaces or line breaks allowed!";
-            toast= Toast.makeText(context, text, duration);
+            toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
 
-        if(name.equals("") || registerEmail.equals("")) {
+        if (name.equals("") || registerEmail.equals("")) {
             text = "Please fill in all fields!";
-            toast= Toast.makeText(context, text, duration);
+            toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
 
         try {
-            manager.registerUser( name, registerEmail);
+            manager.registerUser(name, registerEmail);
         } catch (UserAlreadyExistsException e) {
             text = e.getMessage();
-            toast= Toast.makeText(context, text, duration);
+            toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
@@ -90,7 +85,7 @@ public class MainActivity extends ActionBarActivity {
         EditText emailView = (EditText) findViewById(R.id.emailEditText);
         email = emailView.getText().toString();
 
-       if(! manager.login(email)) {
+       if (!manager.login(email)) {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             CharSequence text = "Login failed. Please register.";
@@ -102,5 +97,4 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, ListWorkspaces.class);
         startActivity(intent);
     }
-
 }

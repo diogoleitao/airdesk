@@ -22,8 +22,6 @@ public class File implements Serializable {
      */
     private int size;
 
-	public File() {}
-
 	public File(String name) {
 		this.name = name;
 		this.content = "";

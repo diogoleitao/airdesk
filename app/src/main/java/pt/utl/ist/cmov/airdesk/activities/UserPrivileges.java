@@ -29,7 +29,8 @@ public class UserPrivileges extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        manager.saveAppState(getApplicationContext());super.onPause();
+        manager.saveAppState(getApplicationContext());
+        super.onPause();
     }
 
     @Override
@@ -53,19 +54,16 @@ public class UserPrivileges extends ActionBarActivity {
 
         userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    final int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 final boolean[] choices;
                 choices = manager.getUserPrivileges(userNameList.get(position));
                 new AlertDialog.Builder(that)
                         .setTitle("Edit " + userNameList.get(position) + "'s Privileges")
-                        .setMultiChoiceItems(new CharSequence[]{ "Read", "Write", "Create", "Delete"}, choices, new DialogInterface.OnMultiChoiceClickListener() {
+                        .setMultiChoiceItems(new CharSequence[] { "Read", "Write", "Create", "Delete"}, choices, new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which,
-                                                boolean isChecked) {
+                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                                 choices[which] = isChecked;
                             }
-
                         })
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -78,7 +76,6 @@ public class UserPrivileges extends ActionBarActivity {
                                     Toast toast = Toast.makeText(context, text, duration);
                                     toast.show();
                                 }
-
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -91,7 +88,6 @@ public class UserPrivileges extends ActionBarActivity {
             }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

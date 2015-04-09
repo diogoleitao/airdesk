@@ -33,7 +33,8 @@ public class ListFiles extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        manager.saveAppState(getApplicationContext());super.onPause();
+        manager.saveAppState(getApplicationContext());
+        super.onPause();
     }
 
     @Override
@@ -53,19 +54,17 @@ public class ListFiles extends ActionBarActivity {
         fileNameList = manager.getFilesFromWorkspace(workspaceName);
 
         fileListView = (ListView) findViewById(R.id.filelist);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileNameList );
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileNameList);
         fileListView.setAdapter(adapter);
         final Context that = this;
 
         fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
-                if(!privileges[0]) { // read privilege
+                if (!privileges[0]) { // read privilege
                     Context context = getApplicationContext();
-                    CharSequence text = "You don't have privilege to read files!";
+                    CharSequence text = "You don't have privileges to read files!";
                     int duration = Toast.LENGTH_SHORT;
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
@@ -82,7 +81,7 @@ public class ListFiles extends ActionBarActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
                 new AlertDialog.Builder(that)
                         .setTitle("Delete " + fileNameList.get(position) + "?")
-                        .setMessage("This action is irreversible. This file uses "+ manager.getFile(fileNameList.get(position)).getSize() +" of space.")
+                        .setMessage("This action is irreversible. This file uses "+ manager.getFile(fileNameList.get(position)).getSize() +"kB of space.")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
@@ -109,7 +108,6 @@ public class ListFiles extends ActionBarActivity {
                 return true;
             }
         });
-
     }
 
     @Override
@@ -120,27 +118,22 @@ public class ListFiles extends ActionBarActivity {
     }
 
     public void addFile(View v) {
-
         EditText filenameView = (EditText) findViewById(R.id.fileNameText);
         String name = filenameView.getText().toString();
 
-        if(name.equals("") || name.equals(" "))
-            return;
-
-        if(Pattern.compile("^\\s+$").matcher(name).matches()){
+        if (Pattern.compile("^\\s+$").matcher(name).matches() || name.equals("") || name.equals(" ")) {
             Context context = getApplicationContext();
-            CharSequence text = "File name must contain at least one meaningful character.";
+            CharSequence text = "File name must contain at least one meaningful character!";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
 
-        if(name.contains("\n")) {
+        if (name.contains("\n")) {
             Context context = getApplicationContext();
             CharSequence text = "No line breaks allowed!";
             int duration = Toast.LENGTH_SHORT;
-
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
@@ -155,11 +148,8 @@ public class ListFiles extends ActionBarActivity {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();
             int duration = Toast.LENGTH_SHORT;
-
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
     }
 }
-
-

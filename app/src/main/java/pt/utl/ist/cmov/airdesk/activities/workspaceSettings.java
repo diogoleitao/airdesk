@@ -14,7 +14,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
@@ -30,7 +30,8 @@ public class workspaceSettings extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        manager.saveAppState(getApplicationContext());super.onPause();
+        manager.saveAppState(getApplicationContext());
+        super.onPause();
     }
 
     @Override
@@ -52,14 +53,13 @@ public class workspaceSettings extends ActionBarActivity {
 
         TextView QuotaView = (TextView) findViewById(R.id.quotaText);
 
-        QuotaView.setText("Quota used/total: " + manager.getUsedQuota(workspaceName) + "/" + manager.getTotalQuota(workspaceName));
+        QuotaView.setText("Quota used/total: " + manager.getUsedQuota(workspaceName) + "/" + manager.getTotalQuota(workspaceName) + "kB");
 
         TextView topicsView = (TextView) findViewById(R.id.topicsText);
         String topics = "";
-        for(String s : manager.getTopics()) {
+        for (String s : manager.getTopics())
             topics +=  s + ", ";
-        }
-        if(topics.length() > 0)
+        if (topics.length() > 0)
             topics = topics.substring(0,topics.length() - 2);
         topicsView.setText("Topics: " + topics);
 
@@ -75,7 +75,6 @@ public class workspaceSettings extends ActionBarActivity {
         ((CheckBox) findViewById(R.id.createFilesBox)).setChecked(currentGlobalPrivileges[2]);
         ((CheckBox) findViewById(R.id.deleteFilesBox)).setChecked(currentGlobalPrivileges[3]);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -114,15 +113,13 @@ public class workspaceSettings extends ActionBarActivity {
         }
     }
 
-    public void inviteUser(View v){
-
+    public void inviteUser(View v) {
         String username = ((TextView)findViewById(R.id.inviteUserText)).getText().toString();
 
-        if(username.equals(manager.getLoggedUser())){
+        if (username.equals(manager.getLoggedUser())) {
             Context context = getApplicationContext();
             CharSequence text = "You can't invite yourself!";
             int duration = Toast.LENGTH_SHORT;
-
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
@@ -131,7 +128,7 @@ public class workspaceSettings extends ActionBarActivity {
         try {
             manager.inviteUser(username);
             Context context = getApplicationContext();
-            CharSequence text = "Invitation sent.";
+            CharSequence text = "Invitation sent!";
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, text, duration);
@@ -169,7 +166,6 @@ public class workspaceSettings extends ActionBarActivity {
                             Context context = getApplicationContext();
                             CharSequence text = e.getMessage();
                             int duration = Toast.LENGTH_SHORT;
-
                             Toast toast = Toast.makeText(context, text, duration);
                             toast.show();
                         }
@@ -189,23 +185,41 @@ public class workspaceSettings extends ActionBarActivity {
     public void addTopic(View v){
         EditText topicView = ((EditText)findViewById(R.id.newTopicText));
         String topicname = topicView.getText().toString();
+
+        if (Pattern.compile("^\\s+$").matcher(topicname).matches() || topicname.equals("") || topicname.equals(" ")) {
+            Context context = getApplicationContext();
+            CharSequence text = "Topic must contain at least one meaningful character!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
+        if (topicname.contains("\n")) {
+            Context context = getApplicationContext();
+            CharSequence text = "No line breaks allowed!";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
         try {
             manager.addTopicToWorkspace(topicname);
 
             TextView topicsView = (TextView) findViewById(R.id.topicsText);
+
             String topics = "";
-            for(String s : manager.getTopics()) {
+            for (String s : manager.getTopics())
                 topics +=  s + ", ";
-            }
-            if(topics.length() > 0)
+
+            if (topics.length() > 0)
                 topics = topics.substring(0,topics.length() - 2);
             topicsView.setText("Topics: " + topics);
-
         } catch (TopicAlreadyAddedException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();
             int duration = Toast.LENGTH_SHORT;
-
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
@@ -215,8 +229,6 @@ public class workspaceSettings extends ActionBarActivity {
     public void privateSwitch(View v) {
         Switch privateSwitch = ((Switch)findViewById(R.id.privateSwitch));
         boolean isprivate = privateSwitch.isChecked();
-
         manager.setWorkspacePrivacy(workspaceName, isprivate);
     }
-
 }

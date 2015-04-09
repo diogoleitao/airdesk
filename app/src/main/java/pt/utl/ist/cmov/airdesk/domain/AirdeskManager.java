@@ -66,19 +66,14 @@ public class AirdeskManager implements Serializable {
 			instance = new AirdeskManager();
 
             try {
-
                 FileInputStream fileInputStream = context.openFileInput(filename);
-
                 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-
-                int duration = Toast.LENGTH_SHORT;
 
                 existingWorkspaces = (HashMap<String, Workspace>)objectInputStream.readObject();
                 registeredUsers = (HashMap<String, User>)objectInputStream.readObject();
 
                 objectInputStream.close();
                 fileInputStream.close();
-
             } catch (FileNotFoundException e) {
                 populateAirdesk();
             }  catch (ClassNotFoundException e) {
@@ -183,10 +178,9 @@ public class AirdeskManager implements Serializable {
     }
 
     public ArrayList<String> getFilesFromWorkspace(String workspace) {
-        ArrayList<String> fileNames = new ArrayList<String>();
-
         currentWorkspace = workspace;
 
+        ArrayList<String> fileNames = new ArrayList<String>();
         if (registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
             fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
         if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
@@ -197,6 +191,10 @@ public class AirdeskManager implements Serializable {
 
     public void addTopicToWorkspace(String topic) throws TopicAlreadyAddedException {
         registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).addTopic(topic);
+    }
+
+    public ArrayList<String> getTopics() {
+        return existingWorkspaces.get(currentWorkspace).getTopics();
     }
 
 	public User getUserByEmail(String email) {
@@ -226,7 +224,6 @@ public class AirdeskManager implements Serializable {
 
     public void deleteFile(String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
         registeredUsers.get(loggedUser).deleteFile(currentWorkspace, fileName);
-        //existingWorkspaces.get(currentWorkspace).getFiles().remove(currentFile);  why delete twice
     }
 
 	public void changeUserPrivileges(String email, boolean[] privileges) throws UserDoesNotHavePermissionsToChangePrivilegesException {
@@ -240,9 +237,9 @@ public class AirdeskManager implements Serializable {
 	public void inviteUser(String username) throws UserDoesNotExistException, UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
         if (!registeredUsers.containsKey(username))
             throw new UserDoesNotExistException();
-        if(!existingWorkspaces.get(currentWorkspace).getOwner().equals(loggedUser))
+        if (!existingWorkspaces.get(currentWorkspace).getOwner().equals(loggedUser))
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
-        else {
+        else { // ELSE CONSTRUCT MIGHT NOT BE NEEDED
             registeredUsers.get(loggedUser).addUserToWorkspace(username, currentWorkspace);
             registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(currentWorkspace));
             existingWorkspaces.get(currentWorkspace).addUser(username);
@@ -278,7 +275,6 @@ public class AirdeskManager implements Serializable {
     }
 
     public void saveAppState(Context context) {
-
         try {
             FileOutputStream fileOutputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -288,16 +284,11 @@ public class AirdeskManager implements Serializable {
 
             objectOutputStream.close();
             fileOutputStream.close();
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public ArrayList<String> getTopics() {
-        return existingWorkspaces.get(currentWorkspace).getTopics();
     }
 
     public void setWorkspacePrivacy(String workspaceName, boolean isprivate) {
@@ -309,27 +300,27 @@ public class AirdeskManager implements Serializable {
     }
 
     public boolean[] getAllPrivilegesFromWorkspace() {
-        boolean[] privileges = {true,true,true,true};
-        for(Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()){
-            if(!p.canRead()) {
+        boolean[] privileges = { true,true,true,true };
+        for (Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()) {
+            if (!p.canRead()) {
                 privileges[0] = false;
                 break;
             }
         }
-        for(Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()){
-            if(!p.canWrite()) {
+        for (Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()) {
+            if (!p.canWrite()) {
                 privileges[1] = false;
                 break;
             }
         }
-        for(Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()){
-            if(!p.canCreate()) {
+        for (Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()) {
+            if (!p.canCreate()) {
                 privileges[2] = false;
                 break;
             }
         }
-        for(Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()){
-            if(!p.canDelete()) {
+        for (Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()) {
+            if (!p.canDelete()) {
                 privileges[3] = false;
                 break;
             }

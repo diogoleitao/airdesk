@@ -24,7 +24,8 @@ public class EditFile extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        manager.saveAppState(getApplicationContext()); super.onPause();
+        manager.saveAppState(getApplicationContext());
+        super.onPause();
     }
 
     @Override
@@ -47,7 +48,6 @@ public class EditFile extends ActionBarActivity {
         textView.setText(file.getContent());
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -56,14 +56,13 @@ public class EditFile extends ActionBarActivity {
     }
 
     public void save(View v) {
-
         String content = ((EditText) findViewById(R.id.fileText)).getText().toString();
 
         boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
 
-        if(!privileges[1]) { // read privilege
+        if (!privileges[1]) { // read privilege
             Context context = getApplicationContext();
-            CharSequence text = "You don't have privilege to edit files!";
+            CharSequence text = "You don't have privileges to edit files!";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
