@@ -42,7 +42,7 @@ public class UserPrivileges extends ActionBarActivity {
         workspaceName = manager.getCurrentWorkspace();
 
         TextView workspaceNameView = (TextView)findViewById(R.id.workspaceNameText);
-        workspaceNameView.setText(workspaceName);
+        workspaceNameView.setText("Workspace name: " + workspaceName);
 
         userNameList = new ArrayList<String>(manager.getUsersFromWorkspace());
         userNameList.remove(manager.getLoggedUser());
