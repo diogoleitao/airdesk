@@ -116,14 +116,14 @@ public class workspaceSettings extends ActionBarActivity {
     public void inviteUser(View v) {
         String username = ((TextView)findViewById(R.id.inviteUserText)).getText().toString();
 
-        if (username.equals(manager.getLoggedUser())) {
+     /*   if (username.equals(manager.getLoggedUser())) {
             Context context = getApplicationContext();
             CharSequence text = "You can't invite yourself!";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
-        }
+        } */
 
         try {
             manager.inviteUser(username);

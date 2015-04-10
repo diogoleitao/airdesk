@@ -54,10 +54,11 @@
         android:layout_height="wrap_content"
         android:text="Logout"
         android:id="@+id/bt_logout"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:onClick="logout"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <ListView
         android:layout_width="wrap_content"
@@ -76,5 +77,14 @@
         android:text="Foreign Workspaces"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:text="Owned Workspaces"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/foreignWorkspacesText"
+        android:layout_alignStart="@+id/foreignWorkspacesText" />
 
 </RelativeLayout>

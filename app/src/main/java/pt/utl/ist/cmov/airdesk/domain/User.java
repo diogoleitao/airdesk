@@ -122,6 +122,7 @@ public class User implements Serializable{
 	 * @param workspace
 	 */
 	public void addUserToWorkspace(String email, String workspace) throws UserAlreadyHasPermissionsInWorkspaceException {
+
         if (getOwnedWorkspaces().get(workspace).getAccessLists().containsKey(email))
             throw new UserAlreadyHasPermissionsInWorkspaceException();
 		Privileges privileges = new Privileges();
