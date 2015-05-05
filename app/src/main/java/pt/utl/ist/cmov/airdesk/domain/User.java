@@ -122,11 +122,16 @@ public class User implements Serializable{
 	 * @param workspace
 	 */
 	public void addUserToWorkspace(String email, String workspace) throws UserAlreadyHasPermissionsInWorkspaceException {
+        if (email.equals(this.getEmail())) {
+            Privileges privileges = new Privileges(true, true, true, true);
+            getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
+            return;
+        }
 
         if (getOwnedWorkspaces().get(workspace).getAccessLists().containsKey(email))
             throw new UserAlreadyHasPermissionsInWorkspaceException();
-		Privileges privileges = new Privileges();
-		getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
+        Privileges privileges = new Privileges();
+        getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
 	}
 
 	/**
@@ -150,9 +155,9 @@ public class User implements Serializable{
 	}
 
 	public void mountWorkspace(Workspace workspace) {
-		if (!workspace.getOwner().equals(getEmail())) {
+		//if (!workspace.getOwner().equals(getEmail())) {
 			foreignWorkspaces.put(workspace.getName(), workspace);
-		}
+		//}
 	}
 
     public Workspace getWorkspace(String workspaceName) {
@@ -199,7 +204,7 @@ public class User implements Serializable{
             workspace.getAccessLists().values().remove(this.getEmail());
             for (Privileges userPrivileges : workspace.getAccessLists().values())
                 userPrivileges.setAll(choices);
-            workspace.getAccessLists().get(getEmail()).setAll(new boolean[]{true,true,true,true});
+            workspace.getAccessLists().get(getEmail()).setAll(new boolean[]{ true,true,true,true });
         } else {
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
         }

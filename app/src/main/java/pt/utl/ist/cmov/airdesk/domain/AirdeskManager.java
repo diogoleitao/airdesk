@@ -181,10 +181,10 @@ public class AirdeskManager implements Serializable {
         currentWorkspace = workspace;
 
         ArrayList<String> fileNames = new ArrayList<String>();
-        if (registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace) != null)
-            fileNames.addAll(registeredUsers.get(loggedUser).getOwnedWorkspaces().get(currentWorkspace).getFiles().keySet());
-        if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
-            fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
+        if (registeredUsers.get(loggedUser).getWorkspace(workspace) != null)
+            fileNames.addAll(registeredUsers.get(loggedUser).getWorkspace(workspace).getFiles().keySet());
+       // if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
+         //   fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
 
         return fileNames;
     }
@@ -235,15 +235,14 @@ public class AirdeskManager implements Serializable {
 	}
 
 	public void inviteUser(String username) throws UserDoesNotExistException, UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
-        if (!registeredUsers.containsKey(username))
-            throw new UserDoesNotExistException();
         if (!existingWorkspaces.get(currentWorkspace).getOwner().equals(loggedUser))
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
-        else { // ELSE CONSTRUCT MIGHT NOT BE NEEDED
-            registeredUsers.get(loggedUser).addUserToWorkspace(username, currentWorkspace);
-            registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(currentWorkspace));
-            existingWorkspaces.get(currentWorkspace).addUser(username);
-        }
+        if (!registeredUsers.containsKey(username))
+            throw new UserDoesNotExistException();
+
+        registeredUsers.get(loggedUser).addUserToWorkspace(username, currentWorkspace);
+        registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(currentWorkspace));
+        existingWorkspaces.get(currentWorkspace).addUser(username);
 	}
 
 	public int getTotalQuota(String workspaceName) {
