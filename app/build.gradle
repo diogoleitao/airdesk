@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "pt.ulisboa.tecnico.cmov.airdesk"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -22,4 +22,10 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.0.0'
+    compile(name:'Termite-WifiP2P-API-release', ext:'aar')
+}
+repositories{
+    flatDir{
+        dirs 'libs'
+    }
 }
