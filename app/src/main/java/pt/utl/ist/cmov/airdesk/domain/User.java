@@ -88,8 +88,8 @@ public class User implements Serializable{
 	 * @param quota the maximum size assigned to the workspace
 	 * @param name the workspace's identifier
 	 */
-	public Workspace createWorkspace(int quota, String name) {
-		Workspace workspace = new Workspace(quota, name, getEmail());
+	public Workspace createWorkspace(int quota, String name, String hash) {
+		Workspace workspace = new Workspace(quota, name, getEmail(), hash);
 		ownedWorkspaces.put(name, workspace);
         return workspace;
 	}

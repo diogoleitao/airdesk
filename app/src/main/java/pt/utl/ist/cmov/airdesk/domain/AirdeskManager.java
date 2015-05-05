@@ -1,7 +1,6 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,6 +9,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -110,7 +111,7 @@ public class AirdeskManager implements Serializable {
 			registeredUsers.put(newUsers.get(i), newUser);
 
 			// CREATE WORKSPACE AND ADD TO PREVIOUSLY CREATED USER'S WORKSPACE SET
-			Workspace newWorkspace = new Workspace(5000, newWorkspaces.get(i), newUsers.get(i));
+			Workspace newWorkspace = new Workspace(5000, newWorkspaces.get(i), newUsers.get(i), "");
 			existingWorkspaces.put(newWorkspaces.get(i), newWorkspace);
 			newUser.getOwnedWorkspaces().put(newWorkspaces.get(i), newWorkspace);
 
@@ -169,7 +170,22 @@ public class AirdeskManager implements Serializable {
 				throw new WorkspaceAlreadyExistsException();
 			}
 		}
-		existingWorkspaces.put(workspaceName, getUserByEmail(loggedUser).createWorkspace(quota*1024, workspaceName));
+
+        String finalWorkspaceName = workspaceName + loggedUser;
+        MessageDigest md;
+
+        try {
+            md = MessageDigest.getInstance("SHA-512");
+            byte[] digestion = md.digest(finalWorkspaceName.getBytes());
+
+            StringBuilder sb = new StringBuilder();
+            for (int i : digestion)
+                sb.append(Byte.toString(digestion[i]));
+
+            existingWorkspaces.put(sb.toString(), getUserByEmail(loggedUser).createWorkspace(quota * 1024, workspaceName, sb.toString()));
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println(e.getMessage());
+        }
 	}
 
     public void deleteWorkspace(String workspaceName) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
-public class Workspace implements Serializable {
+public class Workspace implements Serializable, Observer {
 	/**
 	 * The maximum size of the workspace (in kB)
 	 */
@@ -27,6 +27,8 @@ public class Workspace implements Serializable {
 	 * The owner's/creator's nickname
 	 */
 	private String owner;
+
+	private String hash;
 
 	/**
 	 * Mapping between user's nickname and their privileges regarding the workspace
@@ -53,12 +55,15 @@ public class Workspace implements Serializable {
      */
     private ArrayList<String> users = new ArrayList<String>();
 
+	private ArrayList<Subject> subjects = new ArrayList<Subject>();
+
 	public Workspace() {}
 
-	public Workspace(int quota, String name, String owner) {
+	public Workspace(int quota, String name, String owner, String hash) {
 		this.setQuota(quota);
 		this.setName(name);
 		this.setOwner(owner);
+		this.setHash(hash);
 
         Privileges p = new Privileges(true, true, true, true);
         HashMap<String, Privileges> al = new HashMap<String, Privileges>();
@@ -89,6 +94,14 @@ public class Workspace implements Serializable {
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
 	}
 
 	public HashMap<String, Privileges> getAccessLists() {
@@ -131,6 +144,14 @@ public class Workspace implements Serializable {
         this.users = users;
     }
 
+	public ArrayList<Subject> getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(ArrayList<Subject> subjects) {
+		this.subjects = subjects;
+	}
+
     public void addUser(String user) {
         this.users.add(user);
     }
@@ -161,4 +182,14 @@ public class Workspace implements Serializable {
             updateQuotaOccupied(size);
         }
     }
+
+	@Override
+	public void update() {
+		//TODO
+	}
+
+	@Override
+	public void setSubject(Subject s) {
+		this.getSubjects().add(s);
+	}
 }
