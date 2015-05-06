@@ -2,12 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pt.utl.ist.cmov.airdesk" >
 
-
     <application
         android:allowBackup="true"
-
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name" >
@@ -19,28 +18,29 @@
         </activity>
         <activity
             android:name=".activities.ListWorkspaces"
-            android:label="@string/title_activity_list_workspaces">
+            android:label="@string/title_activity_list_workspaces" >
         </activity>
         <activity
             android:name=".activities.ListFiles"
             android:label="@string/title_activity_list_files"
-            android:parentActivityName=".activities.ListWorkspaces">
+            android:parentActivityName=".activities.ListWorkspaces" >
         </activity>
         <activity
             android:name=".activities.EditFile"
             android:label="@string/title_activity_edit_file"
-            android:parentActivityName=".activities.ListFiles">
+            android:parentActivityName=".activities.ListFiles" >
         </activity>
         <activity
             android:name=".activities.workspaceSettings"
             android:label="@string/title_activity_workspace_settings"
-            android:parentActivityName=".activities.ListWorkspaces">
+            android:parentActivityName=".activities.ListWorkspaces" >
         </activity>
         <activity
             android:name=".activities.UserPrivileges"
             android:label="@string/title_activity_user_privileges"
-            android:parentActivityName=".activities.workspaceSettings">
+            android:parentActivityName=".activities.workspaceSettings" >
         </activity>
+
     </application>
 
 </manifest>

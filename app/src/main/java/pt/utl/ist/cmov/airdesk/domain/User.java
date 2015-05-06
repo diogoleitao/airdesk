@@ -83,7 +83,7 @@ public class User implements Serializable{
 	}
 
 	/**
-	 * Create a workspace with a given name and quota size
+	 * Create AirdeskBroadcastReceiver workspace with AirdeskBroadcastReceiver given name and quota size
 	 *
 	 * @param quota the maximum size assigned to the workspace
 	 * @param name the workspace's identifier
@@ -95,7 +95,7 @@ public class User implements Serializable{
 	}
 
 	/**
-	 * Delete a specific workspace
+	 * Delete AirdeskBroadcastReceiver specific workspace
 	 *
 	 * @param name the workspace's identifier to be deleted from the user's set
 	 */
@@ -115,7 +115,7 @@ public class User implements Serializable{
 	}
 
 	/**
-	 * Add a user to a given workspace when the owner doesn't specify
+	 * Add AirdeskBroadcastReceiver user to AirdeskBroadcastReceiver given workspace when the owner doesn't specify
 	 * the user's privileges
 	 *
 	 * @param email
@@ -135,7 +135,7 @@ public class User implements Serializable{
 	}
 
 	/**
-	 * Remove a given user from a given workspace
+	 * Remove AirdeskBroadcastReceiver given user from AirdeskBroadcastReceiver given workspace
 	 *
 	 * @param email
 	 * @param workspace
@@ -145,7 +145,7 @@ public class User implements Serializable{
 	}
 
 	/**
-	 * Change a given workspace's privacy
+	 * Change AirdeskBroadcastReceiver given workspace's privacy
 	 *
 	 * @param workspace
 	 * @param privacy

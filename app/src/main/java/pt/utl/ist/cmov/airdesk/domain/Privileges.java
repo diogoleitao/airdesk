@@ -5,22 +5,22 @@ import java.io.Serializable;
 public class Privileges implements Serializable {
 
 	/**
-	 * True if a user can read a file; false otherwise
+	 * True if AirdeskBroadcastReceiver user can read AirdeskBroadcastReceiver file; false otherwise
 	 */
 	private boolean read;
 
 	/**
-	 * True if a user can write to a file; false otherwise
+	 * True if AirdeskBroadcastReceiver user can write to AirdeskBroadcastReceiver file; false otherwise
 	 */
 	private boolean write;
 
 	/**
-	 * True if a user can create a file; false otherwise
+	 * True if AirdeskBroadcastReceiver user can create AirdeskBroadcastReceiver file; false otherwise
 	 */
 	private boolean create = false;
 
 	/**
-	 * True if a user can delete a file; false otherwise
+	 * True if AirdeskBroadcastReceiver user can delete AirdeskBroadcastReceiver file; false otherwise
 	 */
 	private boolean delete = false;
 

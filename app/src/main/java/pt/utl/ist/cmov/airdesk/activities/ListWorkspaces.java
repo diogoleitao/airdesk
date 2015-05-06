@@ -2,6 +2,7 @@ package pt.utl.ist.cmov.airdesk.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.receivers.AirdeskBroadcastReceiver;
 
 public class ListWorkspaces extends ActionBarActivity {
 
@@ -100,7 +102,14 @@ public class ListWorkspaces extends ActionBarActivity {
                 return true;
             }
         });
-    }
+
+
+        // register broadcast receiver
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("");
+        AirdeskBroadcastReceiver receiver = new AirdeskBroadcastReceiver(this);
+        registerReceiver(receiver, filter);
+}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -167,5 +176,12 @@ public class ListWorkspaces extends ActionBarActivity {
         manager.logout();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+    }
+
+    // Workspace was deleted by another user
+    public void removeWorkspace(String workspaceName) {
+        // TODO: manager updated
+        foreignWorkspaceList = manager.getForeignWorkspaces(manager.getLoggedUser());
+        adapterForeign.notifyDataSetChanged();
     }
 }
