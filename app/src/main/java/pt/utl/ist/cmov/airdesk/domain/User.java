@@ -2,6 +2,7 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
@@ -11,13 +12,16 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCre
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
-public class User implements Serializable{
+public class User implements Serializable, WorkspaceObserver {
 
 	/**
 	 * The user's name
 	 */
 	private String name;
 
+    /**
+     * The user's email, used as a GUID
+     */
 	private String email;
 
     /**
@@ -35,7 +39,12 @@ public class User implements Serializable{
 	 */
 	private ArrayList<String> subscriptions;
 
-	public User(String name, String email) {
+    /**
+     * List of workspaces that the user is "watching"
+     */
+    private ArrayList<Subject> subjects;
+
+    public User(String name, String email) {
 		this.setName(name);
 		this.setEmail(email);
 		this.ownedWorkspaces = new HashMap<String, Workspace>();
@@ -62,25 +71,17 @@ public class User implements Serializable{
 		return ownedWorkspaces;
 	}
 
-	public void setOwnedWorkspaces(HashMap<String, Workspace> ownedWorkspaces) {
-		this.ownedWorkspaces = ownedWorkspaces;
-	}
-
 	public HashMap<String, Workspace> getForeignWorkspaces() {
 		return foreignWorkspaces;
-	}
-
-	public void setForeignWorkspaces(HashMap<String, Workspace> foreignWorkspaces) {
-		this.foreignWorkspaces = foreignWorkspaces;
 	}
 
 	public ArrayList<String> getSubscriptions() {
 		return subscriptions;
 	}
 
-	public void setSubscriptions(ArrayList<String> subscriptions) {
-		this.subscriptions = subscriptions;
-	}
+	public ArrayList<Subject> getSubjects() {
+        return subjects;
+    }
 
 	/**
 	 * Create a workspace with a given name and quota size
@@ -90,7 +91,7 @@ public class User implements Serializable{
 	 */
 	public Workspace createWorkspace(int quota, String name, String hash) {
 		Workspace workspace = new Workspace(quota, name, getEmail(), hash);
-		ownedWorkspaces.put(name, workspace);
+		getOwnedWorkspaces().put(name, workspace);
         return workspace;
 	}
 
@@ -100,18 +101,22 @@ public class User implements Serializable{
 	 * @param name the workspace's identifier to be deleted from the user's set
 	 */
 	public void deleteWorkspace(String name) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
-		if (getOwnedWorkspaces().containsKey(name))
-            ownedWorkspaces.remove(name);
-        else {
+		if (getOwnedWorkspaces().containsKey(name)) {
+            getOwnedWorkspaces().remove(name);
+            getOwnedWorkspaces().get(name).notifyObservers();
+        } else {
             if (getForeignWorkspaces().containsKey(name)) {
                 if (getForeignWorkspaces().get(name).getAccessLists().get(getEmail()).canDelete()) {
-                    foreignWorkspaces.remove(name);
+                    getForeignWorkspaces().remove(name);
+                    getForeignWorkspaces().get(name).notifyObservers();
                 }
                 else {
                     throw new UserDoesNotHavePermissionsToDeleteWorkspaceException();
                 }
             }
         }
+
+
 	}
 
 	/**
@@ -155,10 +160,18 @@ public class User implements Serializable{
 	}
 
 	public void mountWorkspace(Workspace workspace) {
-		//if (!workspace.getOwner().equals(getEmail())) {
-			foreignWorkspaces.put(workspace.getName(), workspace);
-		//}
+		if (!workspace.getOwner().equals(getEmail())) {
+			getForeignWorkspaces().put(workspace.getName(), workspace);
+            getSubjects().add(workspace);
+		}
 	}
+
+    public void unmountWorkspace(Workspace workspace) {
+        if (!workspace.getOwner().equals(getEmail())) {
+            getForeignWorkspaces().remove(workspace.getName());
+            workspace.notifyObservers();
+        }
+    }
 
     public Workspace getWorkspace(String workspaceName) {
         Workspace workspace;
@@ -178,6 +191,7 @@ public class User implements Serializable{
         if (workspace.getAccessLists().get(getEmail()).canDelete()) {
             workspace.updateQuotaOccupied(-workspace.getFiles().get(filename).getSize());
             workspace.getFiles().remove(filename);
+            workspace.notifyObservers();
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
         }
@@ -215,5 +229,15 @@ public class User implements Serializable{
             getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setAll(privileges);
         } else
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
+    }
+
+    @Override
+    public void update() {
+        //TODO
+    }
+
+    @Override
+    public void setSubject(Subject s) {
+        this.getSubjects().add(s);
     }
 }

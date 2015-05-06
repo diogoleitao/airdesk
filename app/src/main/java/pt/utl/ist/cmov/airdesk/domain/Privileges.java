@@ -77,10 +77,10 @@ public class Privileges implements Serializable {
 
     public boolean[] getAll() {
         boolean[] privileges = new boolean[4];
-        privileges[0] = read;
-        privileges[1] = write;
-        privileges[2] = create;
-        privileges[3] = delete;
+        privileges[0] = canRead();
+        privileges[1] = canWrite();
+        privileges[2] = canCreate();
+        privileges[3] = canDelete();
 
         return privileges;
     }
