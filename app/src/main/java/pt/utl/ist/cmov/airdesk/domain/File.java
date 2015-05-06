@@ -2,7 +2,6 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by Diogo on 25/03/2015.
@@ -24,7 +23,7 @@ public class File implements Serializable, Subject {
      */
     private int size;
 
-    private ArrayList<Observer> observers;
+    private ArrayList<FileObserver> fileObservers;
 
     public File(String name) {
 		this.name = name;
@@ -52,37 +51,38 @@ public class File implements Serializable, Subject {
         return this.size;
     }
 
-    public ArrayList<Observer> getObservers() {
-        return observers;
+    public void setSize(int size) {
+        this.size = size;
     }
 
-    public void setObservers(ArrayList<Observer> observers) {
-        this.observers = observers;
+    public ArrayList<FileObserver> getFileObservers() {
+        return fileObservers;
     }
 
 	public void save(String content) {
 		this.setContent(content);
-        this.size = this.content.length() * 4;
+        this.setSize(this.getContent().length() * 4);
+        notifyObservers();
 	}
 
     @Override
-    public void register(Observer o) {
-        this.getObservers().add(o);
+    public void register(FileObserver fo) {
+        this.getFileObservers().add(fo);
     }
 
     @Override
-    public void unregister(Observer o) {
-        this.getObservers().remove(o);
+    public void unregister(FileObserver fo) {
+        this.getFileObservers().remove(fo);
     }
 
     @Override
     public void notifyObservers() {
-        for (Observer o : this.getObservers())
-            o.notify();
+        for (FileObserver fo : this.getFileObservers())
+            fo.update();
     }
 
     @Override
-    public Object getUpdate(Observer o) {
+    public Object getUpdate(FileObserver fo) {
         //TODO
         return null;
     }

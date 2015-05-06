@@ -5,8 +5,8 @@ package pt.utl.ist.cmov.airdesk.domain;
  */
 public interface Subject {
 
-    void register(Observer o);
-    void unregister(Observer o);
+    void register(FileObserver o);
+    void unregister(FileObserver o);
     void notifyObservers();
-    Object getUpdate(Observer o);
+    Object getUpdate(FileObserver o);
 }

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
-public class Workspace implements Serializable, Observer {
+public class Workspace implements Serializable, FileObserver, Subject {
 	/**
 	 * The maximum size of the workspace (in kB)
 	 */
@@ -116,10 +116,6 @@ public class Workspace implements Serializable, Observer {
 		return topics;
 	}
 
-	public void setTopics(ArrayList<String> topics) {
-		this.topics = topics;
-	}
-
 	public boolean isPrivate() {
 		return isPrivate;
 	}
@@ -132,24 +128,12 @@ public class Workspace implements Serializable, Observer {
 		return files;
 	}
 
-	public void setFiles(HashMap<String, File> files) {
-		this.files = files;
-	}
-
     public ArrayList<String> getUsers() {
         return this.users;
     }
 
-    public void setUsers(ArrayList<String> users) {
-        this.users = users;
-    }
-
 	public ArrayList<Subject> getSubjects() {
 		return subjects;
-	}
-
-	public void setSubjects(ArrayList<Subject> subjects) {
-		this.subjects = subjects;
 	}
 
     public void addUser(String user) {
@@ -165,20 +149,20 @@ public class Workspace implements Serializable, Observer {
     }
 
     public void addTopic(String topic) throws TopicAlreadyAddedException {
-        if (topics.contains(topic)) {
+        if (getTopics().contains(topic)) {
             throw new TopicAlreadyAddedException();
         } else {
-            topics.add(topic);
+            getTopics().add(topic);
         }
     }
 
     public void saveFile(String currentFile, String content) throws WorkspaceQuotaReachedException {
-        int oldSize = files.get(currentFile).getSize();
+        int oldSize = getFiles().get(currentFile).getSize();
         int size = content.length() * 4 - oldSize;
-        if ((quotaOccupied + size) > quota) {
+        if ((getQuotaOccupied() + size) > getQuota()) {
             throw new WorkspaceQuotaReachedException();
         } else {
-            files.get(currentFile).save(content);
+            getFiles().get(currentFile).save(content);
             updateQuotaOccupied(size);
         }
     }
@@ -191,5 +175,28 @@ public class Workspace implements Serializable, Observer {
 	@Override
 	public void setSubject(Subject s) {
 		this.getSubjects().add(s);
+	}
+
+
+	////////////////////// SUBJECT ROLE METHODS //////////////////////
+
+	@Override
+	public void register(FileObserver o) {
+
+	}
+
+	@Override
+	public void unregister(FileObserver o) {
+
+	}
+
+	@Override
+	public void notifyObservers() {
+
+	}
+
+	@Override
+	public Object getUpdate(FileObserver o) {
+		return null;
 	}
 }
