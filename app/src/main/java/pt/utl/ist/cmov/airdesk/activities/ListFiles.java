@@ -81,7 +81,7 @@ public class ListFiles extends ActionBarActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
                 new AlertDialog.Builder(that)
                         .setTitle("Delete " + fileNameList.get(position) + "?")
-                        .setMessage("This action is irreversible. This file uses "+ manager.getFile(fileNameList.get(position)).getSize() +"kB of space.")
+                        .setMessage("This action is irreversible. This file uses " + manager.getFile(fileNameList.get(position)).getSize() + "kB of space.")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
@@ -150,6 +150,33 @@ public class ListFiles extends ActionBarActivity {
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
+        }
+    }
+
+    public void fileAdded(String workspace, String fileName) {
+
+        try {
+            manager.updateWorkspaceFileList(workspace, fileName);
+            if( workspaceName.equals(workspace)) {
+                fileNameList = manager.getFilesFromWorkspace(workspaceName);
+                adapter.notifyDataSetChanged();
+            }
+        } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void fileDeleted(String workspace, String fileName) {
+
+        try {
+            manager.updateWorkspaceFileList(workspace, fileName);
+            if( workspaceName.equals(workspace)) {
+                fileNameList = manager.getFilesFromWorkspace(workspaceName);
+                adapter.notifyDataSetChanged();
+            }
+        } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
+            e.printStackTrace();
         }
     }
 }

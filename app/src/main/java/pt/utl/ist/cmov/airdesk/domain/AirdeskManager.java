@@ -80,12 +80,10 @@ public class AirdeskManager implements Serializable {
                 fileInputStream.close();
             } catch (FileNotFoundException e) {
                 populateAirdesk();
-            }  catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }  catch (IOException e) {
+            }  catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
             }
-		}
+        }
 		return instance;
 	}
 
@@ -352,5 +350,9 @@ public class AirdeskManager implements Serializable {
             }
         }
         return privileges;
+    }
+
+    public void updateWorkspaceFileList(String workspace, String filename) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
+        existingWorkspaces.get(workspace).getFiles().put(filename, registeredUsers.get(loggedUser).createFile(currentWorkspace, filename));
     }
 }

@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
-import pt.utl.ist.cmov.airdesk.domain.receivers.AirdeskBroadcastReceiver;
+import pt.utl.ist.cmov.airdesk.domain.network.AirdeskBroadcastReceiver;
 
 public class ListWorkspaces extends ActionBarActivity {
 
@@ -179,8 +179,13 @@ public class ListWorkspaces extends ActionBarActivity {
     }
 
     // Workspace was deleted by another user
-    public void removeWorkspace(String workspaceName) {
-        // TODO: manager updated
+    public void workspaceRemoved(String workspaceName) {
+
+        foreignWorkspaceList = manager.getForeignWorkspaces(manager.getLoggedUser());
+        adapterForeign.notifyDataSetChanged();
+    }
+
+    public void workspaceAdded(String workspaceName) {
         foreignWorkspaceList = manager.getForeignWorkspaces(manager.getLoggedUser());
         adapterForeign.notifyDataSetChanged();
     }
