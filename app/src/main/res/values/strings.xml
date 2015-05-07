@@ -10,4 +10,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_workspace_settings">Workspace Settings</string>
     <string name="title_activity_user_privileges">User Privileges</string>
+    <string name="port">9000</string>
 </resources>

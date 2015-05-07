@@ -3,8 +3,8 @@ package pt.utl.ist.cmov.airdesk.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
-import pt.utl.ist.cmov.airdesk.domain.network.AirdeskBroadcastReceiver;
 
 public class ListWorkspaces extends ActionBarActivity {
 
@@ -103,13 +102,12 @@ public class ListWorkspaces extends ActionBarActivity {
             }
         });
 
-
         // register broadcast receiver
         IntentFilter filter = new IntentFilter();
         filter.addAction("");
-        AirdeskBroadcastReceiver receiver = new AirdeskBroadcastReceiver(this);
-        registerReceiver(receiver, filter);
-}
+        //AirdeskBroadcastReceiver receiver = new AirdeskBroadcastReceiver(this);
+        //registerReceiver(receiver, filter);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,7 +147,6 @@ public class ListWorkspaces extends ActionBarActivity {
             Context context = getApplicationContext();
             CharSequence text = "No line breaks allowed!";
             int duration = Toast.LENGTH_SHORT;
-
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
@@ -157,7 +154,6 @@ public class ListWorkspaces extends ActionBarActivity {
 
         try {
             manager.addWorkspace(workspaceName, quota);
-
             workspaceList.add(name.getText().toString());
             adapter.notifyDataSetChanged();
             name.setText("");
@@ -166,7 +162,6 @@ public class ListWorkspaces extends ActionBarActivity {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();
             int duration = Toast.LENGTH_SHORT;
-
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
@@ -180,12 +175,11 @@ public class ListWorkspaces extends ActionBarActivity {
 
     // Workspace was deleted by another user
     public void workspaceRemoved(String workspaceName) {
-
         foreignWorkspaceList = manager.getForeignWorkspaces(manager.getLoggedUser());
         adapterForeign.notifyDataSetChanged();
     }
 
-    public void workspaceAdded(String workspaceName) {
+    public void invitationToWorkspace(String workspaceName, String username) {
         foreignWorkspaceList = manager.getForeignWorkspaces(manager.getLoggedUser());
         adapterForeign.notifyDataSetChanged();
     }
