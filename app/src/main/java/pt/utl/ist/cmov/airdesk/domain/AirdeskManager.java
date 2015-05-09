@@ -198,6 +198,11 @@ public class AirdeskManager implements Serializable {
         existingWorkspaces.remove(workspaceName);
     }
 
+    public void workspaceDeleted(String workspaceName) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
+       // ???? isn't this repeated:  registeredUsers.get(loggedUser).deleteWorkspace(workspaceName);
+        existingWorkspaces.remove(workspaceName);
+    }
+
     public ArrayList<String> getFilesFromWorkspace(String workspace) {
         currentWorkspace = workspace;
 
@@ -235,6 +240,12 @@ public class AirdeskManager implements Serializable {
 		existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, registeredUsers.get(loggedUser).createFile(currentWorkspace, fileName));
 	}
 
+    // called when other user added or modified a file. if it is modifying, delete then insert a new one
+    public void newFileAdded(String workspaceName, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
+        existingWorkspaces.get(workspaceName).getFiles().remove(fileName);
+        existingWorkspaces.get(workspaceName).getFiles().put(fileName, registeredUsers.get(loggedUser).createFile(currentWorkspace, fileName));
+    }
+
     public File getFile(String name)  {
         currentFile = name;
         return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
@@ -250,7 +261,12 @@ public class AirdeskManager implements Serializable {
         registeredUsers.get(loggedUser).deleteFile(currentWorkspace, fileName);
     }
 
-	public void changeUserPrivileges(String email, boolean[] privileges) throws UserDoesNotHavePermissionsToChangePrivilegesException {
+    // called when other user added or modified a file. if it is modifying, delete then insert a new one
+    public void fileDeleted(String workspaceName, String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
+        registeredUsers.get(loggedUser).deleteFile(currentWorkspace, fileName);
+    }
+
+    public void changeUserPrivileges(String email, boolean[] privileges) throws UserDoesNotHavePermissionsToChangePrivilegesException {
         registeredUsers.get(loggedUser).changeUserPrivileges(email, privileges, currentWorkspace);
 	}
 

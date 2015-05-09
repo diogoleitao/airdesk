@@ -8,15 +8,22 @@ import android.widget.Toast;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
+import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessages;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
 public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
     private Service mService;
+    private AirdeskManager manager;
 
     public AirdeskBroadcastReceiver(Service service) {
         super();
         this.mService = service;
+        manager = AirdeskManager.getInstance(null);
     }
 
     @Override
@@ -54,34 +61,58 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             ginfo.print();
             Toast.makeText(mService, "Group ownership changed", Toast.LENGTH_SHORT).show();
         } else if (BroadcastMessages.FILE_ADDED_TO_WORKSPACE.equals(action)) {
-            // TODO: manager update
+
             String workspaceName = intent.getStringExtra("workspaceName");
             String fileName = intent.getStringExtra("fileName");
-
-           // ((ListFiles)mService).fileAdded(workspaceName, fileName);
+            try {
+                manager.newFileAdded(workspaceName, fileName);
+            } catch (FileAlreadyExistsException e) {
+                e.printStackTrace();
+            } catch (UserDoesNotHavePermissionsToCreateFilesException e) {
+                e.printStackTrace();
+            }
 
         } else if (BroadcastMessages.FILE_CHANGED.equals(action)) {
-            // TODO: manager update
+
             String workspaceName = intent.getStringExtra("workspaceName");
             String fileName = intent.getStringExtra("fileName");
            // ((ListFiles)mService).fileChanged(workspaceName, fileName);
 
+            try {
+                manager.newFileAdded(workspaceName, fileName);
+            } catch (FileAlreadyExistsException e) {
+                e.printStackTrace();
+            } catch (UserDoesNotHavePermissionsToCreateFilesException e) {
+                e.printStackTrace();
+            }
+
         } else if (BroadcastMessages.FILE_DELETED.equals(action)) {
-            // TODO: manager update
+
             String workspaceName = intent.getStringExtra("workspaceName");
             String fileName = intent.getStringExtra("fileName");
-           // ((ListFiles) mService).fileDeleted(workspaceName, fileName);
+
+            try {
+                manager.fileDeleted(workspaceName, fileName);
+            } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
+                e.printStackTrace();
+            }
 
         } else if (BroadcastMessages.INVITATION_TO_WORKSPACE.equals(action)) {
-            // TODO: manager update
+
             String workspaceName = intent.getStringExtra("workspaceName");
             String username = intent.getStringExtra("username");
-            //((ListWorkspaces)mService).invitationToWorkspace(workspaceName, username);
+
+            manager.inviteUser();
 
         } else if (BroadcastMessages.WORKSPACE_DELETED.equals(action)) {
-            // TODO: manager update
+
             String workspaceName = intent.getStringExtra("workspaceName");
-            //((ListWorkspaces)mService).workspaceRemoved(workspaceName);
+
+            try {
+                manager.workspaceDeleted(workspaceName);
+            } catch (UserDoesNotHavePermissionsToDeleteWorkspaceException e) {
+                e.printStackTrace();
+            }
 
         } else if (BroadcastMessages.WORKSPACE_TOPIC_MATCH.equals(action)) {
             // TODO: manager update
