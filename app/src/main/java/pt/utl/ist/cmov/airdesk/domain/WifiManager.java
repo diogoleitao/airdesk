@@ -1,28 +1,54 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
+
+
 import android.os.AsyncTask;
+import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
+import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
+import pt.utl.ist.cmov.airdesk.R;
+import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
+import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
-public class WifiManager {
+public class WifiManager  {
+
+    public static final String TAG = "airdesk";
+
     private SimWifiP2pManager mManager = null;
     private SimWifiP2pManager.Channel mChannel = null;
     private Messenger mService = null;
     private boolean mBound = false;
     private SimWifiP2pSocketServer mSrvSocket = null;
-    private ReceiveCommTask mComm = null;
     private SimWifiP2pSocket mCliSocket = null;
     private TextView mTextInput;
     private TextView mTextOutput;
+
+    private GlobalService globalService;
+
+    private ListWorkspaces activityLW;
 
     public SimWifiP2pManager getManager() {
         return mManager;
@@ -31,53 +57,45 @@ public class WifiManager {
     public SimWifiP2pManager.Channel getChannel() {
         return mChannel;
     }
-
-    //TODO MAKE SERVICE THAT
-    public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
-        SimWifiP2pSocket s;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        // callbacks for service binding, passed to bindService()
 
         @Override
-        protected Void doInBackground(SimWifiP2pSocket... params) {
-            BufferedReader sockIn;
-            String st;
-
-            s = params[0];
-            try {
-                sockIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
-
-                while ((st = sockIn.readLine()) != null) {
-                    publishProgress(st);
-                }
-            } catch (IOException e) {
-                Log.d("Error reading socket:", e.getMessage());
-            }
-            return null;
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            mManager = new SimWifiP2pManager(mService);
+            mChannel = mManager.initialize(activityLW.getApplication(), activityLW.getMainLooper(), null);
+            mBound = true;
         }
 
         @Override
-        protected void onPreExecute() {
-
+        public void onServiceDisconnected(ComponentName arg0) {
+            mService = null;
+            mManager = null;
+            mChannel = null;
+            mBound = false;
         }
+    };
 
-        @Override
-        protected void onProgressUpdate(String... values) {
-            mTextOutput.append(values[0]+"\n");
-        }
+    public void WifiOn(ListWorkspaces a, View v) {
+        activityLW = a;
 
-        @Override
-        protected void onPostExecute(Void result) {
-            if (!s.isClosed()) {
-                try {
-                    s.close();
-                }
-                catch (Exception e) {
-                    Log.d("Error closing socket:", e.getMessage());
-                }
-            }
-            s = null;
-            if (mBound) {
-                //changes UI in simple caht
-            }
+        // simple chat does: is it okay to bind to listworkspaces? TODO: ??
+        Intent intent = new Intent(v.getContext(), SimWifiP2pService.class);
+        activityLW.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+        // GlobalService.startService(); ??
+
+    }
+
+    public void WifiOff() {
+        if (mBound) {
+            // simple chat does:
+            activityLW.unbindService(mConnection);
+
+            //GlobalService.stopService();
+            mBound = false;
+
         }
     }
 

@@ -16,9 +16,12 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.network.AirdeskBroadcastReceiver;
 
 public class ListWorkspaces extends ActionBarActivity {
 
@@ -102,11 +105,22 @@ public class ListWorkspaces extends ActionBarActivity {
             }
         });
 
+        // what View ??
+        View wifiView = new View(getApplicationContext());
+        manager.WifiOn(this, wifiView);
+
+        // register broadcast receiver
+        // initialize the WDSim API
+        SimWifiP2pSocketManager.Init(getApplicationContext());
+
         // register broadcast receiver
         IntentFilter filter = new IntentFilter();
-        filter.addAction("");
-        //AirdeskBroadcastReceiver receiver = new AirdeskBroadcastReceiver(this);
-        //registerReceiver(receiver, filter);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+        AirdeskBroadcastReceiver receiver = new AirdeskBroadcastReceiver(this);
+        registerReceiver(receiver, filter);
     }
 
     @Override
@@ -169,6 +183,7 @@ public class ListWorkspaces extends ActionBarActivity {
 
     public void logout(View v) {
         manager.logout();
+        manager.WifiOff();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

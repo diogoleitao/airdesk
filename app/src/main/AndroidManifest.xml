@@ -45,6 +45,9 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <service android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
+
     </application>
 
 </manifest>

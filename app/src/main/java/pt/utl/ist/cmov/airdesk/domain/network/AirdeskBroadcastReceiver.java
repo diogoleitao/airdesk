@@ -1,6 +1,6 @@
 package pt.utl.ist.cmov.airdesk.domain.network;
 
-import android.app.Service;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,12 +17,12 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 
 public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
-    private Service mService;
+    private Activity mActivity;
     private AirdeskManager manager;
 
-    public AirdeskBroadcastReceiver(Service service) {
+    public AirdeskBroadcastReceiver(Activity Activity) {
         super();
-        this.mService = service;
+        this.mActivity = Activity;
         manager = AirdeskManager.getInstance(null);
     }
 
@@ -31,15 +31,15 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
 
-            // This action is triggered when the WDSim service changes state:
-            // - creating the service generates the WIFI_P2P_STATE_ENABLED event
-            // - destroying the service generates the WIFI_P2P_STATE_DISABLED event
+            // This action is triggered when the WDSim Activity changes state:
+            // - creating the Activity generates the WIFI_P2P_STATE_ENABLED event
+            // - destroying the Activity generates the WIFI_P2P_STATE_DISABLED event
 
             int state = intent.getIntExtra(SimWifiP2pBroadcast.EXTRA_WIFI_STATE, -1);
             if (state == SimWifiP2pBroadcast.WIFI_P2P_STATE_ENABLED) {
-                Toast.makeText(mService, "WiFi Direct enabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "WiFi Direct enabled", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(mService, "WiFi Direct disabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "WiFi Direct disabled", Toast.LENGTH_SHORT).show();
             }
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
@@ -48,18 +48,18 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             // asynchronous call and the calling activity is notified with AirdeskBroadcastReceiver
             // callback on PeerListListener.onPeersAvailable()
 
-            Toast.makeText(mService, "Peer list changed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "Peer list changed", Toast.LENGTH_SHORT).show();
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
 
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
             ginfo.print();
-            Toast.makeText(mService, "Network membership changed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "Network membership changed", Toast.LENGTH_SHORT).show();
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION.equals(action)) {
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
             ginfo.print();
-            Toast.makeText(mService, "Group ownership changed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "Group ownership changed", Toast.LENGTH_SHORT).show();
         } else if (BroadcastMessages.FILE_ADDED_TO_WORKSPACE.equals(action)) {
 
             String workspaceName = intent.getStringExtra("workspaceName");
@@ -76,7 +76,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
             String workspaceName = intent.getStringExtra("workspaceName");
             String fileName = intent.getStringExtra("fileName");
-           // ((ListFiles)mService).fileChanged(workspaceName, fileName);
+           // ((ListFiles)mActivity).fileChanged(workspaceName, fileName);
 
             try {
                 manager.newFileAdded(workspaceName, fileName);
@@ -102,7 +102,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             String workspaceName = intent.getStringExtra("workspaceName");
             String username = intent.getStringExtra("username");
 
-            manager.inviteUser();
+            // TODO: manager.inviteUser();
 
         } else if (BroadcastMessages.WORKSPACE_DELETED.equals(action)) {
 
@@ -117,7 +117,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
         } else if (BroadcastMessages.WORKSPACE_TOPIC_MATCH.equals(action)) {
             // TODO: manager update
             String workspaceName = intent.getStringExtra("workspaceName");
-            //((ListWorkspaces)mService).workspaceTopicMatch(workspaceName);
+            //((ListWorkspaces)mActivity).workspaceTopicMatch(workspaceName);
         }
     }
 }
