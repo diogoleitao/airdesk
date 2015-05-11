@@ -25,15 +25,15 @@ public class Privileges implements Serializable {
 	private boolean delete = false;
 
 	public Privileges() {
-        this.read = true;
-        this.write = true;
-    }
+		this.setReadPrivilege(true);
+		this.setWritePrivilege(true);
+	}
 
 	public Privileges(boolean read, boolean write, boolean create, boolean delete) {
-		this.read = read;
-		this.write = write;
-		this.create = create;
-		this.delete = delete;
+		this.setReadPrivilege(read);
+		this.setWritePrivilege(write);
+		this.setCreatePrivilege(create);
+		this.setDeletePrivilege(delete);
 	}
 
 	public boolean canRead() {
@@ -68,13 +68,6 @@ public class Privileges implements Serializable {
 		this.delete = delete;
 	}
 
-	public void setAll(boolean[] privileges) {
-		setReadPrivilege(privileges[0]);
-		setWritePrivilege(privileges[1]);
-		setCreatePrivilege(privileges[2]);
-		setDeletePrivilege(privileges[3]);
-	}
-
     public boolean[] getAll() {
         boolean[] privileges = new boolean[4];
         privileges[0] = canRead();
@@ -84,4 +77,11 @@ public class Privileges implements Serializable {
 
         return privileges;
     }
+
+	public void setAll(boolean[] privileges) {
+		setReadPrivilege(privileges[0]);
+		setWritePrivilege(privileges[1]);
+		setCreatePrivilege(privileges[2]);
+		setDeletePrivilege(privileges[3]);
+	}
 }

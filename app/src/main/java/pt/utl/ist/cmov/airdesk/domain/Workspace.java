@@ -7,16 +7,17 @@ import java.util.HashMap;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
-public class Workspace implements Serializable, FileObserver, Subject {
+public class Workspace implements Serializable, Observer, UserSubject {
+
 	/**
 	 * The maximum size of the workspace (in kB)
 	 */
 	private int quota;
 
     /**
-     *
-     */
-    private int quotaOccupied;
+	 * The total quota occupied (in kB)
+	 */
+	private int quotaOccupied;
 
 	/**
 	 * The name of the workspace
@@ -28,6 +29,9 @@ public class Workspace implements Serializable, FileObserver, Subject {
 	 */
 	private String owner;
 
+	/**
+	 * A hash that serves as an GUID
+	 */
 	private String hash;
 
 	/**
@@ -55,7 +59,10 @@ public class Workspace implements Serializable, FileObserver, Subject {
      */
     private ArrayList<String> users = new ArrayList<String>();
 
-	private ArrayList<Subject> subjects = new ArrayList<Subject>();
+	/**
+	 * A list of Users observing the workspace
+	 */
+	private ArrayList<Observer> observers = new ArrayList<Observer>();
 
 	public Workspace() {}
 
@@ -132,29 +139,29 @@ public class Workspace implements Serializable, FileObserver, Subject {
         return this.users;
     }
 
-	public ArrayList<Subject> getSubjects() {
-		return subjects;
-	}
-
     public void addUser(String user) {
-        this.users.add(user);
-    }
+		this.getUsers().add(user);
+	}
 
     public int getQuotaOccupied() {
         return this.quotaOccupied;
-    }
+	}
+
+	public ArrayList<Observer> getObservers() {
+		return observers;
+	}
 
     public void updateQuotaOccupied(int fileSize) {
         this.quotaOccupied += fileSize;
     }
 
     public void addTopic(String topic) throws TopicAlreadyAddedException {
-        if (getTopics().contains(topic)) {
-            throw new TopicAlreadyAddedException();
-        } else {
-            getTopics().add(topic);
-        }
-    }
+		if (this.getTopics().contains(topic)) {
+			throw new TopicAlreadyAddedException();
+		} else {
+			this.getTopics().add(topic);
+		}
+	}
 
     public void saveFile(String currentFile, String content) throws WorkspaceQuotaReachedException {
         int oldSize = getFiles().get(currentFile).getSize();
@@ -164,39 +171,23 @@ public class Workspace implements Serializable, FileObserver, Subject {
         } else {
             getFiles().get(currentFile).save(content);
             updateQuotaOccupied(size);
-        }
-    }
-
-	@Override
-	public void update() {
-		//TODO
-	}
-
-	@Override
-	public void setSubject(Subject s) {
-		this.getSubjects().add(s);
+		}
 	}
 
 
-	////////////////////// SUBJECT ROLE METHODS //////////////////////
-
+	///////// USER SUBJECT METHODS /////////
 	@Override
-	public void register(FileObserver o) {
-
+	public void register(Observer o) {
+		this.getObservers().add(o);
 	}
 
 	@Override
-	public void unregister(FileObserver o) {
-
+	public void unregister(Observer o) {
+		this.getObservers().remove(o);
 	}
 
 	@Override
 	public void notifyObservers() {
-
-	}
-
-	@Override
-	public Object getUpdate(FileObserver o) {
-		return null;
+		//WifiManager.broadcastWorkspaceUpdate(this.getName(), this.getObservers());
 	}
 }

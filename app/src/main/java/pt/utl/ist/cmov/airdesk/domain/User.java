@@ -1,8 +1,6 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
@@ -12,7 +10,7 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCre
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
-public class User implements Serializable, WorkspaceObserver {
+public class User implements Serializable, Observer {
 
 	/**
 	 * The user's name
@@ -27,28 +25,16 @@ public class User implements Serializable, WorkspaceObserver {
     /**
 	 * Mapping between the user's workspaces' names that he created and the Workspace objects
 	 */
-	private HashMap<String, Workspace> ownedWorkspaces;
+    private HashMap<String, Workspace> ownedWorkspaces = new HashMap<String, Workspace>();
 
 	/**
 	 * Mapping between the user's workspaces' names that he joined/got invited to and the Workspace objects
 	 */
-	private HashMap<String, Workspace> foreignWorkspaces;
-
-	/**
-	 * List of topics that the user is interested in, regarding workspaces
-	 */
-	private ArrayList<String> subscriptions;
-
-    /**
-     * List of workspaces that the user is "watching"
-     */
-    private ArrayList<Subject> subjects;
+    private HashMap<String, Workspace> foreignWorkspaces = new HashMap<String, Workspace>();
 
     public User(String name, String email) {
 		this.setName(name);
 		this.setEmail(email);
-		this.ownedWorkspaces = new HashMap<String, Workspace>();
-		this.foreignWorkspaces = new HashMap<String, Workspace>();
 	}
 
 	public String getName() {
@@ -75,14 +61,6 @@ public class User implements Serializable, WorkspaceObserver {
 		return foreignWorkspaces;
 	}
 
-	public ArrayList<String> getSubscriptions() {
-		return subscriptions;
-	}
-
-	public ArrayList<Subject> getSubjects() {
-        return subjects;
-    }
-
 	/**
 	 * Create AirdeskBroadcastReceiver workspace with AirdeskBroadcastReceiver given name and quota size
 	 *
@@ -91,7 +69,7 @@ public class User implements Serializable, WorkspaceObserver {
 	 */
 	public Workspace createWorkspace(int quota, String name, String hash) {
 		Workspace workspace = new Workspace(quota, name, getEmail(), hash);
-		getOwnedWorkspaces().put(name, workspace);
+        getOwnedWorkspaces().put(name, workspace).register(this);
         return workspace;
 	}
 
@@ -101,22 +79,18 @@ public class User implements Serializable, WorkspaceObserver {
 	 * @param name the workspace's identifier to be deleted from the user's set
 	 */
 	public void deleteWorkspace(String name) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
-		if (getOwnedWorkspaces().containsKey(name)) {
-            getOwnedWorkspaces().remove(name);
-            getOwnedWorkspaces().get(name).notifyObservers();
+        if (this.getOwnedWorkspaces().containsKey(name)) {
+            this.getOwnedWorkspaces().remove(name).unregister(this);
         } else {
             if (getForeignWorkspaces().containsKey(name)) {
-                if (getForeignWorkspaces().get(name).getAccessLists().get(getEmail()).canDelete()) {
-                    getForeignWorkspaces().remove(name);
-                    getForeignWorkspaces().get(name).notifyObservers();
+                if (this.getForeignWorkspaces().get(name).getAccessLists().get(this.getEmail()).canDelete()) {
+                    this.getForeignWorkspaces().remove(name).unregister(this);
                 }
                 else {
                     throw new UserDoesNotHavePermissionsToDeleteWorkspaceException();
                 }
             }
         }
-
-
 	}
 
 	/**
@@ -146,8 +120,8 @@ public class User implements Serializable, WorkspaceObserver {
 	 * @param workspace
 	 */
 	public void removeUserFromWorkspace(String email, String workspace) {
-		getOwnedWorkspaces().get(workspace).getAccessLists().remove(email);
-	}
+        getOwnedWorkspaces().get(workspace).getAccessLists().remove(email);
+    }
 
 	/**
 	 * Change AirdeskBroadcastReceiver given workspace's privacy
@@ -162,14 +136,12 @@ public class User implements Serializable, WorkspaceObserver {
 	public void mountWorkspace(Workspace workspace) {
 		if (!workspace.getOwner().equals(getEmail())) {
 			getForeignWorkspaces().put(workspace.getName(), workspace);
-            getSubjects().add(workspace);
 		}
 	}
 
     public void unmountWorkspace(Workspace workspace) {
         if (!workspace.getOwner().equals(getEmail())) {
             getForeignWorkspaces().remove(workspace.getName());
-            workspace.notifyObservers();
         }
     }
 
@@ -190,8 +162,7 @@ public class User implements Serializable, WorkspaceObserver {
         Workspace workspace = getWorkspace(workspaceName);
         if (workspace.getAccessLists().get(getEmail()).canDelete()) {
             workspace.updateQuotaOccupied(-workspace.getFiles().get(filename).getSize());
-            workspace.getFiles().remove(filename);
-            workspace.notifyObservers();
+            workspace.getFiles().remove(filename).unregister(this);
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
         }
@@ -205,6 +176,7 @@ public class User implements Serializable, WorkspaceObserver {
             else {
                 File file = new File(fileName);
                 workspace.getFiles().put(fileName, file);
+                file.register(this);
                 return file;
             }
         } else {
@@ -225,19 +197,9 @@ public class User implements Serializable, WorkspaceObserver {
     }
 
     public void changeUserPrivileges(String email, boolean[] privileges, String workspace) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        if (getOwnedWorkspaces().get(workspace)!= null) {
+        if (getOwnedWorkspaces().get(workspace) != null) {
             getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setAll(privileges);
         } else
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
-    }
-
-    @Override
-    public void update() {
-        //TODO
-    }
-
-    @Override
-    public void setSubject(Subject s) {
-        this.getSubjects().add(s);
     }
 }
