@@ -4,13 +4,18 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
+import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessages;
 import pt.utl.ist.cmov.airdesk.domain.WifiManager;
@@ -51,10 +56,8 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
         } else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 
             // Request available peers from the wifi p2p manager. This is an
-            // asynchronous call and the calling activity is notified with AirdeskBroadcastReceiver
+            // asynchronous call and the calling activity is notified with a
             // callback on PeerListListener.onPeersAvailable()
-
-            wifiManager.setIPS(((SimWifiP2pDeviceList) intent.getSerializableExtra("deviceList")).getDeviceList());
 
             Toast.makeText(mActivity, "Peer list changed", Toast.LENGTH_SHORT).show();
 

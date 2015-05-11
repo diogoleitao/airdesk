@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -34,6 +35,7 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
+import pt.utl.ist.cmov.airdesk.activities.MainActivity;
 import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
 public class WifiManager implements Serializable {
@@ -56,8 +58,8 @@ public class WifiManager implements Serializable {
 
     private GlobalService globalService;
 
-    private ListWorkspaces activityLW;
-    private Collection<SimWifiP2pDevice> IPS;
+    private MainActivity activityLW;
+    private SimWifiP2pDeviceList deviceList;
 
     public SimWifiP2pManager getManager() {
         return mManager;
@@ -86,7 +88,7 @@ public class WifiManager implements Serializable {
         }
     };
 
-    public void WifiOn(ListWorkspaces a, View v) {
+    public void WifiOn(MainActivity a, View v) {
         activityLW = a;
 
         // simple chat does: is it okay to bind to listworkspaces? TODO: ??
@@ -127,7 +129,11 @@ public class WifiManager implements Serializable {
     }
 
 
-    public void setIPS(Collection<SimWifiP2pDevice> IPS) {
-        this.IPS = IPS;
+    public void setIPS(SimWifiP2pDeviceList deviceList) {
+        this.deviceList = deviceList;
+    }
+
+    public SimWifiP2pDeviceList getIPS() {
+        return deviceList;
     }
 }

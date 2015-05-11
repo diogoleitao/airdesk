@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 
 import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
+import pt.utl.ist.cmov.airdesk.activities.MainActivity;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
@@ -380,7 +381,7 @@ public class AirdeskManager implements Serializable {
         existingWorkspaces.get(workspace).getFiles().put(filename, registeredUsers.get(loggedUser).createFile(currentWorkspace, filename));
     }
 
-    public void WifiOn(ListWorkspaces a, View v) {
+    public void WifiOn(MainActivity a, View v) {
         wifiManager.WifiOn(a, v);
     }
 

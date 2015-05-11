@@ -1,12 +1,15 @@
 package pt.utl.ist.cmov.airdesk.activities;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -16,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
@@ -31,11 +34,13 @@ import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
+import pt.utl.ist.cmov.airdesk.domain.WifiManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.network.AirdeskBroadcastReceiver;
 
@@ -49,6 +54,7 @@ public class ListWorkspaces extends ActionBarActivity implements
     ArrayList<String> workspaceList;
     ArrayList<String> foreignWorkspaceList;
     AirdeskManager manager;
+    private WifiManager wifiManager;
 
     @Override
     protected void onPause() {
@@ -68,20 +74,18 @@ public class ListWorkspaces extends ActionBarActivity implements
 
         manager = AirdeskManager.getInstance(getApplicationContext());
 
-        workspaceList = new ArrayList<String>();
-        foreignWorkspaceList = new ArrayList<String>();
+        workspaceList = new ArrayList<>();
+        foreignWorkspaceList = new ArrayList<>();
 
         String email = manager.getLoggedUser();
-
-        findViewById(R.id.bt_addworkspace).setOnClickListener(listenerSendButton);
 
         workspaceList = manager.getWorkspaces(email);
         foreignWorkspaceList = manager.getForeignWorkspaces(email);
 
         workspaceListView = (ListView) findViewById(R.id.workspaceList);
         foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, workspaceList );
-        adapterForeign = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, foreignWorkspaceList );
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, workspaceList);
+        adapterForeign = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, foreignWorkspaceList);
         workspaceListView.setAdapter(adapter);
         foreignWorkspaceListView.setAdapter(adapterForeign);
         final Context that = this;
@@ -124,9 +128,6 @@ public class ListWorkspaces extends ActionBarActivity implements
             }
         });
 
-        // what View ??
-        View wifiView = new View(getApplicationContext());
-        manager.WifiOn(this, wifiView);
 
         // register broadcast receiver
         // initialize the WDSim API
@@ -140,6 +141,10 @@ public class ListWorkspaces extends ActionBarActivity implements
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
         AirdeskBroadcastReceiver receiver = new AirdeskBroadcastReceiver(this);
         registerReceiver(receiver, filter);
+
+        wifiManager = WifiManager.getInstance();
+
+        wifiOn();
     }
 
     @Override
@@ -305,14 +310,12 @@ public class ListWorkspaces extends ActionBarActivity implements
         protected void onPostExecute(String result) {
             if (result != null) {
                 Context context = getApplicationContext();
-                CharSequence text = result;
                 int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, text, duration);
+                Toast toast = Toast.makeText(context, result, duration);
                 toast.show();
-            }
-            else {
+            } else {
                 mComm = new ReceiveCommTask();
-                mComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCliSocket);
+                mComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mCliSocket);
             }
         }
     }
@@ -340,12 +343,18 @@ public class ListWorkspaces extends ActionBarActivity implements
 
         @Override
         protected void onPreExecute() {
+            Context context = getApplicationContext();
+            CharSequence text = "Connecting...";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
 
         }
 
         @Override
         protected void onProgressUpdate(String... values) {
-
+            EditText output = (EditText) findViewById(R.id.workspaceNameText);
+            output.append(values[0] + "\n");
         }
 
         @Override
@@ -353,8 +362,7 @@ public class ListWorkspaces extends ActionBarActivity implements
             if (!s.isClosed()) {
                 try {
                     s.close();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.d("Error closing socket:", e.getMessage());
                 }
             }
@@ -373,23 +381,37 @@ public class ListWorkspaces extends ActionBarActivity implements
 
     @Override
     public void onPeersAvailable(SimWifiP2pDeviceList peers) {
-        StringBuilder peersStr = new StringBuilder();
+        Context context = getApplicationContext();
+        CharSequence text = "AWSETDRTYOJIKDRYFCTVYGBHUNJIMKDRYCTFVYGBHUNJIDCYFUVGBHNOJXSTDYCFUVGBHNOJXDYCFTUVSBUNJIXCTFYGVBUHNJIM";
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+
+        SimWifiP2pDeviceList alreadyConnected = wifiManager.getIPS();
+        wifiManager.setIPS(peers);
 
         // compile list of devices in range
-        for (SimWifiP2pDevice device : peers.getDeviceList()) {
-            String devstr = "" + device.deviceName + " (" + device.getVirtIp() + ")\n";
-            peersStr.append(devstr);
+        for (SimWifiP2pDevice d : peers.getDeviceList()) {
+            if(alreadyConnected.get(d.getVirtIp()) == null) { // if not connected yet
+                connect(d.getVirtIp());
+                send();
+            }
         }
 
-        // display list of devices in range
-        new AlertDialog.Builder(this)
-                .setTitle("Devices in WiFi Range")
-                .setMessage(peersStr.toString())
-                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
+    }
+
+    public void connect(SimWifiP2pDeviceList peers){
+        SimWifiP2pDeviceList alreadyConnected = wifiManager.getIPS();
+        wifiManager.setIPS(peers);
+
+        // compile list of devices in range
+        for (SimWifiP2pDevice d : peers.getDeviceList()) {
+            if(alreadyConnected.get(d.getVirtIp()) == null) { // if not connected yet
+                connect(d.getVirtIp());
+                send();
+            }
+        }
+
     }
 
     @Override
@@ -401,7 +423,7 @@ public class ListWorkspaces extends ActionBarActivity implements
         for (String deviceName : groupInfo.getDevicesInNetwork()) {
             SimWifiP2pDevice device = devices.getByName(deviceName);
             String devstr = "" + deviceName + " (" +
-                    ((device == null)?"??":device.getVirtIp()) + ")\n";
+                    ((device == null) ? "??" : device.getVirtIp()) + ")\n";
             peersStr.append(devstr);
         }
 
@@ -416,16 +438,76 @@ public class ListWorkspaces extends ActionBarActivity implements
                 .show();
     }
 
-    private View.OnClickListener listenerSendButton = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            findViewById(R.id.bt_addworkspace).setEnabled(false);
+    public void send(){
+        findViewById(R.id.bt_addworkspace).setEnabled(false);
+        try {
+            mCliSocket.getOutputStream().write((manager.getLoggedUser()).getBytes());
+            Log.d("send", "send");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    /*
+	 * Listeners associated to buttons
+	 */
+
+    public  void wifiOn(){
+
+        Intent intent = new Intent(getApplicationContext(), SimWifiP2pService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        mBound = true;
+
+        // spawn the chat server background task
+        new IncommingCommTask().executeOnExecutor(
+                AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+
+    public void wifiOff(){
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
+
+    public void connect(String ip){
+        Log.d("connnect", "connect");
+        new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
+    }
+
+   public void disconnect(){
+
+        if (mCliSocket != null) {
             try {
-                mCliSocket.getOutputStream().write( (manager.getLoggedUser()).getBytes());
+                mCliSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        mCliSocket = null;
+    }
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+        // callbacks for service binding, passed to bindService()
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            mManager = new SimWifiP2pManager(mService);
+            mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mService = null;
+            mManager = null;
+            mChannel = null;
+            mBound = false;
         }
     };
 }
