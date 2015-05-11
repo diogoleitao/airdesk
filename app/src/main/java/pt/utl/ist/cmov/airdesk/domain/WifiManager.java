@@ -20,7 +20,10 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.HashMap;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
@@ -33,9 +36,10 @@ import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
 import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
-public class WifiManager  {
+public class WifiManager implements Serializable {
 
     public static final String TAG = "airdesk";
+    private static WifiManager instance;
 
     private SimWifiP2pManager mManager = null;
     private SimWifiP2pManager.Channel mChannel = null;
@@ -46,9 +50,14 @@ public class WifiManager  {
     private TextView mTextInput;
     private TextView mTextOutput;
 
+    //private HashMap<String, User> userToConnection = new HashMap<String, User>();
+
+    private String connectedUser;
+
     private GlobalService globalService;
 
     private ListWorkspaces activityLW;
+    private Collection<SimWifiP2pDevice> IPS;
 
     public SimWifiP2pManager getManager() {
         return mManager;
@@ -84,7 +93,7 @@ public class WifiManager  {
         Intent intent = new Intent(v.getContext(), SimWifiP2pService.class);
         activityLW.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
-        // GlobalService.startService(); ??
+        // GlobalService.startService(); ? TODO: substitute SimWifiP2pService for our globalservice?
 
     }
 
@@ -101,4 +110,24 @@ public class WifiManager  {
 
     public WifiManager (){}
 
+    public static WifiManager getInstance() {
+        if (instance == null) {
+            instance = new WifiManager();
+        }
+        return instance;
+    }
+
+
+    public String getConnectedUser() {
+        return connectedUser;
+    }
+
+    public void setConnectedUser(String connectedUser) {
+        this.connectedUser = connectedUser;
+    }
+
+
+    public void setIPS(Collection<SimWifiP2pDevice> IPS) {
+        this.IPS = IPS;
+    }
 }

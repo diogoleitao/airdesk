@@ -6,10 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+import java.util.HashMap;
+
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessages;
+import pt.utl.ist.cmov.airdesk.domain.WifiManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
@@ -19,11 +23,13 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
     private Activity mActivity;
     private AirdeskManager manager;
+    private WifiManager wifiManager;
 
     public AirdeskBroadcastReceiver(Activity Activity) {
         super();
         this.mActivity = Activity;
         manager = AirdeskManager.getInstance(null);
+        wifiManager = WifiManager.getInstance();
     }
 
     @Override
@@ -47,6 +53,8 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             // Request available peers from the wifi p2p manager. This is an
             // asynchronous call and the calling activity is notified with AirdeskBroadcastReceiver
             // callback on PeerListListener.onPeersAvailable()
+
+            wifiManager.setIPS(((SimWifiP2pDeviceList) intent.getSerializableExtra("deviceList")).getDeviceList());
 
             Toast.makeText(mActivity, "Peer list changed", Toast.LENGTH_SHORT).show();
 

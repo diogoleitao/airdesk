@@ -2,6 +2,7 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 
@@ -84,7 +85,7 @@ public class AirdeskManager implements Serializable {
                 objectInputStream.close();
                 fileInputStream.close();
             } catch (FileNotFoundException e) {
-                populateAirdesk();
+                //populateAirdesk();    this method crashes the app!
             }  catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
             }
@@ -122,8 +123,11 @@ public class AirdeskManager implements Serializable {
 			newUser.getOwnedWorkspaces().put(newWorkspaces.get(i), newWorkspace);
 
 			// CREATE FILE, ADD CONTENT AND ADD TO PREVIOUSLY CREATED WORKSPACE'S FILE SET
-			File newFile = new File(newFiles.get(i));
-			if (i % 2 == 0)
+            File newFile = new File(newFiles.get(i));
+
+            // TODO:: APP CRASHES WHEN THE FILE DOESNT EXIST. CANT RUN ON NEW EMULATORS
+
+            if (i % 2 == 0)
 				newFile.save(newFileContents.get(i/2));
 			newWorkspace.getFiles().put(newFiles.get(i), newFile);
             newWorkspace.updateQuotaOccupied(newFile.getSize());
