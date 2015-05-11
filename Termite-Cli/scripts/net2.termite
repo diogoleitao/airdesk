@@ -1,0 +1,5 @@
+list emus
+assignaddr e1
+assignaddr e2
+binddevice A e1
+binddevice B e2
