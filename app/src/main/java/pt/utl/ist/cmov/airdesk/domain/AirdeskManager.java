@@ -189,6 +189,10 @@ public class AirdeskManager implements Serializable {
         }
     }
 
+    public boolean getWorkspacePrivacy(String workspaceName) {
+        return existingWorkspaces.get(workspaceName).isPrivate();
+    }
+
     public ArrayList<String> getTopics() {
         return existingWorkspaces.get(currentWorkspace).getTopics();
     }
