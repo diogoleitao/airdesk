@@ -1,90 +1,85 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="pt.utl.ist.cmov.airdesk.activities.ListWorkspaces">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <ListView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/workspaceList"
-        android:layout_below="@+id/bt_logout"
-        android:layout_toStartOf="@+id/bt_logout"
-        android:layout_above="@+id/foreignWorkspacesText"
-        android:layout_alignRight="@+id/foreignWorkspaceList"
-        android:layout_alignEnd="@+id/foreignWorkspaceList" />
+        android:orientation="vertical" >
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add workspace"
-        android:id="@+id/bt_addworkspace"
-        android:onClick="addWorkspace"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <requestFocus />
+        </EditText>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/idSendButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sendButton" />
+
+            <Button
+                android:id="@+id/idConnectButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/connectButton" />
+
+            <Button
+                android:id="@+id/idDisconnectButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/disconnectButton" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/idWifiOnButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/serviceButton" />
+
+            <Button
+                android:id="@+id/idWifiOffButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancelButton" />
+
+            <Button
+                android:id="@+id/idInRangeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/inRangeButton" />
+
+            <Button
+                android:id="@+id/idInGroupButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/inGroupButton" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/workspaceNameText"
-        android:layout_alignBottom="@+id/bt_addworkspace"
-        android:layout_toLeftOf="@+id/bt_addworkspace"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:hint="New name"
-        android:maxLines="1"/>
+        android:id="@+id/editText2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:inputType="textMultiLine" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="numberDecimal"
-        android:ems="10"
-        android:id="@+id/quotaText"
-        android:layout_above="@+id/workspaceNameText"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:hint="Quota (in kB)"
-        android:maxLines="1"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:id="@+id/bt_logout"
-        android:onClick="logout"
-        android:maxLines="1"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/foreignWorkspaceList"
-        android:layout_above="@+id/quotaText"
-        android:layout_toStartOf="@+id/bt_logout"
-        android:layout_below="@+id/foreignWorkspacesText"
-        android:layout_alignRight="@+id/bt_addworkspace"
-        android:layout_alignEnd="@+id/bt_addworkspace" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/foreignWorkspacesText"
-        android:text="Foreign Workspaces"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView"
-        android:text="Owned Workspaces"
-        android:layout_alignParentTop="true"
-        android:layout_alignLeft="@+id/foreignWorkspacesText"
-        android:layout_alignStart="@+id/foreignWorkspacesText" />
-
-</RelativeLayout>
+</LinearLayout>

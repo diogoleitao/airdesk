@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -27,6 +28,7 @@ import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
@@ -47,6 +49,26 @@ import pt.utl.ist.cmov.airdesk.domain.network.AirdeskBroadcastReceiver;
 public class ListWorkspaces extends ActionBarActivity implements
         SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener {
 
+    public static final String TAG = "simplechat";
+
+    private SimWifiP2pManager mManager = null;
+    private SimWifiP2pManager.Channel mChannel = null;
+    private Messenger mService = null;
+    private boolean mBound = false;
+    private SimWifiP2pSocketServer mSrvSocket = null;
+    private ReceiveCommTask mComm = null;
+    private SimWifiP2pSocket mCliSocket = null;
+    private TextView mTextInput;
+    private TextView mTextOutput;
+
+    public SimWifiP2pManager getManager() {
+        return mManager;
+    }
+
+    public SimWifiP2pManager.Channel getChannel() {
+        return mChannel;
+    }
+
     ArrayAdapter<String> adapter;
     ArrayAdapter<String> adapterForeign;
     ListView workspaceListView;
@@ -64,7 +86,7 @@ public class ListWorkspaces extends ActionBarActivity implements
 
     @Override
     public void onBackPressed() {
-        logout(findViewById(R.id.bt_logout));
+        //logout(findViewById(R.id.bt_logout));
     }
 
     @Override
@@ -82,14 +104,14 @@ public class ListWorkspaces extends ActionBarActivity implements
         workspaceList = manager.getWorkspaces(email);
         foreignWorkspaceList = manager.getForeignWorkspaces(email);
 
-        workspaceListView = (ListView) findViewById(R.id.workspaceList);
-        foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);
+        //workspaceListView = (ListView) findViewById(R.id.workspaceList);
+       // foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, workspaceList);
         adapterForeign = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, foreignWorkspaceList);
-        workspaceListView.setAdapter(adapter);
-        foreignWorkspaceListView.setAdapter(adapterForeign);
+//        workspaceListView.setAdapter(adapter);
+ //       foreignWorkspaceListView.setAdapter(adapterForeign);
         final Context that = this;
-
+/*
         workspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -127,9 +149,13 @@ public class ListWorkspaces extends ActionBarActivity implements
                 return true;
             }
         });
+*/
 
+        // initialize the UI
+        setContentView(R.layout.activity_list_workspaces);
+        guiSetButtonListeners();
+        guiUpdateInitState();
 
-        // register broadcast receiver
         // initialize the WDSim API
         SimWifiP2pSocketManager.Init(getApplicationContext());
 
@@ -142,9 +168,7 @@ public class ListWorkspaces extends ActionBarActivity implements
         AirdeskBroadcastReceiver receiver = new AirdeskBroadcastReceiver(this);
         registerReceiver(receiver, filter);
 
-        wifiManager = WifiManager.getInstance();
 
-        wifiOn();
     }
 
     @Override
@@ -224,20 +248,121 @@ public class ListWorkspaces extends ActionBarActivity implements
     }
 
 
-    /*
-	 * Classes implementing chat message exchange
+	/*
+	 * Listeners associated to buttons
 	 */
 
-    public static final String TAG = "simplechat";
+    private View.OnClickListener listenerWifiOnButton = new View.OnClickListener() {
+        public void onClick(View v){
 
-    private SimWifiP2pManager mManager = null;
-    private SimWifiP2pManager.Channel mChannel = null;
-    private Messenger mService = null;
-    private boolean mBound = false;
-    private SimWifiP2pSocketServer mSrvSocket = null;
-    private ReceiveCommTask mComm = null;
-    private SimWifiP2pSocket mCliSocket = null;
+            Intent intent = new Intent(v.getContext(), SimWifiP2pService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            mBound = true;
 
+            // spawn the chat server background task
+            new IncommingCommTask().executeOnExecutor(
+                    AsyncTask.THREAD_POOL_EXECUTOR);
+
+            guiUpdateDisconnectedState();
+        }
+    };
+
+    private View.OnClickListener listenerWifiOffButton = new View.OnClickListener() {
+        public void onClick(View v){
+            if (mBound) {
+                unbindService(mConnection);
+                mBound = false;
+                guiUpdateInitState();
+            }
+        }
+    };
+    private View.OnClickListener listenerInRangeButton = new View.OnClickListener() {
+        public void onClick(View v){
+            if (mBound) {
+                mManager.requestPeers(mChannel, (SimWifiP2pManager.PeerListListener) ListWorkspaces.this);
+            } else {
+                Toast.makeText(v.getContext(), "Service not bound",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    private View.OnClickListener listenerInGroupButton = new View.OnClickListener() {
+        public void onClick(View v){
+            if (mBound) {
+                mManager.requestGroupInfo(mChannel, (SimWifiP2pManager.GroupInfoListener) ListWorkspaces.this);
+            } else {
+                Toast.makeText(v.getContext(), "Service not bound",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    private View.OnClickListener listenerConnectButton = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            findViewById(R.id.idConnectButton).setEnabled(false);
+            new OutgoingCommTask().executeOnExecutor(
+                    AsyncTask.THREAD_POOL_EXECUTOR,
+                    mTextInput.getText().toString());
+        }
+    };
+
+    private View.OnClickListener listenerDisconnectButton = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            findViewById(R.id.idDisconnectButton).setEnabled(false);
+            if (mCliSocket != null) {
+                try {
+                    mCliSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            mCliSocket = null;
+            guiUpdateDisconnectedState();
+        }
+    };
+
+    private View.OnClickListener listenerSendButton = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            findViewById(R.id.idSendButton).setEnabled(false);
+            try {
+                mCliSocket.getOutputStream().write( (mTextInput.getText().toString()+"\n").getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mTextInput.setText("");
+            findViewById(R.id.idSendButton).setEnabled(true);
+            findViewById(R.id.idDisconnectButton).setEnabled(true);
+        }
+    };
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        // callbacks for service binding, passed to bindService()
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            mManager = new SimWifiP2pManager(mService);
+            mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mService = null;
+            mManager = null;
+            mChannel = null;
+            mBound = false;
+        }
+    };
+
+
+	/*
+	 * Classes implementing chat message exchange
+	 */
 
     public class IncommingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
 
@@ -286,11 +411,7 @@ public class ListWorkspaces extends ActionBarActivity implements
 
         @Override
         protected void onPreExecute() {
-            Context context = getApplicationContext();
-            CharSequence text = "Connecting...";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+            mTextOutput.setText("Connecting...");
         }
 
         @Override
@@ -309,13 +430,12 @@ public class ListWorkspaces extends ActionBarActivity implements
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                Context context = getApplicationContext();
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, result, duration);
-                toast.show();
-            } else {
+                mTextOutput.setText(result);
+                findViewById(R.id.idConnectButton).setEnabled(true);
+            }
+            else {
                 mComm = new ReceiveCommTask();
-                mComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mCliSocket);
+                mComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCliSocket);
             }
         }
     }
@@ -343,18 +463,18 @@ public class ListWorkspaces extends ActionBarActivity implements
 
         @Override
         protected void onPreExecute() {
-            Context context = getApplicationContext();
-            CharSequence text = "Connecting...";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+            mTextOutput.setText("");
+            findViewById(R.id.idSendButton).setEnabled(true);
+            findViewById(R.id.idDisconnectButton).setEnabled(true);
+            findViewById(R.id.idConnectButton).setEnabled(false);
+            mTextInput.setHint("");
+            mTextInput.setText("");
 
         }
 
         @Override
         protected void onProgressUpdate(String... values) {
-            EditText output = (EditText) findViewById(R.id.workspaceNameText);
-            output.append(values[0] + "\n");
+            mTextOutput.append(values[0]+"\n");
         }
 
         @Override
@@ -362,15 +482,16 @@ public class ListWorkspaces extends ActionBarActivity implements
             if (!s.isClosed()) {
                 try {
                     s.close();
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     Log.d("Error closing socket:", e.getMessage());
                 }
             }
             s = null;
             if (mBound) {
-
+                guiUpdateDisconnectedState();
             } else {
-
+                guiUpdateInitState();
             }
         }
     }
@@ -381,37 +502,23 @@ public class ListWorkspaces extends ActionBarActivity implements
 
     @Override
     public void onPeersAvailable(SimWifiP2pDeviceList peers) {
-        Context context = getApplicationContext();
-        CharSequence text = "AWSETDRTYOJIKDRYFCTVYGBHUNJIMKDRYCTFVYGBHUNJIDCYFUVGBHNOJXSTDYCFUVGBHNOJXDYCFTUVSBUNJIXCTFYGVBUHNJIM";
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-
-        SimWifiP2pDeviceList alreadyConnected = wifiManager.getIPS();
-        wifiManager.setIPS(peers);
+        StringBuilder peersStr = new StringBuilder();
 
         // compile list of devices in range
-        for (SimWifiP2pDevice d : peers.getDeviceList()) {
-            if(alreadyConnected.get(d.getVirtIp()) == null) { // if not connected yet
-                connect(d.getVirtIp());
-                send();
-            }
+        for (SimWifiP2pDevice device : peers.getDeviceList()) {
+            String devstr = "" + device.deviceName + " (" + device.getVirtIp() + ")\n";
+            peersStr.append(devstr);
         }
 
-    }
-
-    public void connect(SimWifiP2pDeviceList peers){
-        SimWifiP2pDeviceList alreadyConnected = wifiManager.getIPS();
-        wifiManager.setIPS(peers);
-
-        // compile list of devices in range
-        for (SimWifiP2pDevice d : peers.getDeviceList()) {
-            if(alreadyConnected.get(d.getVirtIp()) == null) { // if not connected yet
-                connect(d.getVirtIp());
-                send();
-            }
-        }
-
+        // display list of devices in range
+        new AlertDialog.Builder(this)
+                .setTitle("Devices in WiFi Range")
+                .setMessage(peersStr.toString())
+                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
     }
 
     @Override
@@ -423,7 +530,7 @@ public class ListWorkspaces extends ActionBarActivity implements
         for (String deviceName : groupInfo.getDevicesInNetwork()) {
             SimWifiP2pDevice device = devices.getByName(deviceName);
             String devstr = "" + deviceName + " (" +
-                    ((device == null) ? "??" : device.getVirtIp()) + ")\n";
+                    ((device == null)?"??":device.getVirtIp()) + ")\n";
             peersStr.append(devstr);
         }
 
@@ -438,76 +545,53 @@ public class ListWorkspaces extends ActionBarActivity implements
                 .show();
     }
 
-    public void send(){
-        findViewById(R.id.bt_addworkspace).setEnabled(false);
-        try {
-            mCliSocket.getOutputStream().write((manager.getLoggedUser()).getBytes());
-            Log.d("send", "send");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    /*
-	 * Listeners associated to buttons
+	/*
+	 * Helper methods for updating the interface
 	 */
 
-    public  void wifiOn(){
+    private void guiSetButtonListeners() {
 
-        Intent intent = new Intent(getApplicationContext(), SimWifiP2pService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        mBound = true;
-
-        // spawn the chat server background task
-        new IncommingCommTask().executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR);
+        findViewById(R.id.idConnectButton).setOnClickListener(listenerConnectButton);
+        findViewById(R.id.idDisconnectButton).setOnClickListener(listenerDisconnectButton);
+        findViewById(R.id.idSendButton).setOnClickListener(listenerSendButton);
+        findViewById(R.id.idWifiOnButton).setOnClickListener(listenerWifiOnButton);
+        findViewById(R.id.idWifiOffButton).setOnClickListener(listenerWifiOffButton);
+        findViewById(R.id.idInRangeButton).setOnClickListener(listenerInRangeButton);
+        findViewById(R.id.idInGroupButton).setOnClickListener(listenerInGroupButton);
     }
 
+    private void guiUpdateInitState() {
 
-    public void wifiOff(){
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
+        mTextInput = (TextView) findViewById(R.id.editText1);
+        mTextInput.setHint("type remote virtual IP (192.168.0.0/16)");
+        mTextInput.setEnabled(false);
+
+        mTextOutput = (TextView) findViewById(R.id.editText2);
+        mTextOutput.setEnabled(false);
+        mTextOutput.setText("");
+
+        findViewById(R.id.idConnectButton).setEnabled(false);
+        findViewById(R.id.idDisconnectButton).setEnabled(false);
+        findViewById(R.id.idSendButton).setEnabled(false);
+        findViewById(R.id.idWifiOnButton).setEnabled(true);
+        findViewById(R.id.idWifiOffButton).setEnabled(false);
+        findViewById(R.id.idInRangeButton).setEnabled(false);
+        findViewById(R.id.idInGroupButton).setEnabled(false);
     }
 
+    private void guiUpdateDisconnectedState() {
 
-    public void connect(String ip){
-        Log.d("connnect", "connect");
-        new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
+        mTextInput.setEnabled(true);
+        mTextInput.setHint("type remote virtual IP (192.168.0.0/16)");
+        mTextOutput.setEnabled(true);
+        mTextOutput.setText("");
+
+        findViewById(R.id.idSendButton).setEnabled(false);
+        findViewById(R.id.idConnectButton).setEnabled(true);
+        findViewById(R.id.idDisconnectButton).setEnabled(false);
+        findViewById(R.id.idWifiOnButton).setEnabled(false);
+        findViewById(R.id.idWifiOffButton).setEnabled(true);
+        findViewById(R.id.idInRangeButton).setEnabled(true);
+        findViewById(R.id.idInGroupButton).setEnabled(true);
     }
-
-   public void disconnect(){
-
-        if (mCliSocket != null) {
-            try {
-                mCliSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        mCliSocket = null;
-    }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        // callbacks for service binding, passed to bindService()
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            mService = new Messenger(service);
-            mManager = new SimWifiP2pManager(mService);
-            mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mService = null;
-            mManager = null;
-            mChannel = null;
-            mBound = false;
-        }
-    };
 }

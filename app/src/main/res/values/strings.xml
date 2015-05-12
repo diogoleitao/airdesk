@@ -10,5 +10,15 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_workspace_settings">Workspace Settings</string>
     <string name="title_activity_user_privileges">User Privileges</string>
-    <string name="port">9000</string>
+    <string name="port">10001</string>
+
+    <string name="hello">Hello World, SimpleChatActivity!</string>
+
+    <string name="sendButton">Send</string>
+    <string name="connectButton">Connect</string>
+    <string name="disconnectButton">Disconnect</string>
+    <string name="serviceButton">WiFi On</string>
+    <string name="cancelButton">WiFi Off</string>
+    <string name="inRangeButton">In Range</string>
+    <string name="inGroupButton">In Network</string>
 </resources>
