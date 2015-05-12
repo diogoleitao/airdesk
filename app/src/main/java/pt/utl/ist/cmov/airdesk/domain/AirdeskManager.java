@@ -1,5 +1,6 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 
@@ -60,6 +61,8 @@ public class AirdeskManager implements Serializable {
 	 * The currently opened file name
 	 */
 	private String currentFile = "";
+
+    private Activity currentActivity = null;
 
 	private AirdeskManager() {}
 
