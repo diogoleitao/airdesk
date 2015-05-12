@@ -4,16 +4,9 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.util.Log;
 import android.widget.Toast;
 
-import java.util.Collection;
-import java.util.HashMap;
-
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
-import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
-import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
@@ -71,6 +64,8 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
             ginfo.print();
             Toast.makeText(mActivity, "Group ownership changed", Toast.LENGTH_SHORT).show();
+
+            //((ListWorkspaces)mActivity).autoInRangeInGroup();
         } else if (BroadcastMessages.FILE_ADDED_TO_WORKSPACE.equals(action)) {
 
             String workspaceName = intent.getStringExtra("workspaceName");

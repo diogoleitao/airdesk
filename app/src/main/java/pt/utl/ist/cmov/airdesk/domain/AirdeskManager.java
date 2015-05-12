@@ -193,8 +193,8 @@ public class AirdeskManager implements Serializable {
             byte[] digestion = md.digest(finalWorkspaceName.getBytes());
 
             StringBuilder sb = new StringBuilder();
-            for (int i : digestion)
-                sb.append(Byte.toString(digestion[i]));
+            for (byte i : digestion)
+                sb.append(Byte.toString(i));
 
             existingWorkspaces.put(sb.toString(), getUserByEmail(loggedUser).createWorkspace(quota * 1024, workspaceName, sb.toString()));
         } catch (NoSuchAlgorithmException e) {
