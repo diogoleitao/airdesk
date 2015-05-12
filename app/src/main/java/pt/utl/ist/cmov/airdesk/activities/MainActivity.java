@@ -18,6 +18,7 @@ import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.WifiManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
+import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -40,6 +41,9 @@ public class MainActivity extends ActionBarActivity {
         manager = AirdeskManager.getInstance(getApplicationContext());
 
 
+        // Start GlobalService
+        Intent intent = new Intent(this, GlobalService.class);
+        startService(intent);
     }
 
     @Override

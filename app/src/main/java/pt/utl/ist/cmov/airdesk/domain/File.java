@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * Created by Diogo on 25/03/2015.
  */
-public class File implements Serializable, Subject {
+public class File implements Serializable, WorkspaceSubject {
 
 	/**
 	 * The name of the file
@@ -23,13 +23,16 @@ public class File implements Serializable, Subject {
      */
     private int size;
 
-    private ArrayList<FileObserver> fileObservers;
+    /**
+     *
+     */
+    private ArrayList<Observer> observers = new ArrayList<Observer>();
 
     public File(String name) {
-		this.name = name;
-		this.content = "";
-        this.size = 0;
-	}
+        this.setName(name);
+        this.setContent("");
+        this.setSize(0);
+    }
 
 	public String getName() {
 		return this.name;
@@ -55,35 +58,29 @@ public class File implements Serializable, Subject {
         this.size = size;
     }
 
-    public ArrayList<FileObserver> getFileObservers() {
-        return fileObservers;
+    public ArrayList<Observer> getObservers() {
+        return observers;
     }
 
 	public void save(String content) {
 		this.setContent(content);
         this.setSize(this.getContent().length() * 4);
-        notifyObservers();
 	}
 
+
+    ///////// WORKSPACE SUBJECT METHODS /////////
     @Override
-    public void register(FileObserver fo) {
-        this.getFileObservers().add(fo);
+    public void register(Observer o) {
+        this.getObservers().add(o);
     }
 
     @Override
-    public void unregister(FileObserver fo) {
-        this.getFileObservers().remove(fo);
+    public void unregister(Observer o) {
+        this.getObservers().remove(o);
     }
 
     @Override
     public void notifyObservers() {
-        for (FileObserver fo : this.getFileObservers())
-            fo.update();
-    }
-
-    @Override
-    public Object getUpdate(FileObserver fo) {
-        //TODO
-        return null;
+        //WifiManager.broadcastFileUpdate(this.getName(), this.getObservers());
     }
 }

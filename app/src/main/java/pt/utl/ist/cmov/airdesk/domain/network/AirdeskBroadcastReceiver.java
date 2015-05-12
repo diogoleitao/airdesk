@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
-import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessages;
 import pt.utl.ist.cmov.airdesk.domain.WifiManager;
@@ -19,14 +18,14 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 
 public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
-    private Activity mActivity;
     private AirdeskManager manager;
+    private Context context;
     private WifiManager wifiManager;
 
-    public AirdeskBroadcastReceiver(Activity Activity) {
+    public AirdeskBroadcastReceiver(Context _context) {
         super();
-        this.mActivity = Activity;
         manager = AirdeskManager.getInstance(null);
+        context = _context;
         wifiManager = WifiManager.getInstance();
     }
 
@@ -41,9 +40,9 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
             int state = intent.getIntExtra(SimWifiP2pBroadcast.EXTRA_WIFI_STATE, -1);
             if (state == SimWifiP2pBroadcast.WIFI_P2P_STATE_ENABLED) {
-                Toast.makeText(mActivity, "WiFi Direct enabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context.getApplicationContext(), "WiFi Direct enabled", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(mActivity, "WiFi Direct disabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context.getApplicationContext(), "WiFi Direct disabled", Toast.LENGTH_SHORT).show();
             }
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
@@ -52,26 +51,26 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             // asynchronous call and the calling activity is notified with a
             // callback on PeerListListener.onPeersAvailable()
 
-            Toast.makeText(mActivity, "Peer list changed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context.getApplicationContext(), "Peer list changed", Toast.LENGTH_SHORT).show();
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
 
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
             ginfo.print();
-            Toast.makeText(mActivity, "Network membership changed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context.getApplicationContext(), "Network membership changed", Toast.LENGTH_SHORT).show();
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION.equals(action)) {
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
             ginfo.print();
-            Toast.makeText(mActivity, "Group ownership changed", Toast.LENGTH_SHORT).show();
 
-            //((ListWorkspaces)mActivity).autoInRangeInGroup();
+            Toast.makeText(context.getApplicationContext(), "Group ownership changed", Toast.LENGTH_SHORT).show();
+
         } else if (BroadcastMessages.FILE_ADDED_TO_WORKSPACE.equals(action)) {
 
             String workspaceName = intent.getStringExtra("workspaceName");
             String fileName = intent.getStringExtra("fileName");
             try {
-                manager.newFileAdded(workspaceName, fileName);
+                manager.addNewFileBC(workspaceName, fileName);
             } catch (FileAlreadyExistsException e) {
                 e.printStackTrace();
             } catch (UserDoesNotHavePermissionsToCreateFilesException e) {
@@ -85,7 +84,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
            // ((ListFiles)mActivity).fileChanged(workspaceName, fileName);
 
             try {
-                manager.newFileAdded(workspaceName, fileName);
+                manager.addNewFileBC(workspaceName, fileName);
             } catch (FileAlreadyExistsException e) {
                 e.printStackTrace();
             } catch (UserDoesNotHavePermissionsToCreateFilesException e) {
@@ -98,7 +97,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             String fileName = intent.getStringExtra("fileName");
 
             try {
-                manager.fileDeleted(workspaceName, fileName);
+                manager.deleteFileBC(workspaceName, fileName);
             } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
                 e.printStackTrace();
             }
@@ -115,7 +114,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             String workspaceName = intent.getStringExtra("workspaceName");
 
             try {
-                manager.workspaceDeleted(workspaceName);
+                manager.deleteWorkspaceBC(workspaceName);
             } catch (UserDoesNotHavePermissionsToDeleteWorkspaceException e) {
                 e.printStackTrace();
             }
