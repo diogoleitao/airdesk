@@ -4,19 +4,10 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.provider.Settings;
-import android.util.Log;
 import android.widget.Toast;
 
-import java.util.Collection;
-import java.util.HashMap;
-
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
-import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
-import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
-import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessages;
 import pt.utl.ist.cmov.airdesk.domain.WifiManager;
@@ -77,7 +68,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             String workspaceName = intent.getStringExtra("workspaceName");
             String fileName = intent.getStringExtra("fileName");
             try {
-                manager.newFileAdded(workspaceName, fileName);
+                manager.addNewFileBC(workspaceName, fileName);
             } catch (FileAlreadyExistsException e) {
                 e.printStackTrace();
             } catch (UserDoesNotHavePermissionsToCreateFilesException e) {
@@ -91,7 +82,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
            // ((ListFiles)mActivity).fileChanged(workspaceName, fileName);
 
             try {
-                manager.newFileAdded(workspaceName, fileName);
+                manager.addNewFileBC(workspaceName, fileName);
             } catch (FileAlreadyExistsException e) {
                 e.printStackTrace();
             } catch (UserDoesNotHavePermissionsToCreateFilesException e) {
@@ -104,7 +95,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             String fileName = intent.getStringExtra("fileName");
 
             try {
-                manager.fileDeleted(workspaceName, fileName);
+                manager.deleteFileBC(workspaceName, fileName);
             } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
                 e.printStackTrace();
             }
@@ -121,7 +112,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             String workspaceName = intent.getStringExtra("workspaceName");
 
             try {
-                manager.workspaceDeleted(workspaceName);
+                manager.deleteWorkspaceBC(workspaceName);
             } catch (UserDoesNotHavePermissionsToDeleteWorkspaceException e) {
                 e.printStackTrace();
             }
