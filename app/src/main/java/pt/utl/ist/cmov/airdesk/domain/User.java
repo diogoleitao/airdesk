@@ -75,6 +75,11 @@ public class User implements Serializable, Observer {
         }
 	}
 
+    public void deleteForeignWorkspace(String hash) {
+        if (getForeignWorkspaces().containsKey(hash))
+                this.getForeignWorkspaces().remove(hash).unregister(this);
+    }
+
 	/**
 	 * Add AirdeskBroadcastReceiver user to AirdeskBroadcastReceiver given workspace when the owner doesn't specify
 	 * the user's privileges
@@ -148,6 +153,12 @@ public class User implements Serializable, Observer {
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
         }
+    }
+
+    public void deleteForeignFile(String workspaceHash, String filename) {
+        Workspace workspace = getWorkspace(workspaceHash);
+        workspace.updateQuotaOccupied(-workspace.getFiles().get(filename).getSize());
+        workspace.getFiles().remove(filename).unregister(this);
     }
 
     public File createFile(String currentWorkspace, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {

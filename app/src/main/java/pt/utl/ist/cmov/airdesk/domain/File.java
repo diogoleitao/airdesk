@@ -2,6 +2,8 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Diogo on 25/03/2015.
@@ -22,6 +24,11 @@ public class File implements Serializable, WorkspaceSubject {
      * The size of the file in kB (each char is 4kB)
      */
     private int size;
+
+    /**
+     * The timestamp of the file's last edit
+     */
+    private Date timestamp;
 
     /**
      *
@@ -48,6 +55,7 @@ public class File implements Serializable, WorkspaceSubject {
 
     public void setContent(String content) {
         this.content = content;
+        this.timestamp = Calendar.getInstance().getTime();
     }
 
     public int getSize() {
@@ -67,6 +75,13 @@ public class File implements Serializable, WorkspaceSubject {
         this.setSize(this.getContent().length() * 4);
 	}
 
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
 
     ///////// WORKSPACE SUBJECT METHODS /////////
     @Override

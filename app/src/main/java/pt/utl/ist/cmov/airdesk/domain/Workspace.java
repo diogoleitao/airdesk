@@ -163,6 +163,8 @@ public class Workspace implements Serializable, Observer, UserSubject {
 	}
 
 
+
+
 	///////// USER SUBJECT METHODS /////////
 	@Override
 	public void register(Observer o) {

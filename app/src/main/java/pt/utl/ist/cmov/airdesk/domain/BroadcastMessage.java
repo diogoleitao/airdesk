@@ -13,17 +13,15 @@ public class BroadcastMessage implements Serializable{
     private File file;
     private Workspace workspace;
 
-    public BroadcastMessage(MessageTypes _messageType, String _arg1, String _ip){
+    public BroadcastMessage(MessageTypes _messageType, String _arg1){
         messageType = _messageType;
         arg1 = _arg1;
-        ip = _ip;
     }
 
-    public BroadcastMessage(MessageTypes _messageType, String _arg1, String _arg2, String _ip){
+    public BroadcastMessage(MessageTypes _messageType, String _arg1, String _arg2){
         messageType = _messageType;
         arg1 = _arg1;
         arg2 = _arg2;
-        ip = _ip;
     }
 
     public String getIp() {
@@ -76,6 +74,6 @@ public class BroadcastMessage implements Serializable{
 
     public enum MessageTypes {
         FILE_CHANGED, FILE_DELETED, FILE_ADDED_TO_WORKSPACE, WORKSPACE_DELETED,
-        NEW_WORKSPACE, INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE,
+        INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE
     }
 }

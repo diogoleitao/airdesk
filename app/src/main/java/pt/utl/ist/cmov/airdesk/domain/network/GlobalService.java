@@ -23,6 +23,7 @@ import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
+import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 import pt.utl.ist.cmov.airdesk.domain.WifiManager;
 
 public class GlobalService extends Service implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener{
@@ -37,10 +38,10 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
 
     private WifiManager wifiManager;
 
-    private List<String> ips;
+    public static List<String> ips;
     private ServerCommTask srvSocketTask;
     public List<IncomingServerClientCommTask> clientSocketTasks;
-
+    public static GlobalService instance;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -105,6 +106,7 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
         super.onCreate();
 
         ips = new ArrayList<String>();
+        instance = this;
 
         // register broadcast receiver
         // initialize the WDSim API
@@ -176,6 +178,15 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
 
     public SimWifiP2pManager.Channel getChannel() {
         return mChannel;
+    }
+
+    public static void broadcastMessage(BroadcastMessage message){
+        for(String ip : ips) {
+            message.setIp(ip);
+            OutgoingServerClientCommTask task = new OutgoingServerClientCommTask(GlobalService.instance);
+            task.executeOnExecutor(
+                    AsyncTask.THREAD_POOL_EXECUTOR, message);
+        }
     }
 
 }

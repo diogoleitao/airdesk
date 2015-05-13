@@ -3,6 +3,7 @@ package pt.utl.ist.cmov.airdesk.domain.network;
 import android.app.Service;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -42,6 +43,8 @@ public class OutgoingServerClientCommTask extends AsyncTask<BroadcastMessage, Vo
             socket = new SimWifiP2pSocket(message.getIp(), GlobalService.SERVICE_PORT);
             ObjectOutputStream o = new ObjectOutputStream(socket.getOutputStream());
             o.writeObject(message);
+            Log.d("MessageSend", "SENT MESSAGE " + message.getMessageType().toString());
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

@@ -24,6 +24,7 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
+import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
 public class AirdeskManager implements Serializable {
 
@@ -261,8 +262,12 @@ public class AirdeskManager implements Serializable {
 
     // TODO ?? SEND  MESSAGE
     public void inviteUser(String workspaceHash, String email) throws UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
-        if(loggedUser.getWorkspace(workspaceHash).getOwner() == loggedUser.getEmail())
+        if (loggedUser.getWorkspace(workspaceHash).getOwner() == loggedUser.getEmail()){
             loggedUser.getWorkspace(workspaceHash).getAccessLists().put(email, new Privileges());
+            BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.INVITATION_TO_WORKSPACE, workspaceHash, email);
+            message.setWorkspace(loggedUser.getWorkspace(workspaceHash));
+            GlobalService.broadcastMessage(message);
+        }
         else
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
     }
@@ -275,6 +280,20 @@ public class AirdeskManager implements Serializable {
     public void addForeignWorkspace(Workspace workspace){
         loggedUser.getForeignWorkspaces().put(workspace.getHash(), workspace);
         namesToHashes.put(workspace.getName(),workspace.getHash());
+    }
+
+    public void deleteForeignFile(String workspaceHash, String filename){
+        loggedUser.deleteForeignFile(workspaceHash, filename);
+    }
+
+    public void deleteForeignWorkspace(String workspaceHash) {
+        loggedUser.deleteForeignWorkspace(workspaceHash);
+        namesToHashes.remove(workspaceHash);
+    }
+
+    public void addForeignNewFile(String workspaceHash, String fileName){
+        File file = new File(fileName);
+        loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().put(fileName, file);
     }
 
     public void deleteWorkspaceBC(String workspaceHash) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
