@@ -163,15 +163,6 @@ public class AirdeskManager implements Serializable {
         this.currentWorkspace = currentWorkspace;
     }
 
-    public void WifiOn(MainActivity a, View v) {
-        wifiManager.WifiOn(a, v);
-    }
-
-    public void WifiOff() {
-        wifiManager.WifiOff();
-    }
-
-
     /////////////////////////////
     ////////// GETTERS //////////
     /////////////////////////////
@@ -305,7 +296,6 @@ public class AirdeskManager implements Serializable {
         currentFile = "";
     }
 
-    // TODO BECOME DISCOVERABLE IN WIFI, SO OTHERS CAN DOWNLOAD OUR FILES
     public void registerUser(String name, String email) throws UserAlreadyExistsException {
         if (getUserByEmail(email) == null) {
             registeredUsers.put(email, new User(name, email));
