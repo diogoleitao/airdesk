@@ -124,6 +124,14 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                     manager.addForeignWorkspace(message.getWorkspace());
                 }
                 break;
+            case WORKSPACE_PRIVILEGES_CHANGED:
+                workspaceHash = message.getArg1();
+                user = message.getArg2();
+                workspace = manager.getLoggedUser().getWorkspace(workspaceHash);
+                // We have the workspace mounted and its our privileges
+                if(workspace != null && user.equals(manager.getLoggedUser().getEmail()))
+                    workspace.getAccessLists().get(user).setAll(message.getPrivileges().getAll());
+                break;
             case REQUEST_FILE:
                 workspaceHash = message.getArg1();
                 fileName = message.getArg2();

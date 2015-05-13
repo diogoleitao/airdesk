@@ -230,6 +230,8 @@ public class AirdeskManager implements Serializable {
     public void deleteWorkspace(String workspaceHash) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
         loggedUser.deleteWorkspace(workspaceHash);
         namesToHashes.remove(workspaceHash);
+        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_DELETED, workspaceHash);
+        GlobalService.broadcastMessage(message);
     }
 
     public void addTopicToWorkspace(String workspaceHash, String topic) throws TopicAlreadyAddedException {
@@ -238,18 +240,30 @@ public class AirdeskManager implements Serializable {
 
     public void addNewFile(String workspaceHash, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
         loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().put(fileName, loggedUser.createFile(workspaceHash, fileName));
+        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_ADDED_TO_WORKSPACE, workspaceHash, fileName);
+        GlobalService.broadcastMessage(message);
     }
 
     public void saveFile(String workspaceHash, String filename, String content) throws WorkspaceQuotaReachedException {
         loggedUser.getWorkspace(workspaceHash).saveFile(filename, content);
+        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_CHANGED, workspaceHash, filename);
+        message.setFile(getFile(workspaceHash, filename));
+        GlobalService.broadcastMessage(message);
     }
 
     public void deleteFile(String workspaceHash, String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
         loggedUser.deleteFile(workspaceHash, fileName);
+        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_DELETED, workspaceHash, fileName);
+        GlobalService.broadcastMessage(message);
     }
 
     public void changeUserPrivileges(String workspaceHash, String email, boolean[] privileges) throws UserDoesNotHavePermissionsToChangePrivilegesException {
         loggedUser.changeUserPrivileges(email, privileges, workspaceHash);
+        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_PRIVILEGES_CHANGED, workspaceHash, email);
+        Privileges privileges1 = new Privileges();
+        privileges1.setAll(privileges);
+        message.setPrivileges(privileges1);
+        GlobalService.broadcastMessage(message);
     }
 
     public void applyGlobalPrivileges(String workspaceHash, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {

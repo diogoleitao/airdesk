@@ -12,6 +12,7 @@ public class BroadcastMessage implements Serializable{
     private String arg1, arg2;
     private File file;
     private Workspace workspace;
+    private Privileges privileges;
 
     public BroadcastMessage(MessageTypes _messageType, String _arg1){
         messageType = _messageType;
@@ -72,8 +73,16 @@ public class BroadcastMessage implements Serializable{
         this.workspace = workspace;
     }
 
+    public Privileges getPrivileges() {
+        return privileges;
+    }
+
+    public void setPrivileges(Privileges privileges) {
+        this.privileges = privileges;
+    }
+
     public enum MessageTypes {
         FILE_CHANGED, FILE_DELETED, FILE_ADDED_TO_WORKSPACE, WORKSPACE_DELETED,
-        INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE
+        INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE, WORKSPACE_PRIVILEGES_CHANGED
     }
 }
