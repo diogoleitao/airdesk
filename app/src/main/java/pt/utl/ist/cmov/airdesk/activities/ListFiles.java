@@ -98,33 +98,6 @@ public class ListFiles extends ActionBarActivity implements Updatable {
         }
     }
 
-    public void fileAdded(String workspace, String fileName) {
-
-        try {
-            manager.updateWorkspaceFileList(workspace, fileName);
-            if( workspace.equals(workspace)) {
-                fileNameList = manager.getFilesFromWorkspace(workspace);
-                adapter.notifyDataSetChanged();
-            }
-        } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void fileDeleted(String workspace, String fileName) {
-
-        try {
-            manager.updateWorkspaceFileList(workspace, fileName);
-            if( workspace.equals(workspace)) {
-                fileNameList = manager.getFilesFromWorkspace(workspace);
-                adapter.notifyDataSetChanged();
-            }
-        } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void updateUI() {
         workspace = manager.getCurrentWorkspace();

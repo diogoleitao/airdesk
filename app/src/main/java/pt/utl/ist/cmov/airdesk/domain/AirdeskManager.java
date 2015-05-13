@@ -297,10 +297,9 @@ public class AirdeskManager implements Serializable {
     public void addForeignWorkspace(Workspace workspace){
         loggedUser.getForeignWorkspaces().put(workspace.getHash(), workspace);
         namesToHashes.put(workspace.getName(), workspace.getHash());
-        updateUI();
     }
 
-    private void updateUI() {
+    public void updateUI() {
         if(currentActivity instanceof Updatable)
             ((Updatable)currentActivity).updateUI();
     }
@@ -348,10 +347,6 @@ public class AirdeskManager implements Serializable {
         loggedUser.getWorkspace(workspaceHash).setPrivacy(isPrivate);
     }
 
-    public void updateWorkspaceFileList(String workspaceHash, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
-        addNewFileBC(workspaceHash, fileName);
-    }
-
     public void matchWorkspaceTopicsBC(String workspaceHash, ArrayList<String> topics) {
         for (String topic : topics) {
             if (loggedUser.getWorkspace(workspaceHash).getTopics().contains(topic)) {
@@ -368,4 +363,5 @@ public class AirdeskManager implements Serializable {
     public void setCurrentActivity(Activity currentActivity) {
         this.currentActivity = currentActivity;
     }
+
 }

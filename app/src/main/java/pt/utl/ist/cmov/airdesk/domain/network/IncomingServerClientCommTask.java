@@ -94,6 +94,7 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 if(file != null){
                     if(file.getTimestamp().compareTo(message.getFile().getTimestamp()) < 0){
                         file.setContent(message.getFile().getContent());
+                        manager.updateUI();
                     }
                 }
 
@@ -102,6 +103,7 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 workspaceHash = message.getArg1();
                 fileName = message.getArg2();
                 manager.deleteForeignFile(workspaceHash, fileName);
+                manager.updateUI();
                 break;
             case FILE_ADDED_TO_WORKSPACE:
                 workspaceHash = message.getArg1();
@@ -110,11 +112,13 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 // We have the workspace and we should update it
                 if(workspace != null){
                     manager.addForeignNewFile(workspaceHash, fileName);
+                    manager.updateUI();
                 }
                 break;
             case WORKSPACE_DELETED:
                 workspaceHash = message.getArg1();
                 manager.deleteForeignWorkspace(workspaceHash);
+                manager.updateUI();
                 break;
             case INVITATION_TO_WORKSPACE:
                 workspaceHash = message.getArg1();
@@ -122,6 +126,7 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 Log.d("MessageDispatch", "GOT INVITATION TO WORKSPACE " + workspaceHash);
                 if(manager.getLoggedUser().getEmail().equals(user)){
                     manager.addForeignWorkspace(message.getWorkspace());
+                    manager.updateUI();
                 }
                 break;
             case WORKSPACE_PRIVILEGES_CHANGED:
@@ -129,8 +134,10 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 user = message.getArg2();
                 workspace = manager.getLoggedUser().getWorkspace(workspaceHash);
                 // We have the workspace mounted and its our privileges
-                if(workspace != null && user.equals(manager.getLoggedUser().getEmail()))
+                if(workspace != null && user.equals(manager.getLoggedUser().getEmail())) {
                     workspace.getAccessLists().get(user).setAll(message.getPrivileges().getAll());
+                    manager.updateUI();
+                }
                 break;
             case REQUEST_FILE:
                 workspaceHash = message.getArg1();
