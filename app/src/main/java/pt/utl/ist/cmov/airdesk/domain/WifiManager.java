@@ -14,6 +14,7 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import pt.utl.ist.cmov.airdesk.activities.MainActivity;
 import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
+import pt.utl.ist.cmov.airdesk.domain.network.OutgoingServerClientCommTask;
 
 public class WifiManager implements Serializable {
 
@@ -36,7 +37,8 @@ public class WifiManager implements Serializable {
         return mManager;
     }
 
-    public WifiManager (){}
+    public WifiManager() {
+    }
 
     public static WifiManager getInstance() {
         if (instance == null) {
@@ -68,12 +70,11 @@ public class WifiManager implements Serializable {
 
     public static void broadcastWorkspaceUpdate(Workspace w) {
 
-        for(String ip : IPs)
-            //create outgoing task for user
-            new OutgoingServerClientCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
+        for (String ip : IPs){
+        //create outgoing task for user
+        //TODO new OutgoingServerClientCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
 
         }
+    }
 
-
-}
 }

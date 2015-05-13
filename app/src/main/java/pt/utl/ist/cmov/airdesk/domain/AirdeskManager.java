@@ -2,7 +2,6 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.View;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,8 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
-import pt.utl.ist.cmov.airdesk.activities.MainActivity;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
@@ -203,7 +200,6 @@ public class AirdeskManager implements Serializable {
         return existingWorkspaces.get(currentWorkspace).getUsers();
     }
 
-    // TODO CHANGE SO FOREIGN WORKSPACES ARE RETRIEVED FROM THE OTHER USER VIA WIFI
     public ArrayList<String> getForeignWorkspaces(String email){
         ArrayList<String> workspaceNames = new ArrayList<String>();
         if (registeredUsers.keySet().contains(email)) {
@@ -398,8 +394,8 @@ public class AirdeskManager implements Serializable {
         existingWorkspaces.get(workspaceName).getFiles().put(fileName, registeredUsers.get(loggedUser).createFile(currentWorkspace, fileName));
     }
 
-    public void saveFileBC(String fileName, String content) throws WorkspaceQuotaReachedException {
-        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).saveFile(fileName, content);
+    public void saveFileBC(String workspaceName, String fileName, String content) throws WorkspaceQuotaReachedException {
+        registeredUsers.get(loggedUser).getWorkspace(workspaceName).saveFile(fileName, content);
     }
 
     public void deleteFileBC(String workspaceName, String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {

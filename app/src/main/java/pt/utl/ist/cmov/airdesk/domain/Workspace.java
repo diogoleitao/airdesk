@@ -188,6 +188,6 @@ public class Workspace implements Serializable, Observer, UserSubject {
 
 	@Override
 	public void notifyObservers() {
-		WifiManager.broadcastWorkspaceUpdate(this, this.getObservers());
+		WifiManager.broadcastWorkspaceUpdate(this);
 	}
 }
