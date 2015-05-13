@@ -49,18 +49,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
         throw new UnsupportedOperationException("it is not implemented");
     }
 
- /*   public void getAllActivities() {
-        try {
-            ActivityInfo[] list = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES).activities;
-            for (ActivityInfo aList : list)
-                System.out.println("List of running " + aList.name);
-        } catch (PackageManager.NameNotFoundException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-    }
-*/
-
 	/*
 	 * Listeners associated to WDSim
 	 */

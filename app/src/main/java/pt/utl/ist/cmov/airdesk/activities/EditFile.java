@@ -16,7 +16,7 @@ import pt.utl.ist.cmov.airdesk.domain.File;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
-public class EditFile extends ActionBarActivity {
+public class EditFile extends ActionBarActivity implements Updatable{
 
     String filename;
     File file;
@@ -41,12 +41,8 @@ public class EditFile extends ActionBarActivity {
         setContentView(R.layout.activity_edit_file);
 
         manager = AirdeskManager.getInstance(getApplicationContext());
-        workspace = manager.getCurrentWorkspace();
-        filename = manager.getCurrentFile();
-        file = manager.getFile(workspace.getHash(), filename);
-
-        TextView textView = (TextView)findViewById(R.id.fileText);
-        textView.setText(file.getContent());
+        manager.setCurrentActivity(this);
+        updateUI();
     }
 
 
@@ -87,5 +83,15 @@ public class EditFile extends ActionBarActivity {
     public void cancelFileEdit(View v) {
         Intent intent = new Intent(this, ListFiles.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void updateUI() {
+        workspace = manager.getCurrentWorkspace();
+        filename = manager.getCurrentFile();
+        file = manager.getFile(workspace.getHash(), filename);
+
+        TextView textView = (TextView)findViewById(R.id.fileText);
+        textView.setText(file.getContent());
     }
 }

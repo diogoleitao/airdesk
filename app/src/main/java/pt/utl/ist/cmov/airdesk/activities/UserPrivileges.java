@@ -20,7 +20,7 @@ import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 
-public class UserPrivileges extends ActionBarActivity {
+public class UserPrivileges extends ActionBarActivity implements Updatable{
 
     ArrayAdapter<String> adapter;
     ListView userListView;
@@ -40,6 +40,19 @@ public class UserPrivileges extends ActionBarActivity {
         setContentView(R.layout.activity_user_privileges);
 
         manager = AirdeskManager.getInstance(getApplicationContext());
+        manager.setCurrentActivity(this);
+        updateUI();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_user_privileges, menu);
+        return true;
+    }
+
+    @Override
+    public void updateUI() {
         workspace = manager.getCurrentWorkspace();
 
         TextView workspaceView = (TextView)findViewById(R.id.workspaceNameText);
@@ -89,12 +102,4 @@ public class UserPrivileges extends ActionBarActivity {
             }
         });
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_user_privileges, menu);
-        return true;
-    }
-
 }

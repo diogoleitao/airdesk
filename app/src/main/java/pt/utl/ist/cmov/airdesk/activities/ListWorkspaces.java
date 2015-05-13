@@ -21,7 +21,7 @@ import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
 
-public class ListWorkspaces extends ActionBarActivity {
+public class ListWorkspaces extends ActionBarActivity implements Updatable{
 
     ArrayAdapter<String> adapter;
     ArrayAdapter<String> adapterForeign;
@@ -49,66 +49,8 @@ public class ListWorkspaces extends ActionBarActivity {
 
 
         manager = AirdeskManager.getInstance(getApplicationContext());
-
-        workspaceList = new ArrayList<String>();
-        foreignWorkspaceList = new ArrayList<String>();
-
-        String email = manager.getLoggedUser().getEmail();
-
-        for(Workspace w : manager.getOwnedWorkspaces().values()){
-            workspaceList.add(w.getName());
-        }
-        for(Workspace w : manager.getForeignWorkspaces().values()){
-            foreignWorkspaceList.add(w.getName());
-        }
-
-        workspaceListView = (ListView) findViewById(R.id.workspaceList);
-        foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, workspaceList );
-        adapterForeign = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, foreignWorkspaceList );
-        workspaceListView.setAdapter(adapter);
-        foreignWorkspaceListView.setAdapter(adapterForeign);
-        final Context that = this;
-
-        workspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(that, ListFiles.class);
-                manager.setCurrentWorkspace(workspaceList.get(position));
-                startActivity(intent);
-            }
-        });
-
-        foreignWorkspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(that, ListFiles.class);
-                manager.setCurrentWorkspace(foreignWorkspaceList.get(position));
-                startActivity(intent);
-            }
-        });
-
-        this.workspaceListView.setLongClickable(true);
-        this.workspaceListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
-                Intent intent = new Intent(that, workspaceSettings.class);
-                manager.setCurrentWorkspace(workspaceList.get(position));
-                startActivity(intent);
-                return true;
-            }
-        });
-
-        this.foreignWorkspaceListView.setLongClickable(true);
-        this.foreignWorkspaceListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
-                Intent intent = new Intent(that, workspaceSettings.class);
-                manager.setCurrentWorkspace(foreignWorkspaceList.get(position));
-                startActivity(intent);
-                return true;
-            }
-        });
-
-
+        manager.setCurrentActivity(this);
+        updateUI();
     }
 
     @Override
@@ -178,5 +120,64 @@ public class ListWorkspaces extends ActionBarActivity {
     public void invitationToWorkspace(String workspaceName, String username) {
         foreignWorkspaceList.addAll(manager.getForeignWorkspaces().keySet());
         adapterForeign.notifyDataSetChanged();
+    }
+
+    @Override
+    public void updateUI() {
+        workspaceList = new ArrayList<String>();
+        foreignWorkspaceList = new ArrayList<String>();
+
+        for(Workspace w : manager.getOwnedWorkspaces().values()){
+            workspaceList.add(w.getName());
+        }
+        for(Workspace w : manager.getForeignWorkspaces().values()){
+            foreignWorkspaceList.add(w.getName());
+        }
+
+        workspaceListView = (ListView) findViewById(R.id.workspaceList);
+        foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, workspaceList );
+        adapterForeign = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, foreignWorkspaceList );
+        workspaceListView.setAdapter(adapter);
+        foreignWorkspaceListView.setAdapter(adapterForeign);
+        final Context that = this;
+
+        workspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(that, ListFiles.class);
+                manager.setCurrentWorkspace(workspaceList.get(position));
+                startActivity(intent);
+            }
+        });
+
+        foreignWorkspaceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(that, ListFiles.class);
+                manager.setCurrentWorkspace(foreignWorkspaceList.get(position));
+                startActivity(intent);
+            }
+        });
+
+        this.workspaceListView.setLongClickable(true);
+        this.workspaceListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+                Intent intent = new Intent(that, workspaceSettings.class);
+                manager.setCurrentWorkspace(workspaceList.get(position));
+                startActivity(intent);
+                return true;
+            }
+        });
+
+        this.foreignWorkspaceListView.setLongClickable(true);
+        this.foreignWorkspaceListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id) {
+                Intent intent = new Intent(that, workspaceSettings.class);
+                manager.setCurrentWorkspace(foreignWorkspaceList.get(position));
+                startActivity(intent);
+                return true;
+            }
+        });
     }
 }

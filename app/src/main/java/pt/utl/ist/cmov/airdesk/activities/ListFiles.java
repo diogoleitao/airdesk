@@ -25,7 +25,7 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 
-public class ListFiles extends ActionBarActivity {
+public class ListFiles extends ActionBarActivity implements Updatable {
 
     ArrayAdapter<String> adapter;
     ListView fileListView;
@@ -51,66 +51,8 @@ public class ListFiles extends ActionBarActivity {
         setContentView(R.layout.activity_list_files);
 
         manager = AirdeskManager.getInstance(getApplicationContext());
-        workspace = manager.getCurrentWorkspace();
-
-        fileNameList = manager.getFilesFromWorkspace(workspace.getHash());
-
-        fileListView = (ListView) findViewById(R.id.filelist);
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileNameList);
-        fileListView.setAdapter(adapter);
-        final Context that = this;
-
-        fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                boolean[] privileges = manager.getUserPrivileges(workspace.getHash(),manager.getLoggedUser().getEmail());
-                if (!privileges[0]) { // read privilege
-                    Context context = getApplicationContext();
-                    CharSequence text = "You don't have privileges to read files!";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-                } else {
-                    Intent intent = new Intent(that, EditFile.class);
-                    manager.setCurrentFile(fileNameList.get(position));
-                    manager.getFile(workspace.getHash(), fileNameList.get(position));
-                    startActivity(intent);
-                }
-            }
-        });
-
-        this.fileListView.setLongClickable(true);
-        this.fileListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
-                new AlertDialog.Builder(that)
-                        .setTitle("Delete " + fileNameList.get(position) + "?")
-                        .setMessage("This action is irreversible. This file uses " + (new DecimalFormat("##.##")).format((float) manager.getFile(workspace.getHash(),fileNameList.get(position)).getSize() / 1024) + "kB of space.")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                try {
-                                    manager.deleteFile(workspace.getHash(),fileNameList.get(position));
-                                    fileNameList.remove(position);
-                                    adapter.notifyDataSetChanged();
-                                } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
-                                    Context context = getApplicationContext();
-                                    CharSequence text = e.getMessage();
-                                    int duration = Toast.LENGTH_SHORT;
-
-                                    Toast toast = Toast.makeText(context, text, duration);
-                                    toast.show();
-                                }
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-                return true;
-            }
-        });
+        manager.setCurrentActivity(this);
+        updateUI();
     }
 
     @Override
@@ -181,5 +123,69 @@ public class ListFiles extends ActionBarActivity {
         } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void updateUI() {
+        workspace = manager.getCurrentWorkspace();
+
+        fileNameList = manager.getFilesFromWorkspace(workspace.getHash());
+
+        fileListView = (ListView) findViewById(R.id.filelist);
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileNameList);
+        fileListView.setAdapter(adapter);
+        final Context that = this;
+
+        fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                boolean[] privileges = manager.getUserPrivileges(workspace.getHash(),manager.getLoggedUser().getEmail());
+                if (!privileges[0]) { // read privilege
+                    Context context = getApplicationContext();
+                    CharSequence text = "You don't have privileges to read files!";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                } else {
+                    Intent intent = new Intent(that, EditFile.class);
+                    manager.setCurrentFile(fileNameList.get(position));
+                    manager.getFile(workspace.getHash(), fileNameList.get(position));
+                    startActivity(intent);
+                }
+            }
+        });
+
+        this.fileListView.setLongClickable(true);
+        this.fileListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
+                new AlertDialog.Builder(that)
+                        .setTitle("Delete " + fileNameList.get(position) + "?")
+                        .setMessage("This action is irreversible. This file uses " + (new DecimalFormat("##.##")).format((float) manager.getFile(workspace.getHash(),fileNameList.get(position)).getSize() / 1024) + "kB of space.")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                try {
+                                    manager.deleteFile(workspace.getHash(),fileNameList.get(position));
+                                    fileNameList.remove(position);
+                                    adapter.notifyDataSetChanged();
+                                } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
+                                    Context context = getApplicationContext();
+                                    CharSequence text = e.getMessage();
+                                    int duration = Toast.LENGTH_SHORT;
+
+                                    Toast toast = Toast.makeText(context, text, duration);
+                                    toast.show();
+                                }
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                return true;
+            }
+        });
     }
 }
