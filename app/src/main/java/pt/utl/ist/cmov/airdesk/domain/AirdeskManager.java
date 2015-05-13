@@ -15,6 +15,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import pt.utl.ist.cmov.airdesk.activities.Updatable;
+import pt.utl.ist.cmov.airdesk.activities.UserPrivileges;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
@@ -49,6 +51,7 @@ public class AirdeskManager implements Serializable {
      * The currently logged in user email
 	 */
 	private static User loggedUser;
+    private Activity currentActivity;
 
     public void setCurrentFile(String currentFile) {
         this.currentFile = currentFile;
@@ -260,7 +263,7 @@ public class AirdeskManager implements Serializable {
         loggedUser.getWorkspace(workspaceHash).setPrivacy(isPrivate);
     }
 
-    // TODO ?? SEND  MESSAGE
+
     public void inviteUser(String workspaceHash, String email) throws UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
         if (loggedUser.getWorkspace(workspaceHash).getOwner() == loggedUser.getEmail()){
             loggedUser.getWorkspace(workspaceHash).getAccessLists().put(email, new Privileges());
@@ -279,7 +282,13 @@ public class AirdeskManager implements Serializable {
 
     public void addForeignWorkspace(Workspace workspace){
         loggedUser.getForeignWorkspaces().put(workspace.getHash(), workspace);
-        namesToHashes.put(workspace.getName(),workspace.getHash());
+        namesToHashes.put(workspace.getName(), workspace.getHash());
+        updateUI();
+    }
+
+    private void updateUI() {
+        if(currentActivity instanceof Updatable)
+            ((Updatable)currentActivity).updateUI();
     }
 
     public void deleteForeignFile(String workspaceHash, String filename){
@@ -340,5 +349,9 @@ public class AirdeskManager implements Serializable {
 
     public Workspace getCurrentWorkspace() {
         return loggedUser.getWorkspace(currentWorkspace);
+    }
+
+    public void setCurrentActivity(Activity currentActivity) {
+        this.currentActivity = currentActivity;
     }
 }
