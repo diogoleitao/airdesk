@@ -1,6 +1,5 @@
 package pt.utl.ist.cmov.airdesk.domain.network;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,7 @@ import android.widget.Toast;
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
-import pt.utl.ist.cmov.airdesk.domain.BroadcastMessages;
+import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 import pt.utl.ist.cmov.airdesk.domain.WifiManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
@@ -24,7 +23,7 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
     public AirdeskBroadcastReceiver(Context _context) {
         super();
-        manager = AirdeskManager.getInstance(null);
+        manager = AirdeskManager.getInstance(_context);
         context = _context;
         wifiManager = WifiManager.getInstance();
     }
@@ -65,64 +64,6 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
             Toast.makeText(context.getApplicationContext(), "Group ownership changed", Toast.LENGTH_SHORT).show();
 
-        } else if (BroadcastMessages.FILE_ADDED_TO_WORKSPACE.equals(action)) {
-
-            String workspaceName = intent.getStringExtra("workspaceName");
-            String fileName = intent.getStringExtra("fileName");
-            try {
-                manager.addNewFileBC(workspaceName, fileName);
-            } catch (FileAlreadyExistsException e) {
-                e.printStackTrace();
-            } catch (UserDoesNotHavePermissionsToCreateFilesException e) {
-                e.printStackTrace();
-            }
-
-        } else if (BroadcastMessages.FILE_CHANGED.equals(action)) {
-
-            String workspaceName = intent.getStringExtra("workspaceName");
-            String fileName = intent.getStringExtra("fileName");
-           // ((ListFiles)mActivity).fileChanged(workspaceName, fileName);
-
-            try {
-                manager.addNewFileBC(workspaceName, fileName);
-            } catch (FileAlreadyExistsException e) {
-                e.printStackTrace();
-            } catch (UserDoesNotHavePermissionsToCreateFilesException e) {
-                e.printStackTrace();
-            }
-
-        } else if (BroadcastMessages.FILE_DELETED.equals(action)) {
-
-            String workspaceName = intent.getStringExtra("workspaceName");
-            String fileName = intent.getStringExtra("fileName");
-
-            try {
-                manager.deleteFileBC(workspaceName, fileName);
-            } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
-                e.printStackTrace();
-            }
-
-        } else if (BroadcastMessages.INVITATION_TO_WORKSPACE.equals(action)) {
-
-            String workspaceName = intent.getStringExtra("workspaceName");
-            String username = intent.getStringExtra("username");
-
-            // TODO: manager.inviteUser();
-
-        } else if (BroadcastMessages.WORKSPACE_DELETED.equals(action)) {
-
-            String workspaceName = intent.getStringExtra("workspaceName");
-
-            try {
-                manager.deleteWorkspaceBC(workspaceName);
-            } catch (UserDoesNotHavePermissionsToDeleteWorkspaceException e) {
-                e.printStackTrace();
-            }
-
-        } else if (BroadcastMessages.WORKSPACE_TOPIC_MATCH.equals(action)) {
-            // TODO: manager update
-            String workspaceName = intent.getStringExtra("workspaceName");
-            //((ListWorkspaces)mActivity).workspaceTopicMatch(workspaceName);
         }
     }
 }
