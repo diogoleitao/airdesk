@@ -10,11 +10,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/workspaceList"
-        android:layout_below="@+id/bt_logout"
-        android:layout_toStartOf="@+id/bt_logout"
         android:layout_above="@+id/foreignWorkspacesText"
         android:layout_alignRight="@+id/foreignWorkspaceList"
-        android:layout_alignEnd="@+id/foreignWorkspaceList" />
+        android:layout_alignEnd="@+id/foreignWorkspaceList"
+        android:layout_below="@+id/textView" />
 
     <Button
         android:layout_width="wrap_content"
@@ -49,23 +48,11 @@
         android:hint="Quota (in kB)"
         android:maxLines="1"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:id="@+id/bt_logout"
-        android:onClick="logout"
-        android:maxLines="1"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/foreignWorkspaceList"
         android:layout_above="@+id/quotaText"
-        android:layout_toStartOf="@+id/bt_logout"
         android:layout_below="@+id/foreignWorkspacesText"
         android:layout_alignRight="@+id/bt_addworkspace"
         android:layout_alignEnd="@+id/bt_addworkspace" />
