@@ -12,10 +12,6 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 
 public class User implements Serializable, Observer {
 
-	/**
-	 * The user's name
-	 */
-	private String name;
 
     /**
      * The user's email, used as a GUID
@@ -32,17 +28,8 @@ public class User implements Serializable, Observer {
 	 */
     private HashMap<String, Workspace> foreignWorkspaces = new HashMap<String, Workspace>();
 
-    public User(String name, String email) {
-		this.setName(name);
+    public User(String email) {
 		this.setEmail(email);
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getEmail() {
@@ -57,11 +44,18 @@ public class User implements Serializable, Observer {
 		return ownedWorkspaces;
 	}
 
-	public HashMap<String, Workspace> getForeignWorkspaces() {
-		return foreignWorkspaces;
-	}
+    public HashMap<String, Workspace> getForeignWorkspaces() {
+        return foreignWorkspaces;
+    }
 
-	/**
+    public HashMap<String, Workspace> getAllWorkspaces() {
+        HashMap<String, Workspace> result =  new HashMap<String, Workspace>();
+        result.putAll(foreignWorkspaces);
+        result.putAll(ownedWorkspaces);
+        return result;
+    }
+
+    /**
 	 * Create AirdeskBroadcastReceiver workspace with AirdeskBroadcastReceiver given name and quota size
 	 *
 	 * @param quota the maximum size assigned to the workspace

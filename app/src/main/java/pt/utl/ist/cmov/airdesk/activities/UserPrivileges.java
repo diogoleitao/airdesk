@@ -45,7 +45,7 @@ public class UserPrivileges extends ActionBarActivity {
         workspaceNameView.setText("Workspace name: " + workspaceName);
 
         userNameList = new ArrayList<String>(manager.getUsersFromWorkspace());
-        userNameList.remove(manager.getLoggedUser());
+        userNameList.remove(manager.getLoggedUser().getEmail());
 
         userListView = (ListView) findViewById(R.id.userListView);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, userNameList );

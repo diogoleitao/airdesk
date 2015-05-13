@@ -2,7 +2,6 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.View;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,8 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import pt.utl.ist.cmov.airdesk.activities.ListWorkspaces;
-import pt.utl.ist.cmov.airdesk.activities.MainActivity;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyExistsException;
@@ -39,16 +36,6 @@ public class AirdeskManager implements Serializable {
 	 */
 	private static AirdeskManager instance = null;
 
-	/**
-	 * Mapping between users' emails and User objects
-	 */
-	private static HashMap<String, User> registeredUsers = new HashMap<String, User>();
-
-    /**
-     * Mapping between workspaces' names and Workspace objects
-     */
-    private static HashMap<String, Workspace> existingWorkspaces = new HashMap<String, Workspace>();
-
     /**
      * Mapping between workspaces' hashes and Workspace names
      */
@@ -62,7 +49,7 @@ public class AirdeskManager implements Serializable {
     /**
      * The currently logged in user email
 	 */
-	private String loggedUser = "";
+	private static User loggedUser;
 
     /**
 	 * The currently opened workspace name
@@ -88,13 +75,12 @@ public class AirdeskManager implements Serializable {
                 FileInputStream fileInputStream = context.openFileInput(filename);
                 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
-                existingWorkspaces = (HashMap<String, Workspace>)objectInputStream.readObject();
-                registeredUsers = (HashMap<String, User>)objectInputStream.readObject();
+                loggedUser = (User) objectInputStream.readObject();
 
                 objectInputStream.close();
                 fileInputStream.close();
             } catch (FileNotFoundException e) {
-                //populateAirdesk();    this method crashes the app!
+                //it's okay
             }  catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
             }
@@ -102,54 +88,12 @@ public class AirdeskManager implements Serializable {
 		return instance;
 	}
 
-    public static void populateAirdesk() {
-        ArrayList<String> newUsers = new ArrayList<String>();
-        ArrayList<String> newWorkspaces = new ArrayList<String>();
-        ArrayList<String> newFiles = new ArrayList<String>();
-        ArrayList<String> newFileContents = new ArrayList<String>();
-
-        // CREATE SOME GIBBERISH DATA TO FILL THE "DATABASE"
-        for (int i = 0; i < 10; i++) {
-            newUsers.add("user" + i);
-            newWorkspaces.add("workspace" + i);
-            newFiles.add("file" + i);
-            if (i % 2 == 0) {
-                newFileContents.add("I have some content " + i);
-            }
-        }
-
-        // ADD THE GIBBERISH DATA TO "DATABASE";
-        // ALL DATA CREATION AND MANIPULATION IS DONE MANUALLY
-        // TO PREVENT (AND LATER, TO DETECT) ERRORS
-        for (int i = 0; i < 10; i++) {
-            // CREATE USER
-            User newUser = new User(newUsers.get(i), newUsers.get(i));
-            registeredUsers.put(newUsers.get(i), newUser);
-
-            // CREATE WORKSPACE AND ADD TO PREVIOUSLY CREATED USER'S WORKSPACE SET
-            Workspace newWorkspace = new Workspace(5000, newWorkspaces.get(i), newUsers.get(i), "");
-            existingWorkspaces.put(newWorkspaces.get(i), newWorkspace);
-            newUser.getOwnedWorkspaces().put(newWorkspaces.get(i), newWorkspace);
-
-            // CREATE FILE, ADD CONTENT AND ADD TO PREVIOUSLY CREATED WORKSPACE'S FILE SET
-            File newFile = new File(newFiles.get(i));
-
-            // TODO:: APP CRASHES WHEN THE FILE DOESN'T EXIST. CAN'T RUN ON NEW EMULATORS
-
-            if (i % 2 == 0)
-                newFile.save(newFileContents.get(i / 2));
-            newWorkspace.getFiles().put(newFiles.get(i), newFile);
-            newWorkspace.updateQuotaOccupied(newFile.getSize());
-        }
-    }
-
     public void saveAppState(Context context) {
         try {
             FileOutputStream fileOutputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 
-            objectOutputStream.writeObject(existingWorkspaces);
-            objectOutputStream.writeObject(registeredUsers);
+            objectOutputStream.writeObject(loggedUser);
 
             objectOutputStream.close();
             fileOutputStream.close();
@@ -159,23 +103,14 @@ public class AirdeskManager implements Serializable {
     }
 
     public void setCurrentWorkspace(String currentWorkspace) {
-        this.currentWorkspaceHash = existingWorkspaces.get(currentWorkspace).getHash();
+        this.currentWorkspaceHash = loggedUser.getAllWorkspaces().get(currentWorkspace).getHash();
         this.currentWorkspace = currentWorkspace;
     }
-
-    public void WifiOn(MainActivity a, View v) {
-        wifiManager.WifiOn(a, v);
-    }
-
-    public void WifiOff() {
-        wifiManager.WifiOff();
-    }
-
 
     /////////////////////////////
     ////////// GETTERS //////////
     /////////////////////////////
-    public String getLoggedUser() {
+    public User getLoggedUser() {
         return loggedUser;
     }
 
@@ -193,95 +128,75 @@ public class AirdeskManager implements Serializable {
 
     public File getFile(String name) {
         currentFile = name;
-        return existingWorkspaces.get(currentWorkspace).getFiles().get(name);
+        return loggedUser.getAllWorkspaces().get(currentWorkspace).getFiles().get(name);
     }
 
     public int getTotalQuota(String workspaceName) {
-        return existingWorkspaces.get(workspaceName).getQuota();
+        return loggedUser.getAllWorkspaces().get(workspaceName).getQuota();
     }
 
     public int getUsedQuota(String workspaceName) {
-        return existingWorkspaces.get(workspaceName).getQuotaOccupied();
+        return loggedUser.getAllWorkspaces().get(workspaceName).getQuotaOccupied();
     }
 
     public boolean[] getUserPrivileges(String email) {
-        return existingWorkspaces.get(currentWorkspace).getAccessLists().get(email).getAll();
+        return loggedUser.getAllWorkspaces().get(currentWorkspace).getAccessLists().get(email).getAll();
     }
 
     public ArrayList<String> getUsersFromWorkspace() {
-        return existingWorkspaces.get(currentWorkspace).getUsers();
+        return new ArrayList<String>(loggedUser.getAllWorkspaces().get(currentWorkspace).getAccessLists().keySet());
     }
 
-    // TODO CHANGE SO FOREIGN WORKSPACES ARE RETRIEVED FROM THE OTHER USER VIA WIFI
-    public ArrayList<String> getForeignWorkspaces(String email){
-        ArrayList<String> workspaceNames = new ArrayList<String>();
-        if (registeredUsers.keySet().contains(email)) {
-            workspaceNames.addAll(registeredUsers.get(email).getForeignWorkspaces().keySet());
-            return workspaceNames;
-        } else {
-            return null;
-        }
+    public HashMap<String, Workspace> getOwnedWorkspaces(){
+        return loggedUser.getOwnedWorkspaces();
+    }
+
+    public HashMap<String, Workspace> getForeignWorkspaces(){
+        return loggedUser.getForeignWorkspaces();
     }
 
     public ArrayList<String> getFilesFromWorkspace(String workspace) {
         currentWorkspace = workspace;
 
         ArrayList<String> fileNames = new ArrayList<String>();
-        if (registeredUsers.get(loggedUser).getWorkspace(workspace) != null)
-            fileNames.addAll(registeredUsers.get(loggedUser).getWorkspace(workspace).getFiles().keySet());
-        // if (registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace) != null)
-        //   fileNames.addAll(registeredUsers.get(loggedUser).getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
+        if (loggedUser.getWorkspace(workspace) != null)
+            fileNames.addAll(loggedUser.getWorkspace(workspace).getFiles().keySet());
+        // if (loggedUser.getForeignWorkspaces().get(currentWorkspace) != null)
+        //   fileNames.addAll(loggedUser.getForeignWorkspaces().get(currentWorkspace).getFiles().keySet());
 
         return fileNames;
     }
 
-    public ArrayList<String> getWorkspaces(String email){
-        ArrayList<String> workspaceNames = new ArrayList<String>();
-        if (registeredUsers.keySet().contains(email)) {
-            workspaceNames.addAll(registeredUsers.get(email).getOwnedWorkspaces().keySet());
-            return workspaceNames;
-        } else {
-            return null;
-        }
-    }
 
     public boolean getWorkspacePrivacy(String workspaceName) {
-        return existingWorkspaces.get(workspaceName).isPrivate();
+        return loggedUser.getAllWorkspaces().get(workspaceName).isPrivate();
     }
 
     public ArrayList<String> getTopics() {
-        return existingWorkspaces.get(currentWorkspace).getTopics();
-    }
-
-    public User getUserByEmail(String email) {
-        if (registeredUsers.keySet().contains(email)) {
-            return registeredUsers.get(email);
-        } else {
-            return null;
-        }
+        return loggedUser.getAllWorkspaces().get(currentWorkspace).getTopics();
     }
 
     public boolean[] getAllPrivilegesFromWorkspace() {
         boolean[] privileges = {true, true, true, true};
-        for (Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()) {
+        for (Privileges p : loggedUser.getAllWorkspaces().get(currentWorkspace).getAccessLists().values()) {
             if (!p.canRead()) {
                 privileges[0] = false;
                 break;
             }
         }
-        for (Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()) {
+        for (Privileges p : loggedUser.getAllWorkspaces().get(currentWorkspace).getAccessLists().values()) {
             if (!p.canWrite()) {
                 privileges[1] = false;
                 break;
             }
         }
-        for (Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()) {
+        for (Privileges p : loggedUser.getAllWorkspaces().get(currentWorkspace).getAccessLists().values()) {
             if (!p.canCreate()) {
                 privileges[2] = false;
                 break;
             }
         }
-        for (Privileges p : existingWorkspaces.get(currentWorkspace).getAccessLists().values()) {
+        for (Privileges p : loggedUser.getAllWorkspaces().get(currentWorkspace).getAccessLists().values()) {
             if (!p.canDelete()) {
                 privileges[3] = false;
                 break;
@@ -294,30 +209,14 @@ public class AirdeskManager implements Serializable {
     //////////////////////////////////
     ////////// DOMAIN LOGIC //////////
     //////////////////////////////////
-    public boolean login(String email) {
-        loggedUser = email;
-        return registeredUsers.keySet().contains(email);
-    }
+    public void login(String email) {
+        loggedUser = new User(email);
 
-    public void logout() {
-        loggedUser = "";
-        currentWorkspace = "";
-        currentFile = "";
-    }
-
-    // TODO BECOME DISCOVERABLE IN WIFI, SO OTHERS CAN DOWNLOAD OUR FILES
-    public void registerUser(String name, String email) throws UserAlreadyExistsException {
-        if (getUserByEmail(email) == null) {
-            registeredUsers.put(email, new User(name, email));
-            loggedUser = email;
-        } else {
-            throw new UserAlreadyExistsException();
-        }
     }
 
     // TODO FORWARD CHANGES TO USERS SUBSCRIBED
     public void addWorkspace(String workspaceName, int quota) throws WorkspaceAlreadyExistsException {
-        for (String w : existingWorkspaces.keySet()) {
+        for (String w : loggedUser.getAllWorkspaces().keySet()) {
             if (w.equals(workspaceName)) {
                 throw new WorkspaceAlreadyExistsException();
             }
@@ -334,62 +233,52 @@ public class AirdeskManager implements Serializable {
             for (byte i : digestion)
                 sb.append(Byte.toString(i));
 
-            existingWorkspaces.put(workspaceName, getUserByEmail(loggedUser).createWorkspace(quota * 1024, workspaceName, sb.toString()));
+            loggedUser.getAllWorkspaces().put(workspaceName, loggedUser.createWorkspace(quota * 1024, workspaceName, sb.toString()));
             hashesToNames.put(sb.toString(), workspaceName);
-            existingWorkspaces.get(workspaceName).notifyObservers();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
     }
 
     public void deleteWorkspace(String workspaceName) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
-        registeredUsers.get(loggedUser).deleteWorkspace(workspaceName);
-        hashesToNames.remove(existingWorkspaces.get(workspaceName).getHash());
-        existingWorkspaces.remove(workspaceName).notifyObservers();
+        hashesToNames.remove(loggedUser.getAllWorkspaces().get(workspaceName).getHash());
+        loggedUser.deleteWorkspace(workspaceName);
     }
 
     public void addTopicToWorkspace(String topic) throws TopicAlreadyAddedException {
-        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).addTopic(topic);
-        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).notifyObservers();
+        loggedUser.getWorkspace(currentWorkspace).addTopic(topic);
     }
 
     public void addNewFile(String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
-        existingWorkspaces.get(currentWorkspace).getFiles().put(fileName, registeredUsers.get(loggedUser).createFile(currentWorkspace, fileName));
-        existingWorkspaces.get(currentWorkspace).getFiles().get(fileName).notifyObservers();
+        loggedUser.getAllWorkspaces().get(currentWorkspace).getFiles().put(fileName, loggedUser.createFile(currentWorkspace, fileName));
     }
 
     public void saveFile(String content) throws WorkspaceQuotaReachedException {
-        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).saveFile(currentFile, content);
-        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).notifyObservers();
+        loggedUser.getWorkspace(currentWorkspace).saveFile(currentFile, content);
     }
 
     public void deleteFile(String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
-        registeredUsers.get(loggedUser).deleteFile(currentWorkspace, fileName);
-        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).notifyObservers();
+        loggedUser.deleteFile(currentWorkspace, fileName);
     }
 
     public void changeUserPrivileges(String email, boolean[] privileges) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        registeredUsers.get(loggedUser).changeUserPrivileges(email, privileges, currentWorkspace);
+        loggedUser.changeUserPrivileges(email, privileges, currentWorkspace);
     }
 
     public void applyGlobalPrivileges(String workspaceName, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        registeredUsers.get(loggedUser).applyGlobalPrivileges(workspaceName, choices);
+        loggedUser.applyGlobalPrivileges(workspaceName, choices);
     }
 
     public void setWorkspacePrivacy(String workspaceName, boolean isPrivate) {
-        registeredUsers.get(loggedUser).getWorkspace(workspaceName).setPrivacy(isPrivate);
+        loggedUser.getWorkspace(workspaceName).setPrivacy(isPrivate);
     }
 
-    // TODO ?? SEND THE WORKSPACE
-    public void inviteUser(String username) throws UserDoesNotExistException, UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
-        if (!existingWorkspaces.get(currentWorkspace).getOwner().equals(loggedUser))
+    // TODO ?? SEND  MESSAGE
+    public void inviteUser(String email) throws UserAlreadyHasPermissionsInWorkspaceException, UserDoesNotHavePermissionsToChangePrivilegesException {
+        if(loggedUser.getWorkspace(currentWorkspace).getOwner() == loggedUser.getEmail())
+            loggedUser.getWorkspace(currentWorkspace).getAccessLists().put(email, new Privileges());
+        else
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
-        if (!registeredUsers.containsKey(username))
-            throw new UserDoesNotExistException();
-
-        registeredUsers.get(loggedUser).addUserToWorkspace(username, currentWorkspace);
-        registeredUsers.get(username).mountWorkspace(existingWorkspaces.get(currentWorkspace));
-        existingWorkspaces.get(currentWorkspace).addUser(username);
     }
 
 
@@ -397,32 +286,32 @@ public class AirdeskManager implements Serializable {
     ////////// NETWORK INTERFACE METHODS //////////
     ///////////////////////////////////////////////
     public void deleteWorkspaceBC(String workspaceName) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
-        registeredUsers.get(loggedUser).deleteWorkspace(workspaceName);
+        loggedUser.deleteWorkspace(workspaceName);
     }
 
     public void addTopicToWorkspaceBC(String workspaceName, String topic) throws TopicAlreadyAddedException {
-        registeredUsers.get(loggedUser).getWorkspace(workspaceName).addTopic(topic);
+        loggedUser.getWorkspace(workspaceName).addTopic(topic);
     }
 
     public void addNewFileBC(String workspaceName, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
-        existingWorkspaces.get(workspaceName).getFiles().put(fileName, registeredUsers.get(loggedUser).createFile(currentWorkspace, fileName));
+        loggedUser.getAllWorkspaces().get(workspaceName).getFiles().put(fileName, loggedUser.createFile(currentWorkspace, fileName));
     }
 
-    public void saveFileBC(String fileName, String content) throws WorkspaceQuotaReachedException {
-        registeredUsers.get(loggedUser).getWorkspace(currentWorkspace).saveFile(fileName, content);
+    public void saveFileBC(String workspaceName, String fileName, String content) throws WorkspaceQuotaReachedException {
+        loggedUser.getWorkspace(workspaceName).saveFile(fileName, content);
     }
 
     public void deleteFileBC(String workspaceName, String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
-        registeredUsers.get(loggedUser).deleteFile(workspaceName, fileName);
+        loggedUser.deleteFile(workspaceName, fileName);
     }
 
     public void applyGlobalPrivilegesBC(String workspaceName, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        registeredUsers.get(loggedUser).applyGlobalPrivileges(workspaceName, choices);
-        //existingWorkspaces.get(workspaceName).setPrivacy(isPrivate);
+        loggedUser.applyGlobalPrivileges(workspaceName, choices);
+        //loggedUser.getAllWorkspaces().get(workspaceName).setPrivacy(isPrivate);
     }
 
     public void setWorkspacePrivacyBC(String workspaceName, boolean isPrivate) {
-        registeredUsers.get(loggedUser).getWorkspace(workspaceName).setPrivacy(isPrivate);
+        loggedUser.getWorkspace(workspaceName).setPrivacy(isPrivate);
     }
 
     public void updateWorkspaceFileList(String workspaceName, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
@@ -431,8 +320,8 @@ public class AirdeskManager implements Serializable {
 
     public void matchWorkspaceTopicsBC(String workspaceName, ArrayList<String> topics) {
         for (String topic : topics) {
-            if (registeredUsers.get(loggedUser).getWorkspace(workspaceName).getTopics().contains(topic)) {
-                registeredUsers.get(loggedUser).mountWorkspace(existingWorkspaces.get(workspaceName));
+            if (loggedUser.getWorkspace(workspaceName).getTopics().contains(topic)) {
+                loggedUser.mountWorkspace(loggedUser.getAllWorkspaces().get(workspaceName));
                 return;
             }
         }

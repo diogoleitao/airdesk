@@ -54,10 +54,6 @@ public class Workspace implements Serializable, Observer, UserSubject {
 	 */
 	private HashMap<String, File> files = new HashMap<String, File>();
 
-    /**
-     *
-     */
-    private ArrayList<String> users = new ArrayList<String>();
 
 	/**
 	 * A list of Users observing the workspace
@@ -135,14 +131,6 @@ public class Workspace implements Serializable, Observer, UserSubject {
 		return files;
 	}
 
-    public ArrayList<String> getUsers() {
-        return this.users;
-    }
-
-    public void addUser(String user) {
-		this.getUsers().add(user);
-	}
-
     public int getQuotaOccupied() {
         return this.quotaOccupied;
 	}
@@ -188,6 +176,6 @@ public class Workspace implements Serializable, Observer, UserSubject {
 
 	@Override
 	public void notifyObservers() {
-		//WifiManager.broadcastWorkspaceUpdate(this.getName(), this.getObservers());
+		WifiManager.broadcastWorkspaceUpdate(this);
 	}
 }

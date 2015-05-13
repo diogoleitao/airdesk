@@ -48,7 +48,7 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
         throw new UnsupportedOperationException("it is not implemented");
     }
 
-    public void getAllActivities() {
+ /*   public void getAllActivities() {
         try {
             ActivityInfo[] list = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES).activities;
             for (ActivityInfo aList : list)
@@ -58,7 +58,7 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             e1.printStackTrace();
         }
     }
-
+*/
 
 	/*
 	 * Listeners associated to WDSim
@@ -91,6 +91,9 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             String devstr = "" + deviceName + " (" +
                     ((device == null)?"??":device.getVirtIp()) + ")\n";
             peersStr.append(devstr);
+
+            if((device == null))
+                wifiManager.addIP(device.getVirtIp());
         }
         Log.d(TAG, "Peer list: " + peersStr);
     }

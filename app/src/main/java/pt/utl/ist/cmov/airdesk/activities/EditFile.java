@@ -59,7 +59,7 @@ public class EditFile extends ActionBarActivity {
     public void save(View v) {
         String content = ((EditText) findViewById(R.id.fileText)).getText().toString();
 
-        boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
+        boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser().getEmail());
 
         if (!privileges[1]) { // read privilege
             Context context = getApplicationContext();

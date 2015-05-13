@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -61,7 +62,7 @@ public class ListFiles extends ActionBarActivity {
         fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser());
+                boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser().getEmail());
                 if (!privileges[0]) { // read privilege
                     Context context = getApplicationContext();
                     CharSequence text = "You don't have privileges to read files!";
@@ -81,7 +82,7 @@ public class ListFiles extends ActionBarActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
                 new AlertDialog.Builder(that)
                         .setTitle("Delete " + fileNameList.get(position) + "?")
-                        .setMessage("This action is irreversible. This file uses " + manager.getFile(fileNameList.get(position)).getSize() + "kB of space.")
+                        .setMessage("This action is irreversible. This file uses " + (new DecimalFormat("##.##")).format((float) manager.getFile(fileNameList.get(position)).getSize() / 1024) + "kB of space.")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
