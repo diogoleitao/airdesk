@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
+import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 
 public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
@@ -79,18 +80,39 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
     }
 
     protected void dispatchMessage(BroadcastMessage message){
+        String workspaceHash, fileName, user;
+        AirdeskManager manager = AirdeskManager.getInstance(context);
         switch(message.getMessageType()){
             case FILE_CHANGED:
+                workspaceHash = message.getArg1();
+                fileName = message.getArg2();
+
+
                 break;
             case FILE_DELETED:
+                workspaceHash = message.getArg1();
+                fileName = message.getArg2();
                 break;
             case FILE_ADDED_TO_WORKSPACE:
+                workspaceHash = message.getArg1();
+                fileName = message.getArg2();
                 break;
             case WORKSPACE_DELETED:
+                workspaceHash = message.getArg1();
                 break;
-            case WORKSPACE_TOPIC_MATCH:
+            case NEW_WORKSPACE:
+                workspaceHash = message.getArg1();
                 break;
             case INVITATION_TO_WORKSPACE:
+                workspaceHash = message.getArg1();
+                user = message.getArg2();
+                break;
+            case REQUEST_FILE:
+                workspaceHash = message.getArg1();
+                fileName = message.getArg2();
+                break;
+            case REQUEST_WORKSPACE:
+                workspaceHash = message.getArg1();
                 break;
         }
     }

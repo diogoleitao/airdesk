@@ -1,13 +1,17 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by Tiago on 06/05/2015.
  */
-public class BroadcastMessage {
+public class BroadcastMessage implements Serializable{
 
     private String ip;
     private MessageTypes messageType;
     private String arg1, arg2;
+    private File file;
+    private Workspace workspace;
 
     public BroadcastMessage(MessageTypes _messageType, String _arg1, String _ip){
         messageType = _messageType;
@@ -54,8 +58,24 @@ public class BroadcastMessage {
         this.arg2 = arg2;
     }
 
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
+    }
+
     public enum MessageTypes {
         FILE_CHANGED, FILE_DELETED, FILE_ADDED_TO_WORKSPACE, WORKSPACE_DELETED,
-        WORKSPACE_TOPIC_MATCH, INVITATION_TO_WORKSPACE
+        NEW_WORKSPACE, INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE,
     }
 }
