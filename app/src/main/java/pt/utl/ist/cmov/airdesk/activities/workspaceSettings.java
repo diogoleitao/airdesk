@@ -14,6 +14,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
@@ -53,7 +54,7 @@ public class workspaceSettings extends ActionBarActivity {
 
         TextView QuotaView = (TextView) findViewById(R.id.quotaText);
 
-        QuotaView.setText("Quota used/total: " + manager.getUsedQuota(workspaceName) + "/" + manager.getTotalQuota(workspaceName) + "kB");
+        QuotaView.setText("Quota used/total: " + (new DecimalFormat("##.##")).format((float)manager.getUsedQuota(workspaceName)/1024) + "/" + (new DecimalFormat("##.##")).format((float)manager.getTotalQuota(workspaceName)/1024) + "kB");
 
         TextView topicsView = (TextView) findViewById(R.id.topicsText);
         String topics = "";
@@ -142,7 +143,7 @@ public class workspaceSettings extends ActionBarActivity {
             ((CheckBox) findViewById(R.id.createFilesBox)).setChecked(currentGlobalPrivileges[2]);
             ((CheckBox) findViewById(R.id.deleteFilesBox)).setChecked(currentGlobalPrivileges[3]);
             
-        } catch (UserDoesNotExistException | UserAlreadyHasPermissionsInWorkspaceException | UserDoesNotHavePermissionsToChangePrivilegesException e) {
+        } catch (UserAlreadyHasPermissionsInWorkspaceException | UserDoesNotHavePermissionsToChangePrivilegesException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();
             int duration = Toast.LENGTH_SHORT;

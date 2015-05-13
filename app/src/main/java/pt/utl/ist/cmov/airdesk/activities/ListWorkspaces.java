@@ -38,7 +38,7 @@ public class ListWorkspaces extends ActionBarActivity {
 
     @Override
     public void onBackPressed() {
-        logout(findViewById(R.id.bt_logout));
+
     }
 
     @Override
@@ -46,15 +46,16 @@ public class ListWorkspaces extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_workspaces);
 
+
         manager = AirdeskManager.getInstance(getApplicationContext());
 
         workspaceList = new ArrayList<String>();
         foreignWorkspaceList = new ArrayList<String>();
 
-        String email = manager.getLoggedUser();
+        String email = manager.getLoggedUser().getEmail();
 
-        workspaceList = manager.getWorkspaces(email);
-        foreignWorkspaceList = manager.getForeignWorkspaces(email);
+        workspaceList.addAll(manager.getOwnedWorkspaces().keySet());
+        foreignWorkspaceList.addAll(manager.getForeignWorkspaces().keySet());
 
         workspaceListView = (ListView) findViewById(R.id.workspaceList);
         foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);
@@ -163,20 +164,14 @@ public class ListWorkspaces extends ActionBarActivity {
         }
     }
 
-    public void logout(View v) {
-        manager.logout();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
-
     // Workspace was deleted by another user
     public void workspaceRemoved(String workspaceName) {
-        foreignWorkspaceList = manager.getForeignWorkspaces(manager.getLoggedUser());
+        foreignWorkspaceList.addAll(manager.getForeignWorkspaces().keySet());
         adapterForeign.notifyDataSetChanged();
     }
 
     public void invitationToWorkspace(String workspaceName, String username) {
-        foreignWorkspaceList = manager.getForeignWorkspaces(manager.getLoggedUser());
+        foreignWorkspaceList.addAll(manager.getForeignWorkspaces().keySet());
         adapterForeign.notifyDataSetChanged();
     }
 }

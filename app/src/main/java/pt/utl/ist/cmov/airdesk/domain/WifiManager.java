@@ -69,12 +69,12 @@ public class WifiManager implements Serializable {
 
 
     public static void broadcastWorkspaceUpdate(Workspace w) {
-
+/*
         for (String ip : IPs){
         //create outgoing task for user
         //TODO new OutgoingServerClientCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip);
 
-        }
+        }*/
     }
 
 }

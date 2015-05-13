@@ -44,6 +44,12 @@ public class MainActivity extends ActionBarActivity {
         // Start GlobalService
         Intent intent = new Intent(this, GlobalService.class);
         startService(intent);
+
+        if(manager.getLoggedUser() != null){
+            intent = new Intent(this, ListWorkspaces.class);
+            startActivity(intent);
+        }
+
     }
 
     @Override
@@ -53,13 +59,9 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
-    public void register(View v) {
-        EditText nameView = (EditText) findViewById(R.id.nameEditText);
-        EditText emailRegisterView = (EditText) findViewById(R.id.registerEmailText);
-        EditText emailView = (EditText) findViewById(R.id.emailEditText);
 
-        name = nameView.getText().toString();
-        registerEmail = emailRegisterView.getText().toString();
+    public void login(View v) {
+        EditText emailView = (EditText) findViewById(R.id.emailEditText);
         email = emailView.getText().toString();
 
         Context context = getApplicationContext();
@@ -67,45 +69,21 @@ public class MainActivity extends ActionBarActivity {
         Toast toast;
         CharSequence text;
 
-        if (name.contains(" ") || registerEmail.contains(" ") || name.contains("\n") || registerEmail.contains("\n")) {
+        if (email.contains(" ") || email.contains("\n")) {
             text = "No spaces or line breaks allowed!";
             toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
 
-        if (name.equals("") || registerEmail.equals("")) {
+        if (email.equals("")) {
             text = "Please fill in all fields!";
             toast = Toast.makeText(context, text, duration);
             toast.show();
             return;
         }
 
-        try {
-            manager.registerUser(name, registerEmail);
-        } catch (UserAlreadyExistsException e) {
-            text = e.getMessage();
-            toast = Toast.makeText(context, text, duration);
-            toast.show();
-            return;
-        }
-
-        Intent intent = new Intent(this, ListWorkspaces.class);
-        startActivity(intent);
-    }
-
-    public void login(View v) {
-        EditText emailView = (EditText) findViewById(R.id.emailEditText);
-        email = emailView.getText().toString();
-
-       if (!manager.login(email)) {
-            Context context = getApplicationContext();
-            int duration = Toast.LENGTH_SHORT;
-            CharSequence text = "Login failed. Please register.";
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-            return;
-        }
+        manager.login(email);
 
         Intent intent = new Intent(this, ListWorkspaces.class);
         startActivity(intent);
