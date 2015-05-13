@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
+import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 
 public class UserPrivileges extends ActionBarActivity {
@@ -24,7 +25,7 @@ public class UserPrivileges extends ActionBarActivity {
     ArrayAdapter<String> adapter;
     ListView userListView;
     ArrayList<String> userNameList;
-    String workspaceName;
+    Workspace workspace;
     AirdeskManager manager;
 
     @Override
@@ -39,12 +40,12 @@ public class UserPrivileges extends ActionBarActivity {
         setContentView(R.layout.activity_user_privileges);
 
         manager = AirdeskManager.getInstance(getApplicationContext());
-        workspaceName = manager.getCurrentWorkspace();
+        workspace = manager.getCurrentWorkspace();
 
-        TextView workspaceNameView = (TextView)findViewById(R.id.workspaceNameText);
-        workspaceNameView.setText("Workspace name: " + workspaceName);
+        TextView workspaceView = (TextView)findViewById(R.id.workspaceNameText);
+        workspaceView.setText("Workspace name: " + workspace.getName());
 
-        userNameList = new ArrayList<String>(manager.getUsersFromWorkspace());
+        userNameList = new ArrayList<String>(manager.getUsersFromWorkspace(workspace.getHash()));
         userNameList.remove(manager.getLoggedUser().getEmail());
 
         userListView = (ListView) findViewById(R.id.userListView);
@@ -56,7 +57,7 @@ public class UserPrivileges extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 final boolean[] choices;
-                choices = manager.getUserPrivileges(userNameList.get(position));
+                choices = manager.getUserPrivileges(workspace.getHash(),userNameList.get(position));
                 new AlertDialog.Builder(that)
                         .setTitle("Edit " + userNameList.get(position) + "'s Privileges")
                         .setMultiChoiceItems(new CharSequence[] { "Read", "Write", "Create", "Delete"}, choices, new DialogInterface.OnMultiChoiceClickListener() {
@@ -68,7 +69,7 @@ public class UserPrivileges extends ActionBarActivity {
                         .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
-                                    manager.changeUserPrivileges(userNameList.get(position), choices);
+                                    manager.changeUserPrivileges(workspace.getHash(),userNameList.get(position), choices);
                                 } catch (UserDoesNotHavePermissionsToChangePrivilegesException e) {
                                     Context context = getApplicationContext();
                                     CharSequence text = e.getMessage();

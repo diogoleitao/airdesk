@@ -18,14 +18,10 @@ public class User implements Serializable, Observer {
      */
 	private String email;
 
-    /**
-	 * Mapping between the user's workspaces' names that he created and the Workspace objects
-	 */
+
     private HashMap<String, Workspace> ownedWorkspaces = new HashMap<String, Workspace>();
 
-	/**
-	 * Mapping between the user's workspaces' names that he joined/got invited to and the Workspace objects
-	 */
+
     private HashMap<String, Workspace> foreignWorkspaces = new HashMap<String, Workspace>();
 
     public User(String email) {
@@ -55,31 +51,22 @@ public class User implements Serializable, Observer {
         return result;
     }
 
-    /**
-	 * Create AirdeskBroadcastReceiver workspace with AirdeskBroadcastReceiver given name and quota size
-	 *
-	 * @param quota the maximum size assigned to the workspace
-	 * @param name the workspace's identifier
-	 */
+
 	public Workspace createWorkspace(int quota, String name, String hash) {
 		Workspace workspace = new Workspace(quota, name, getEmail(), hash);
-        getOwnedWorkspaces().put(name, workspace);
-        getWorkspace(name).register(this);
+        getOwnedWorkspaces().put(hash, workspace);
+        getWorkspace(hash).register(this);
         return workspace;
 	}
 
-	/**
-	 * Delete AirdeskBroadcastReceiver specific workspace
-	 *
-	 * @param name the workspace's identifier to be deleted from the user's set
-	 */
-	public void deleteWorkspace(String name) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
-        if (this.getOwnedWorkspaces().containsKey(name)) {
-            this.getOwnedWorkspaces().remove(name).unregister(this);
+
+	public void deleteWorkspace(String hash) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
+        if (this.getOwnedWorkspaces().containsKey(hash)) {
+            this.getOwnedWorkspaces().remove(hash).unregister(this);
         } else {
-            if (getForeignWorkspaces().containsKey(name)) {
-                if (this.getForeignWorkspaces().get(name).getAccessLists().get(this.getEmail()).canDelete()) {
-                    this.getForeignWorkspaces().remove(name).unregister(this);
+            if (getForeignWorkspaces().containsKey(hash)) {
+                if (this.getForeignWorkspaces().get(hash).getAccessLists().get(this.getEmail()).canDelete()) {
+                    this.getForeignWorkspaces().remove(hash).unregister(this);
                 }
                 else {
                     throw new UserDoesNotHavePermissionsToDeleteWorkspaceException();
@@ -130,31 +117,31 @@ public class User implements Serializable, Observer {
 
 	public void mountWorkspace(Workspace workspace) {
 		if (!workspace.getOwner().equals(getEmail())) {
-			getForeignWorkspaces().put(workspace.getName(), workspace);
+			getForeignWorkspaces().put(workspace.getHash(), workspace);
 		}
 	}
 
     public void unmountWorkspace(Workspace workspace) {
         if (!workspace.getOwner().equals(getEmail())) {
-            getForeignWorkspaces().remove(workspace.getName());
+            getForeignWorkspaces().remove(workspace.getHash());
         }
     }
 
-    public Workspace getWorkspace(String workspaceName) {
+    public Workspace getWorkspace(String workspaceHash) {
         Workspace workspace;
 
-        if (getOwnedWorkspaces().containsKey(workspaceName))
-            workspace = getOwnedWorkspaces().get(workspaceName);
-        else if (getForeignWorkspaces().containsKey(workspaceName))
-            workspace = getForeignWorkspaces().get(workspaceName);
+        if (getOwnedWorkspaces().containsKey(workspaceHash))
+            workspace = getOwnedWorkspaces().get(workspaceHash);
+        else if (getForeignWorkspaces().containsKey(workspaceHash))
+            workspace = getForeignWorkspaces().get(workspaceHash);
         else
             workspace = null;
 
         return workspace;
     }
 
-    public void deleteFile(String workspaceName, String filename) throws UserDoesNotHavePermissionsToDeleteFileException {
-        Workspace workspace = getWorkspace(workspaceName);
+    public void deleteFile(String workspaceHash, String filename) throws UserDoesNotHavePermissionsToDeleteFileException {
+        Workspace workspace = getWorkspace(workspaceHash);
         if (workspace.getAccessLists().get(getEmail()).canDelete()) {
             workspace.updateQuotaOccupied(-workspace.getFiles().get(filename).getSize());
             workspace.getFiles().remove(filename).unregister(this);
@@ -179,8 +166,8 @@ public class User implements Serializable, Observer {
         }
     }
 
-    public void applyGlobalPrivileges(String workspaceName, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        Workspace workspace = getWorkspace(workspaceName);
+    public void applyGlobalPrivileges(String workspaceHash, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
+        Workspace workspace = getWorkspace(workspaceHash);
         if (workspace.getOwner().equals(this.getEmail())) {
             workspace.getAccessLists().values().remove(this.getEmail());
             for (Privileges userPrivileges : workspace.getAccessLists().values())

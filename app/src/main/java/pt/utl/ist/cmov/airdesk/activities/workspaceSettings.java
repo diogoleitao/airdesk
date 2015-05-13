@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
+import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
@@ -26,7 +27,7 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCha
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
 public class workspaceSettings extends ActionBarActivity {
-    String workspaceName;
+    Workspace workspace;
     AirdeskManager manager;
 
     @Override
@@ -47,29 +48,29 @@ public class workspaceSettings extends ActionBarActivity {
         setContentView(R.layout.activity_workspace_settings);
 
         manager = AirdeskManager.getInstance(getApplicationContext());
-        workspaceName = manager.getCurrentWorkspace();
+        workspace = manager.getCurrentWorkspace();
 
-        TextView workspaceNameView = (TextView) findViewById(R.id.workspaceNameText);
-        workspaceNameView.setText("Workspace name: " + workspaceName);
+        TextView workspaceView = (TextView) findViewById(R.id.workspaceNameText);
+        workspaceView.setText("Workspace name: " + workspace.getName());
 
         TextView QuotaView = (TextView) findViewById(R.id.quotaText);
 
-        QuotaView.setText("Quota used/total: " + (new DecimalFormat("##.##")).format((float)manager.getUsedQuota(workspaceName)/1024) + "/" + (new DecimalFormat("##.##")).format((float)manager.getTotalQuota(workspaceName)/1024) + "kB");
+        QuotaView.setText("Quota used/total: " + (new DecimalFormat("##.##")).format((float)manager.getUsedQuota(workspace.getHash())/1024) + "/" + (new DecimalFormat("##.##")).format((float)manager.getTotalQuota(workspace.getHash())/1024) + "kB");
 
         TextView topicsView = (TextView) findViewById(R.id.topicsText);
         String topics = "";
-        for (String s : manager.getTopics())
+        for (String s : manager.getTopics(workspace.getHash()))
             topics +=  s + ", ";
         if (topics.length() > 0)
             topics = topics.substring(0,topics.length() - 2);
         topicsView.setText("Topics: " + topics);
 
         Switch privateSwitch = ((Switch)findViewById(R.id.privateSwitch));
-        boolean isprivate = manager.getWorkspacePrivacy(workspaceName);
+        boolean isprivate = manager.getWorkspacePrivacy(workspace.getHash());
 
         privateSwitch.setChecked(isprivate);
 
-        boolean[] currentGlobalPrivileges = manager.getAllPrivilegesFromWorkspace();
+        boolean[] currentGlobalPrivileges = manager.getAllPrivilegesFromWorkspace(workspace.getHash());
 
         ((CheckBox) findViewById(R.id.readFilesBox)).setChecked(currentGlobalPrivileges[0]);
         ((CheckBox) findViewById(R.id.writeFilesBox)).setChecked(currentGlobalPrivileges[1]);
@@ -98,7 +99,7 @@ public class workspaceSettings extends ActionBarActivity {
         choices[3] = ((CheckBox) findViewById(R.id.deleteFilesBox)).isChecked();
 
         try {
-            manager.applyGlobalPrivileges(workspaceName, choices);
+            manager.applyGlobalPrivileges(workspace.getHash(), choices);
             Context context = getApplicationContext();
             CharSequence text = "Privileges changed!";
             int duration = Toast.LENGTH_SHORT;
@@ -127,7 +128,7 @@ public class workspaceSettings extends ActionBarActivity {
         } */
 
         try {
-            manager.inviteUser(username);
+            manager.inviteUser(workspace.getHash(),username);
             Context context = getApplicationContext();
             CharSequence text = "Invitation sent!";
             int duration = Toast.LENGTH_SHORT;
@@ -136,7 +137,7 @@ public class workspaceSettings extends ActionBarActivity {
             toast.show();
             ((TextView)findViewById(R.id.inviteUserText)).setText("");
             
-            boolean[] currentGlobalPrivileges = manager.getAllPrivilegesFromWorkspace();
+            boolean[] currentGlobalPrivileges = manager.getAllPrivilegesFromWorkspace(workspace.getHash());
 
             ((CheckBox) findViewById(R.id.readFilesBox)).setChecked(currentGlobalPrivileges[0]);
             ((CheckBox) findViewById(R.id.writeFilesBox)).setChecked(currentGlobalPrivileges[1]);
@@ -157,12 +158,12 @@ public class workspaceSettings extends ActionBarActivity {
     public void deleteThis(View v){
         final Context that = this;
         new AlertDialog.Builder(this)
-                .setTitle("Delete " + workspaceName + "?")
+                .setTitle("Delete " + workspace.getName() + "?")
                 .setMessage("This action is irreversible.")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                            manager.deleteWorkspace(workspaceName);
+                            manager.deleteWorkspace(workspace.getHash());
                         } catch (UserDoesNotHavePermissionsToDeleteWorkspaceException e) {
                             Context context = getApplicationContext();
                             CharSequence text = e.getMessage();
@@ -206,12 +207,12 @@ public class workspaceSettings extends ActionBarActivity {
         }
 
         try {
-            manager.addTopicToWorkspace(topicname);
+            manager.addTopicToWorkspace(workspace.getHash(),topicname);
 
             TextView topicsView = (TextView) findViewById(R.id.topicsText);
 
             String topics = "";
-            for (String s : manager.getTopics())
+            for (String s : manager.getTopics(workspace.getHash()))
                 topics +=  s + ", ";
 
             if (topics.length() > 0)
@@ -230,6 +231,6 @@ public class workspaceSettings extends ActionBarActivity {
     public void privateSwitch(View v) {
         Switch privateSwitch = ((Switch)findViewById(R.id.privateSwitch));
         boolean isprivate = privateSwitch.isChecked();
-        manager.setWorkspacePrivacy(workspaceName, isprivate);
+        manager.setWorkspacePrivacy(workspace.getHash(), isprivate);
     }
 }

@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
+import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
@@ -29,7 +30,7 @@ public class ListFiles extends ActionBarActivity {
     ArrayAdapter<String> adapter;
     ListView fileListView;
     ArrayList<String> fileNameList;
-    String workspaceName;
+    Workspace workspace;
     AirdeskManager manager;
 
     @Override
@@ -50,9 +51,9 @@ public class ListFiles extends ActionBarActivity {
         setContentView(R.layout.activity_list_files);
 
         manager = AirdeskManager.getInstance(getApplicationContext());
-        workspaceName = manager.getCurrentWorkspace();
+        workspace = manager.getCurrentWorkspace();
 
-        fileNameList = manager.getFilesFromWorkspace(workspaceName);
+        fileNameList = manager.getFilesFromWorkspace(workspace.getHash());
 
         fileListView = (ListView) findViewById(R.id.filelist);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fileNameList);
@@ -62,7 +63,7 @@ public class ListFiles extends ActionBarActivity {
         fileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser().getEmail());
+                boolean[] privileges = manager.getUserPrivileges(workspace.getHash(),manager.getLoggedUser().getEmail());
                 if (!privileges[0]) { // read privilege
                     Context context = getApplicationContext();
                     CharSequence text = "You don't have privileges to read files!";
@@ -71,7 +72,8 @@ public class ListFiles extends ActionBarActivity {
                     toast.show();
                 } else {
                     Intent intent = new Intent(that, EditFile.class);
-                    manager.getFile(fileNameList.get(position));
+                    manager.setCurrentFile(fileNameList.get(position));
+                    manager.getFile(workspace.getHash(), fileNameList.get(position));
                     startActivity(intent);
                 }
             }
@@ -82,11 +84,11 @@ public class ListFiles extends ActionBarActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
                 new AlertDialog.Builder(that)
                         .setTitle("Delete " + fileNameList.get(position) + "?")
-                        .setMessage("This action is irreversible. This file uses " + (new DecimalFormat("##.##")).format((float) manager.getFile(fileNameList.get(position)).getSize() / 1024) + "kB of space.")
+                        .setMessage("This action is irreversible. This file uses " + (new DecimalFormat("##.##")).format((float) manager.getFile(workspace.getHash(),fileNameList.get(position)).getSize() / 1024) + "kB of space.")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
-                                    manager.deleteFile(fileNameList.get(position));
+                                    manager.deleteFile(workspace.getHash(),fileNameList.get(position));
                                     fileNameList.remove(position);
                                     adapter.notifyDataSetChanged();
                                 } catch (UserDoesNotHavePermissionsToDeleteFileException e) {
@@ -141,7 +143,7 @@ public class ListFiles extends ActionBarActivity {
         }
 
         try {
-            manager.addNewFile(name);
+            manager.addNewFile(workspace.getHash(),name);
             filenameView.setText("");
             fileNameList.add(name);
             adapter.notifyDataSetChanged();
@@ -158,8 +160,8 @@ public class ListFiles extends ActionBarActivity {
 
         try {
             manager.updateWorkspaceFileList(workspace, fileName);
-            if( workspaceName.equals(workspace)) {
-                fileNameList = manager.getFilesFromWorkspace(workspaceName);
+            if( workspace.equals(workspace)) {
+                fileNameList = manager.getFilesFromWorkspace(workspace);
                 adapter.notifyDataSetChanged();
             }
         } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {
@@ -172,8 +174,8 @@ public class ListFiles extends ActionBarActivity {
 
         try {
             manager.updateWorkspaceFileList(workspace, fileName);
-            if( workspaceName.equals(workspace)) {
-                fileNameList = manager.getFilesFromWorkspace(workspaceName);
+            if( workspace.equals(workspace)) {
+                fileNameList = manager.getFilesFromWorkspace(workspace);
                 adapter.notifyDataSetChanged();
             }
         } catch (FileAlreadyExistsException | UserDoesNotHavePermissionsToCreateFilesException e) {

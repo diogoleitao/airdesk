@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
+import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException;
 
 public class ListWorkspaces extends ActionBarActivity {
@@ -54,8 +55,12 @@ public class ListWorkspaces extends ActionBarActivity {
 
         String email = manager.getLoggedUser().getEmail();
 
-        workspaceList.addAll(manager.getOwnedWorkspaces().keySet());
-        foreignWorkspaceList.addAll(manager.getForeignWorkspaces().keySet());
+        for(Workspace w : manager.getOwnedWorkspaces().values()){
+            workspaceList.add(w.getName());
+        }
+        for(Workspace w : manager.getForeignWorkspaces().values()){
+            foreignWorkspaceList.add(w.getName());
+        }
 
         workspaceListView = (ListView) findViewById(R.id.workspaceList);
         foreignWorkspaceListView = (ListView) findViewById(R.id.foreignWorkspaceList);

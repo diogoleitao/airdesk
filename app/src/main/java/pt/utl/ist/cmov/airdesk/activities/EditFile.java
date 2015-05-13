@@ -13,13 +13,14 @@ import android.widget.Toast;
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.File;
+import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
 public class EditFile extends ActionBarActivity {
 
     String filename;
     File file;
-    String workspaceName;
+    Workspace workspace;
     AirdeskManager manager;
 
     @Override
@@ -40,9 +41,9 @@ public class EditFile extends ActionBarActivity {
         setContentView(R.layout.activity_edit_file);
 
         manager = AirdeskManager.getInstance(getApplicationContext());
-        workspaceName = manager.getCurrentWorkspace();
+        workspace = manager.getCurrentWorkspace();
         filename = manager.getCurrentFile();
-        file = manager.getFile(filename);
+        file = manager.getFile(workspace.getHash(), filename);
 
         TextView textView = (TextView)findViewById(R.id.fileText);
         textView.setText(file.getContent());
@@ -59,7 +60,7 @@ public class EditFile extends ActionBarActivity {
     public void save(View v) {
         String content = ((EditText) findViewById(R.id.fileText)).getText().toString();
 
-        boolean[] privileges = manager.getUserPrivileges(manager.getLoggedUser().getEmail());
+        boolean[] privileges = manager.getUserPrivileges(workspace.getHash(), manager.getLoggedUser().getEmail());
 
         if (!privileges[1]) { // read privilege
             Context context = getApplicationContext();
@@ -71,7 +72,7 @@ public class EditFile extends ActionBarActivity {
         }
 
         try {
-            manager.saveFile(content);
+            manager.saveFile(workspace.getHash(), filename, content);
             Intent intent = new Intent(this, ListFiles.class);
             startActivity(intent);
         } catch (WorkspaceQuotaReachedException e) {
