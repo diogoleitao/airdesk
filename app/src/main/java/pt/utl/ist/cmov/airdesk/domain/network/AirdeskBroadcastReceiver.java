@@ -1,30 +1,28 @@
 package pt.utl.ist.cmov.airdesk.domain.network;
 
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
-import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 import pt.utl.ist.cmov.airdesk.domain.WifiManager;
-import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
-import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
-import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
-import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
 public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
+    private static final String TAG = "BroadcastReceiver";
     private AirdeskManager manager;
-    private Context context;
+    private GlobalService service;
     private WifiManager wifiManager;
 
-    public AirdeskBroadcastReceiver(Context _context) {
+    public AirdeskBroadcastReceiver(GlobalService _context) {
         super();
         manager = AirdeskManager.getInstance(_context);
-        context = _context;
+        service = _context;
         wifiManager = WifiManager.getInstance();
     }
 
@@ -50,20 +48,19 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             // asynchronous call and the calling activity is notified with a
             // callback on PeerListListener.onPeersAvailable()
 
-            Toast.makeText(context.getApplicationContext(), "Peer list changed", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Peer list changed");
+            service.registerDeviceListCallback();
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
 
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
             ginfo.print();
-            Toast.makeText(context.getApplicationContext(), "Network membership changed", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Network membership changed");
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION.equals(action)) {
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
             ginfo.print();
-
-            Toast.makeText(context.getApplicationContext(), "Group ownership changed", Toast.LENGTH_SHORT).show();
-
+            Log.d(TAG, "Group ownership changed");
         }
     }
 }

@@ -79,6 +79,19 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
     }
 
     protected void dispatchMessage(BroadcastMessage message){
-
+        switch(message.getMessageType()){
+            case FILE_CHANGED:
+                break;
+            case FILE_DELETED:
+                break;
+            case FILE_ADDED_TO_WORKSPACE:
+                break;
+            case WORKSPACE_DELETED:
+                break;
+            case WORKSPACE_TOPIC_MATCH:
+                break;
+            case INVITATION_TO_WORKSPACE:
+                break;
+        }
     }
 }
