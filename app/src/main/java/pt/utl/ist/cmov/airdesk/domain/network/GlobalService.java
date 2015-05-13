@@ -9,6 +9,7 @@ import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
@@ -23,6 +24,7 @@ import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
+import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 import pt.utl.ist.cmov.airdesk.domain.WifiManager;
 
@@ -42,6 +44,7 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
     private ServerCommTask srvSocketTask;
     public List<IncomingServerClientCommTask> clientSocketTasks;
     public static GlobalService instance;
+    private Handler handler;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -95,6 +98,8 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
 
         ips = new ArrayList<String>();
         instance = this;
+
+        AirdeskManager.getInstance(null).setGlobalService(this);
 
         // register broadcast receiver
         // initialize the WDSim API
@@ -177,4 +182,7 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
         }
     }
 
+    public void registerHandler(Handler serviceHandler) {
+        handler = serviceHandler;
+    }
 }

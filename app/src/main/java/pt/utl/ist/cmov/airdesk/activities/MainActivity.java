@@ -22,9 +22,7 @@ import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
 public class MainActivity extends ActionBarActivity {
 
-    String name;
     String email;
-    String registerEmail;
     AirdeskManager manager;
 
 

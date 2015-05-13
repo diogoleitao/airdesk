@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
@@ -42,13 +45,14 @@ public class ListWorkspaces extends ActionBarActivity implements Updatable{
 
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_workspaces);
 
-
         manager = AirdeskManager.getInstance(getApplicationContext());
+
         manager.setCurrentActivity(this);
         updateUI();
     }

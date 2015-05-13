@@ -2,6 +2,8 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,7 +53,12 @@ public class AirdeskManager implements Serializable {
      * The currently logged in user email
 	 */
 	private static User loggedUser;
-    private Activity currentActivity;
+    private static Activity currentActivity;
+    private GlobalService globalService;
+
+    public Handler getServiceHandler() {
+        return serviceHandler;
+    }
 
     public void setCurrentFile(String currentFile) {
         this.currentFile = currentFile;
@@ -74,6 +81,9 @@ public class AirdeskManager implements Serializable {
 		if (instance == null) {
 			instance = new AirdeskManager();
             wifiManager = new WifiManager();
+
+            if(context == null)
+                return instance;
 
             try {
                 FileInputStream fileInputStream = context.openFileInput(filename);
@@ -299,6 +309,13 @@ public class AirdeskManager implements Serializable {
         namesToHashes.put(workspace.getName(), workspace.getHash());
     }
 
+     private Handler serviceHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            updateUI();
+        }
+    };
+
     public void updateUI() {
         if(currentActivity instanceof Updatable)
             ((Updatable)currentActivity).updateUI();
@@ -364,4 +381,7 @@ public class AirdeskManager implements Serializable {
         this.currentActivity = currentActivity;
     }
 
+    public void setGlobalService(GlobalService globalService) {
+        this.globalService = globalService;
+    }
 }

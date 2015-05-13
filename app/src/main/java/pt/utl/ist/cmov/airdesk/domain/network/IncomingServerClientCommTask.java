@@ -2,6 +2,8 @@ package pt.utl.ist.cmov.airdesk.domain.network;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import pt.utl.ist.cmov.airdesk.domain.Workspace;
 public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
     SimWifiP2pSocket s;
     Context context;
+    private Handler handler;
 
     public IncomingServerClientCommTask(Context _context){
         super();
@@ -80,9 +83,14 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
         s = null;
     }
 
+    public void registerHandler(Handler serviceHandler) {
+        handler = serviceHandler;
+    }
+
     protected void dispatchMessage(BroadcastMessage message, SimWifiP2pSocket socket){
         BroadcastMessage messageOutput;
         String workspaceHash, fileName, user;
+        Message msg;
         AirdeskManager manager = AirdeskManager.getInstance(context);
         switch(message.getMessageType()){
             case FILE_CHANGED:
@@ -94,7 +102,9 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 if(file != null){
                     if(file.getTimestamp().compareTo(message.getFile().getTimestamp()) < 0){
                         file.setContent(message.getFile().getContent());
-                        manager.updateUI();
+                        registerHandler(manager.getServiceHandler());
+                        msg = handler.obtainMessage();
+                        handler.sendMessage(msg);
                     }
                 }
 
@@ -103,7 +113,9 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 workspaceHash = message.getArg1();
                 fileName = message.getArg2();
                 manager.deleteForeignFile(workspaceHash, fileName);
-                manager.updateUI();
+                registerHandler(manager.getServiceHandler());
+                msg = handler.obtainMessage();
+                handler.sendMessage(msg);
                 break;
             case FILE_ADDED_TO_WORKSPACE:
                 workspaceHash = message.getArg1();
@@ -112,13 +124,17 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 // We have the workspace and we should update it
                 if(workspace != null){
                     manager.addForeignNewFile(workspaceHash, fileName);
-                    manager.updateUI();
+                    registerHandler(manager.getServiceHandler());
+                    msg = handler.obtainMessage();
+                    handler.sendMessage(msg);
                 }
                 break;
             case WORKSPACE_DELETED:
                 workspaceHash = message.getArg1();
                 manager.deleteForeignWorkspace(workspaceHash);
-                manager.updateUI();
+                registerHandler(manager.getServiceHandler());
+                msg = handler.obtainMessage();
+                handler.sendMessage(msg);
                 break;
             case INVITATION_TO_WORKSPACE:
                 workspaceHash = message.getArg1();
@@ -126,7 +142,9 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 Log.d("MessageDispatch", "GOT INVITATION TO WORKSPACE " + workspaceHash);
                 if(manager.getLoggedUser().getEmail().equals(user)){
                     manager.addForeignWorkspace(message.getWorkspace());
-                    manager.updateUI();
+                    registerHandler(manager.getServiceHandler());
+                    msg = handler.obtainMessage();
+                    handler.sendMessage(msg);
                 }
                 break;
             case WORKSPACE_PRIVILEGES_CHANGED:
@@ -136,7 +154,9 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 // We have the workspace mounted and its our privileges
                 if(workspace != null && user.equals(manager.getLoggedUser().getEmail())) {
                     workspace.getAccessLists().get(user).setAll(message.getPrivileges().getAll());
-                    manager.updateUI();
+                    registerHandler(manager.getServiceHandler());
+                    msg = handler.obtainMessage();
+                    handler.sendMessage(msg);
                 }
                 break;
             case REQUEST_FILE:
