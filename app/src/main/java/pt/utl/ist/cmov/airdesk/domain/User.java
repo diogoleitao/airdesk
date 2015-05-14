@@ -148,8 +148,8 @@ public class User implements Serializable, Observer {
     public void deleteFile(String workspaceHash, String filename) throws UserDoesNotHavePermissionsToDeleteFileException {
         Workspace workspace = getWorkspace(workspaceHash);
         if (workspace.getAccessLists().get(getEmail()).canDelete()) {
-            workspace.updateQuotaOccupied(-workspace.getFiles().get(filename).getSize());
-            workspace.getFiles().remove(filename).unregister(this);
+            workspace.removeFile(filename);
+            workspace.unregister(this);
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
         }
@@ -157,8 +157,8 @@ public class User implements Serializable, Observer {
 
     public void deleteForeignFile(String workspaceHash, String filename) {
         Workspace workspace = getWorkspace(workspaceHash);
-        workspace.updateQuotaOccupied(-workspace.getFiles().get(filename).getSize());
-        workspace.getFiles().remove(filename).unregister(this);
+        workspace.removeFile(filename);
+        workspace.unregister(this);
     }
 
     public File createFile(String currentWorkspace, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
@@ -168,7 +168,7 @@ public class User implements Serializable, Observer {
                 throw new FileAlreadyExistsException();
             else {
                 File file = new File(fileName);
-                workspace.getFiles().put(fileName, file);
+                workspace.addFile(fileName, file);
                 file.register(this);
                 return file;
             }

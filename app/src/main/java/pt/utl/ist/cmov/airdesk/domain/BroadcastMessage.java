@@ -1,6 +1,7 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by Tiago on 06/05/2015.
@@ -13,6 +14,7 @@ public class BroadcastMessage implements Serializable{
     private File file;
     private Workspace workspace;
     private Privileges privileges;
+    private Date workspaceTimestamp;
 
     public BroadcastMessage(MessageTypes _messageType, String _arg1){
         messageType = _messageType;
@@ -81,8 +83,16 @@ public class BroadcastMessage implements Serializable{
         this.privileges = privileges;
     }
 
+    public Date getWorkspaceTimestamp() {
+        return workspaceTimestamp;
+    }
+
+    public void setWorkspaceTimestamp(Date workspaceTimestamp) {
+        this.workspaceTimestamp = workspaceTimestamp;
+    }
+
     public enum MessageTypes {
         FILE_CHANGED, FILE_DELETED, FILE_ADDED_TO_WORKSPACE, WORKSPACE_DELETED,
-        INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE, FILE_OPEN, FILE_CLOSE, WORKSPACE_PRIVILEGES_CHANGED
+        INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE, FILE_OPEN, FILE_CLOSE, I_AM_USER, WORKSPACE_TIMESTAMP, WORKSPACE_UPDATED, WORKSPACE_PRIVILEGES_CHANGED
     }
 }

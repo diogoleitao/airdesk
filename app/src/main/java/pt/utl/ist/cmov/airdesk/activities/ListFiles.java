@@ -102,6 +102,13 @@ public class ListFiles extends ActionBarActivity implements Updatable {
     public void updateUI() {
         workspace = manager.getCurrentWorkspace();
 
+        if(workspace==null){
+            Toast.makeText(getApplicationContext(),"The workspace was deleted!", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, ListWorkspaces.class);
+            startActivity(intent);
+            return;
+        }
+
         fileNameList = manager.getFilesFromWorkspace(workspace.getHash());
 
         fileListView = (ListView) findViewById(R.id.filelist);
@@ -137,11 +144,11 @@ public class ListFiles extends ActionBarActivity implements Updatable {
             public boolean onItemLongClick(AdapterView<?> parent, View v, final int position, long id) {
                 new AlertDialog.Builder(that)
                         .setTitle("Delete " + fileNameList.get(position) + "?")
-                        .setMessage("This action is irreversible. This file uses " + (new DecimalFormat("##.##")).format((float) manager.getFile(workspace.getHash(),fileNameList.get(position)).getSize() / 1024) + "kB of space.")
+                        .setMessage("This action is irreversible. This file uses " + (new DecimalFormat("##.##")).format((float) manager.getFile(workspace.getHash(), fileNameList.get(position)).getSize() / 1024) + "kB of space.")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
-                                    manager.deleteFile(workspace.getHash(),fileNameList.get(position));
+                                    manager.deleteFile(workspace.getHash(), fileNameList.get(position));
                                     fileNameList.remove(position);
                                     adapter.notifyDataSetChanged();
                                 } catch (UserDoesNotHavePermissionsToDeleteFileException e) {

@@ -16,6 +16,7 @@ import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 import pt.utl.ist.cmov.airdesk.domain.File;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
 public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
     SimWifiP2pSocket s;
@@ -59,10 +60,10 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
 
     @Override
     protected void onPreExecute() {
-        CharSequence text = "Connecting...";
+        /*CharSequence text = "Connecting...";
         int duration = Toast.LENGTH_SHORT;
         Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+        toast.show();*/
     }
 
     @Override
@@ -92,7 +93,53 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
         String workspaceHash, fileName, user;
         Message msg;
         AirdeskManager manager = AirdeskManager.getInstance(context);
+        registerHandler(manager.getServiceHandler());
         switch(message.getMessageType()){
+            case I_AM_USER:
+                // a user just connected to our device
+                String email = message.getArg1();
+                for(Workspace w : manager.getForeignWorkspaces().values()){
+                    if(w.getOwner().equals(email)){
+                        // I have a foreign workspace of this user, I need to know how recent is his version
+                        messageOutput = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_TIMESTAMP, email, w.getHash());
+                        messageOutput.setWorkspaceTimestamp(w.getTimestamp());
+                        messageOutput.setWorkspace(w);
+                        GlobalService.broadcastMessage(messageOutput);
+                        // TODO: possible optimization, send all shared workspaces and timespams in one broadcast. dont do 1 message per workspace
+                    }
+                }
+                break;
+            case WORKSPACE_TIMESTAMP:
+                if(! manager.getLoggedUser().getEmail().equals(message.getArg1()))
+                    break; // this message is not for me
+                workspaceHash = message.getArg2();
+                Workspace w = manager.getOwnedWorkspaces().get(workspaceHash);
+                if(w == null){
+                    // I deleted that workspace you are asking for. I'll return the hash you gave me and tell everyone to delete it.
+                    messageOutput = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_DELETED, workspaceHash);
+                    GlobalService.broadcastMessage(messageOutput);
+                } else if(w.getTimestamp().after(message.getWorkspaceTimestamp())){
+                    // I changed the workspace while you were disconnected. Here is my current version, you have to take it. TODO: merge. support the condition of both owner and peer changing the file offline.
+                    messageOutput = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_UPDATED, workspaceHash);
+                    messageOutput.setWorkspace(w);
+                    GlobalService.broadcastMessage(messageOutput);
+                } else if(w.getTimestamp().before(message.getWorkspaceTimestamp())){
+                    // You changed the workspace while we were disconnected from each other. I accept your version, and broadcast it to all others.
+                    manager.changeWorkspace(w.getHash(), message.getWorkspace());
+                    msg = handler.obtainMessage();
+                    handler.sendMessage(msg);
+                }
+                break;
+            case WORKSPACE_UPDATED:
+                // I must make sure this message was intended for me. I might not have access to this workspace.
+                workspaceHash = message.getArg1();
+                if(manager.getForeignWorkspaces().containsKey(workspaceHash)) {
+                    manager.updateWorkspace(workspaceHash, message.getWorkspace());
+                    // I save the up-to-date version of the workspace.
+                    msg = handler.obtainMessage();
+                    handler.sendMessage(msg);
+                }
+                break;
             case FILE_CHANGED:
                 workspaceHash = message.getArg1();
                 fileName = message.getArg2();
@@ -102,12 +149,10 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 if(file != null){
                     if(file.getTimestamp().compareTo(message.getFile().getTimestamp()) < 0){
                         file.setContent(message.getFile().getContent());
-                        registerHandler(manager.getServiceHandler());
                         msg = handler.obtainMessage();
                         handler.sendMessage(msg);
                     }
                 }
-
                 break;
             case FILE_OPEN:
                 workspaceHash = message.getArg1();
@@ -127,18 +172,16 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 workspaceHash = message.getArg1();
                 fileName = message.getArg2();
                 manager.deleteForeignFile(workspaceHash, fileName);
-                registerHandler(manager.getServiceHandler());
                 msg = handler.obtainMessage();
                 handler.sendMessage(msg);
                 break;
             case FILE_ADDED_TO_WORKSPACE:
                 workspaceHash = message.getArg1();
                 fileName = message.getArg2();
-                Workspace workspace = manager.getLoggedUser().getWorkspace(workspaceHash);
+                Workspace workspace = manager.getLoggedUser().getForeignWorkspaces().get(workspaceHash);
                 // We have the workspace and we should update it
                 if(workspace != null){
                     manager.addForeignNewFile(workspaceHash, fileName);
-                    registerHandler(manager.getServiceHandler());
                     msg = handler.obtainMessage();
                     handler.sendMessage(msg);
                 }
@@ -146,7 +189,6 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
             case WORKSPACE_DELETED:
                 workspaceHash = message.getArg1();
                 manager.deleteForeignWorkspace(workspaceHash);
-                registerHandler(manager.getServiceHandler());
                 msg = handler.obtainMessage();
                 handler.sendMessage(msg);
                 break;
@@ -156,7 +198,6 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 Log.d("MessageDispatch", "GOT INVITATION TO WORKSPACE " + workspaceHash);
                 if(manager.getLoggedUser().getEmail().equals(user)){
                     manager.addForeignWorkspace(message.getWorkspace());
-                    registerHandler(manager.getServiceHandler());
                     msg = handler.obtainMessage();
                     handler.sendMessage(msg);
                 }
@@ -168,7 +209,6 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 // We have the workspace mounted and its our privileges
                 if(workspace != null && user.equals(manager.getLoggedUser().getEmail())) {
                     workspace.getAccessLists().get(user).setAll(message.getPrivileges().getAll());
-                    registerHandler(manager.getServiceHandler());
                     msg = handler.obtainMessage();
                     handler.sendMessage(msg);
                 }

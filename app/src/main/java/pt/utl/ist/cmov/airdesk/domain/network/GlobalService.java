@@ -6,10 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
@@ -44,7 +41,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
     private ServerCommTask srvSocketTask;
     public List<IncomingServerClientCommTask> clientSocketTasks;
     public static GlobalService instance;
-    private Handler handler;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -68,6 +64,10 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             String devstr = "" + device.deviceName + " (" + device.getVirtIp() + "); ";
             peersStr.append(devstr);
             ips.add(device.getVirtIp());
+
+            // TODO: optimization: only the new peers online need to send this message. this is all peers that are online, even if there is only 1 new peer
+            BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.I_AM_USER, AirdeskManager.getInstance(this).getLoggedUser().getEmail());
+            GlobalService.broadcastMessage(message);
         }
         Log.d(TAG, "Peer list: " + peersStr);
     }
@@ -95,6 +95,7 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
     public void onCreate() {
         // TODO Auto-generated method stub
         super.onCreate();
+
 
         ips = new ArrayList<String>();
         instance = this;
@@ -180,9 +181,5 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             task.executeOnExecutor(
                     AsyncTask.THREAD_POOL_EXECUTOR, message);
         }
-    }
-
-    public void registerHandler(Handler serviceHandler) {
-        handler = serviceHandler;
     }
 }

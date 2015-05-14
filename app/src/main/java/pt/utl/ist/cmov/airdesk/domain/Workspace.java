@@ -2,6 +2,8 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
@@ -34,6 +36,20 @@ public class Workspace implements Serializable, Observer, UserSubject {
 	 */
 	private String hash;
 
+	public boolean isOnline() {
+		return online;
+	}
+
+	public void setOnline(boolean online) {
+		this.online = online;
+	}
+
+	public boolean online = false;
+	/**
+	 * The timestamp of the file's last edit
+	 */
+	private Date timestamp;
+
 	/**
 	 * Mapping between user's nickname and their privileges regarding the workspace
 	 */
@@ -60,13 +76,12 @@ public class Workspace implements Serializable, Observer, UserSubject {
 	 */
 	private ArrayList<Observer> observers = new ArrayList<Observer>();
 
-	public Workspace() {}
-
 	public Workspace(int quota, String name, String owner, String hash) {
 		this.setQuota(quota);
 		this.setName(name);
 		this.setOwner(owner);
 		this.setHash(hash);
+		this.timestamp = Calendar.getInstance().getTime();
 
         Privileges p = new Privileges(true, true, true, true);
         HashMap<String, Privileges> al = new HashMap<String, Privileges>();
@@ -113,6 +128,7 @@ public class Workspace implements Serializable, Observer, UserSubject {
 
 	public void setAccessLists(HashMap<String, Privileges> accessLists) {
 		this.accessLists = accessLists;
+		this.timestamp = Calendar.getInstance().getTime();
 	}
 
 	public ArrayList<String> getTopics() {
@@ -158,6 +174,7 @@ public class Workspace implements Serializable, Observer, UserSubject {
             throw new WorkspaceQuotaReachedException();
         } else {
             getFiles().get(currentFile).save(content);
+			this.timestamp = Calendar.getInstance().getTime();
             updateQuotaOccupied(size);
 		}
 	}
@@ -179,5 +196,40 @@ public class Workspace implements Serializable, Observer, UserSubject {
 	@Override
 	public void notifyObservers() {
 		WifiManager.broadcastWorkspaceUpdate(this);
+	}
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public void update(Workspace workspace) {
+		this.setQuota(workspace.getQuota());
+		this.quotaOccupied = workspace.getQuotaOccupied();
+		this.setName(workspace.getName());
+		this.setOwner(workspace.getOwner());
+		//this.setHash(workspace.getHash()); should be the same
+		this.setAccessLists(workspace.getAccessLists());
+		this.setTimestamp(workspace.getTimestamp());
+		this.online = workspace.isOnline();
+		this.files = workspace.getFiles();
+		this.topics = workspace.getTopics();
+		this.isPrivate = workspace.isPrivate();
+		this.observers = workspace.getObservers();
+	}
+
+	public void addFile(String fileName, File file) {
+		this.timestamp = Calendar.getInstance().getTime();
+		files.put(fileName,file);
+		quotaOccupied = file.getSize();
+	}
+
+	public void removeFile(String fileName) {
+		this.timestamp = Calendar.getInstance().getTime();
+		quotaOccupied -= getFiles().get(fileName).getSize();
+		files.remove(fileName);
 	}
 }

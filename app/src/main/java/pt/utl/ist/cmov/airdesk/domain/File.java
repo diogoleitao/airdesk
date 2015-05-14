@@ -82,6 +82,7 @@ public class File implements Serializable, WorkspaceSubject {
 	public void save(String content) {
 		this.setContent(content);
         this.setSize(this.getContent().length() * 4);
+        this.timestamp = Calendar.getInstance().getTime();
 	}
 
     public Date getTimestamp() {

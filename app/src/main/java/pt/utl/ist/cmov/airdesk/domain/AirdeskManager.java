@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.activities.Updatable;
-import pt.utl.ist.cmov.airdesk.activities.UserPrivileges;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
@@ -142,10 +141,13 @@ public class AirdeskManager implements Serializable {
         return open;
     }
     public void closeFile(String workspaceHash, String name) {
-        loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().get(name).close();
-        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_CLOSE, workspaceHash, name);
-        message.setFile(getFile(workspaceHash, name));
-        GlobalService.broadcastMessage(message);
+        File file = loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().get(name);
+        if(file != null){
+            file.close();
+            BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_CLOSE, workspaceHash, name);
+            message.setFile(getFile(workspaceHash, name));
+            GlobalService.broadcastMessage(message);
+        }
     }
 
     public int getTotalQuota(String workspaceHash) {
@@ -267,7 +269,7 @@ public class AirdeskManager implements Serializable {
     }
 
     public void addNewFile(String workspaceHash, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
-        loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().put(fileName, loggedUser.createFile(workspaceHash, fileName));
+        loggedUser.getAllWorkspaces().get(workspaceHash).addFile(fileName, loggedUser.createFile(workspaceHash, fileName));
         BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_ADDED_TO_WORKSPACE, workspaceHash, fileName);
         GlobalService.broadcastMessage(message);
     }
@@ -347,7 +349,7 @@ public class AirdeskManager implements Serializable {
 
     public void addForeignNewFile(String workspaceHash, String fileName){
         File file = new File(fileName);
-        loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().put(fileName, file);
+        loggedUser.getAllWorkspaces().get(workspaceHash).addFile(fileName, file);
     }
 
     public void deleteWorkspaceBC(String workspaceHash) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
@@ -399,4 +401,16 @@ public class AirdeskManager implements Serializable {
     public void setGlobalService(GlobalService globalService) {
         this.globalService = globalService;
     }
+
+    public void changeWorkspace(String hash, Workspace workspace) {
+        getLoggedUser().getOwnedWorkspaces().get(hash).update(workspace);
+        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_UPDATED, hash);
+        message.setWorkspace(workspace);
+        GlobalService.broadcastMessage(message);
+    }
+
+    public void updateWorkspace(String hash, Workspace workspace) {
+        getLoggedUser().getForeignWorkspaces().get(hash).update(workspace);
+    }
+
 }

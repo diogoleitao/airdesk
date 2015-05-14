@@ -29,11 +29,11 @@ public class OutgoingServerClientCommTask extends AsyncTask<BroadcastMessage, Vo
 
     @Override
     protected void onPreExecute() {
-        Context context = service;
+        /*Context context = service;
         CharSequence text = "Connecting...";
         int duration = Toast.LENGTH_SHORT;
         Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+        toast.show();*/
     }
 
     @Override

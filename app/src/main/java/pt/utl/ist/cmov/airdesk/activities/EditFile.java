@@ -77,6 +77,7 @@ public class EditFile extends ActionBarActivity implements Updatable{
         try {
             manager.saveFile(workspace.getHash(), filename, content);
             Intent intent = new Intent(this, ListFiles.class);
+            manager.closeFile(workspace.getHash(), filename);
             startActivity(intent);
         } catch (WorkspaceQuotaReachedException e) {
             Context context = getApplicationContext();
@@ -98,7 +99,7 @@ public class EditFile extends ActionBarActivity implements Updatable{
         workspace = manager.getCurrentWorkspace();
 
         if(workspace==null){
-            Toast.makeText(getApplicationContext(),"The workspace was deleted!", Toast.LENGTH_LONG);
+            Toast.makeText(getApplicationContext(),"The workspace was deleted!", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this, ListWorkspaces.class);
             startActivity(intent);
         }
@@ -107,12 +108,10 @@ public class EditFile extends ActionBarActivity implements Updatable{
         file = manager.getFile(workspace.getHash(), filename);
 
         if(file==null){
-            Toast.makeText(getApplicationContext(),"The file was deleted!", Toast.LENGTH_LONG);
+            Toast.makeText(getApplicationContext(),"The file was deleted!", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this, ListFiles.class);
             startActivity(intent);
         }
-
-
 
         TextView textView = (TextView)findViewById(R.id.fileText);
         textView.setText(file.getContent());
