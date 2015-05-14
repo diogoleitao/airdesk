@@ -102,6 +102,7 @@ public class EditFile extends ActionBarActivity implements Updatable{
             Toast.makeText(getApplicationContext(),"The workspace was deleted!", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this, ListWorkspaces.class);
             startActivity(intent);
+            return;
         }
 
         filename = manager.getCurrentFile();
@@ -111,6 +112,7 @@ public class EditFile extends ActionBarActivity implements Updatable{
             Toast.makeText(getApplicationContext(),"The file was deleted!", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this, ListFiles.class);
             startActivity(intent);
+            return;
         }
 
         TextView textView = (TextView)findViewById(R.id.fileText);
