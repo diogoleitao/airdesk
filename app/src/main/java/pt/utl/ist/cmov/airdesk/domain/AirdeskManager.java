@@ -266,6 +266,10 @@ public class AirdeskManager implements Serializable {
 
     public void addTopicToWorkspace(String workspaceHash, String topic) throws TopicAlreadyAddedException {
         loggedUser.getWorkspace(workspaceHash).addTopic(topic);
+        // Send message to everyone informing
+        BroadcastMessage messageTopics = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_TOPICS_CHANGED, getLoggedUser().getEmail());
+        messageTopics.setTopics(loggedUser.getWorkspace(workspaceHash).getTopics());
+        GlobalService.broadcastMessage(messageTopics);
     }
 
     public void addNewFile(String workspaceHash, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {

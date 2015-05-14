@@ -2,6 +2,7 @@ package pt.utl.ist.cmov.airdesk.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Tiago on 06/05/2015.
@@ -13,6 +14,8 @@ public class BroadcastMessage implements Serializable{
     private String arg1, arg2;
     private File file;
     private Workspace workspace;
+    private List<Workspace> workspaces;
+    private List<String> topics;
     private Privileges privileges;
     private Date workspaceTimestamp;
 
@@ -91,8 +94,26 @@ public class BroadcastMessage implements Serializable{
         this.workspaceTimestamp = workspaceTimestamp;
     }
 
+    public List<Workspace> getWorkspaces() {
+        return workspaces;
+    }
+
+    public void setWorkspaces(List<Workspace> workspaces) {
+        this.workspaces = workspaces;
+    }
+
+    public List<String> getTopics() {
+        return topics;
+    }
+
+    public void setTopics(List<String> topics) {
+        this.topics = topics;
+    }
+
     public enum MessageTypes {
         FILE_CHANGED, FILE_DELETED, FILE_ADDED_TO_WORKSPACE, WORKSPACE_DELETED,
-        INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE, FILE_OPEN, FILE_CLOSE, I_AM_USER, WORKSPACE_TIMESTAMP, WORKSPACE_UPDATED, WORKSPACE_PRIVILEGES_CHANGED
+        INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE, FILE_OPEN, FILE_CLOSE, I_AM_USER,
+        WORKSPACE_TIMESTAMP, WORKSPACE_UPDATED, WORKSPACE_PRIVILEGES_CHANGED, WORKSPACE_TOPICS_REQUEST,
+        WORKSPACES_WITH_TOPICS, WORKSPACE_TOPICS_CHANGED
     }
 }

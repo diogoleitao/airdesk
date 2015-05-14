@@ -68,6 +68,10 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             // TODO: optimization: only the new peers online need to send this message. this is all peers that are online, even if there is only 1 new peer
             BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.I_AM_USER, AirdeskManager.getInstance(this).getLoggedUser().getEmail());
             GlobalService.broadcastMessage(message);
+
+            BroadcastMessage messageTopics = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_TOPICS_REQUEST, AirdeskManager.getInstance(this).getLoggedUser().getEmail());
+            messageTopics.setTopics(AirdeskManager.getInstance(this).getLoggedUser().getTopics());
+            GlobalService.broadcastMessage(messageTopics);
         }
         Log.d(TAG, "Peer list: " + peersStr);
     }

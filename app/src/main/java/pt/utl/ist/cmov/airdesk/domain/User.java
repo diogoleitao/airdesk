@@ -10,6 +10,7 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCha
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCreateFilesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
+import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
 public class User implements Serializable, Observer {
 
@@ -185,7 +186,7 @@ public class User implements Serializable, Observer {
             workspace.getAccessLists().values().remove(this.getEmail());
             for (Privileges userPrivileges : workspace.getAccessLists().values())
                 userPrivileges.setAll(choices);
-            workspace.getAccessLists().get(getEmail()).setAll(new boolean[]{ true,true,true,true });
+            workspace.getAccessLists().get(getEmail()).setAll(new boolean[]{true, true, true, true});
         } else {
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
         }
@@ -207,6 +208,9 @@ public class User implements Serializable, Observer {
         if(!topics.contains(topic)) {
             topics.add(topic);
             result = true;
+            BroadcastMessage messageTopics = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_TOPICS_REQUEST, getEmail());
+            messageTopics.setTopics(getTopics());
+            GlobalService.broadcastMessage(messageTopics);
         }
         return result;
     }
