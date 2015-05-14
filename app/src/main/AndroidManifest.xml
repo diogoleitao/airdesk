@@ -3,14 +3,14 @@
     package="pt.utl.ist.cmov.airdesk" >
 
     <uses-permission
-        android:required="true"
-        android:name="android.permission.ACCESS_WIFI_STATE"/>
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        android:required="true" />
     <uses-permission
-        android:required="true"
-        android:name="android.permission.CHANGE_WIFI_STATE"/>
+        android:name="android.permission.CHANGE_WIFI_STATE"
+        android:required="true" />
     <uses-permission
-        android:required="true"
-        android:name="android.permission.INTERNET"/>
+        android:name="android.permission.INTERNET"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -49,14 +49,19 @@
             android:label="@string/title_activity_user_privileges"
             android:parentActivityName=".activities.workspaceSettings" >
         </activity>
+        <activity
+            android:name=".activities.Topics"
+            android:label="@string/title_activity_topics"
+            android:parentActivityName=".activities.ListWorkspaces">
+        </activity>
 
         <service
             android:name=".domain.network.GlobalService"
             android:enabled="true"
             android:exported="true" >
         </service>
-
         <service android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
+
 
     </application>
 

@@ -22,7 +22,6 @@ import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
-import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotExistException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToChangePrivilegesException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
@@ -212,7 +211,7 @@ public class workspaceSettings extends ActionBarActivity implements Updatable {
     public void updateUI() {
         workspace = manager.getCurrentWorkspace();
 
-        TextView workspaceView = (TextView) findViewById(R.id.workspaceNameText);
+        TextView workspaceView = (TextView) findViewById(R.id.topicText);
         workspaceView.setText("Workspace name: " + workspace.getName());
 
         TextView QuotaView = (TextView) findViewById(R.id.quotaText);

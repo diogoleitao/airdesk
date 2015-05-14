@@ -1,6 +1,7 @@
 package pt.utl.ist.cmov.airdesk.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.domain.exceptions.FileAlreadyExistsException;
@@ -23,6 +24,7 @@ public class User implements Serializable, Observer {
 
 
     private HashMap<String, Workspace> foreignWorkspaces = new HashMap<String, Workspace>();
+    private ArrayList<String> topics = new ArrayList<String>();
 
     public User(String email) {
 		this.setEmail(email);
@@ -194,5 +196,22 @@ public class User implements Serializable, Observer {
             getOwnedWorkspaces().get(workspace).getAccessLists().get(email).setAll(privileges);
         } else
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
+    }
+
+    public ArrayList<String> getTopics() {
+        return topics;
+    }
+
+    public boolean addTopic(String topic) {
+        boolean result = false;
+        if(!topics.contains(topic)) {
+            topics.add(topic);
+            result = true;
+        }
+        return result;
+    }
+
+    public void removeTopic(String s) {
+        topics.remove(s);
     }
 }

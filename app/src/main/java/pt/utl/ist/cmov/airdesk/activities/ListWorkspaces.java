@@ -2,11 +2,7 @@ package pt.utl.ist.cmov.airdesk.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
@@ -65,7 +61,7 @@ public class ListWorkspaces extends ActionBarActivity implements Updatable{
     }
 
     public void addWorkspace(View v) {
-        EditText name = (EditText) findViewById(R.id.workspaceNameText);
+        EditText name = (EditText) findViewById(R.id.topicText);
         String workspaceName = name.getText().toString();
         EditText quotaView = (EditText) findViewById(R.id.quotaText);
         String quotaText = quotaView.getText().toString();
@@ -113,17 +109,6 @@ public class ListWorkspaces extends ActionBarActivity implements Updatable{
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
-    }
-
-    // Workspace was deleted by another user
-    public void workspaceRemoved(String workspaceName) {
-        foreignWorkspaceList.addAll(manager.getForeignWorkspaces().keySet());
-        adapterForeign.notifyDataSetChanged();
-    }
-
-    public void invitationToWorkspace(String workspaceName, String username) {
-        foreignWorkspaceList.addAll(manager.getForeignWorkspaces().keySet());
-        adapterForeign.notifyDataSetChanged();
     }
 
     @Override
@@ -183,5 +168,10 @@ public class ListWorkspaces extends ActionBarActivity implements Updatable{
                 return true;
             }
         });
+    }
+
+    public void topics(View view) {
+        Intent intent = new Intent(this, Topics.class);
+        startActivity(intent);
     }
 }

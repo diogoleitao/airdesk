@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/workspaceNameText"
+        android:id="@+id/topicText"
         android:editable="false"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:text="Quota used/total: "
         android:id="@+id/quotaText"
-        android:layout_below="@+id/workspaceNameText"
+        android:layout_below="@+id/topicText"
         android:layout_centerHorizontal="true" />
 
     <EditText
@@ -136,8 +136,8 @@
         android:text="Apply"
         android:id="@+id/bt_apply"
         android:layout_alignTop="@+id/linearLayout"
-        android:layout_alignRight="@+id/workspaceNameText"
-        android:layout_alignEnd="@+id/workspaceNameText"
+        android:layout_alignRight="@+id/topicText"
+        android:layout_alignEnd="@+id/topicText"
         android:onClick="applyGlobalPrivileges" />
 
     <Button

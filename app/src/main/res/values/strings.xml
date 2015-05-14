@@ -21,4 +21,5 @@
     <string name="cancelButton">WiFi Off</string>
     <string name="inRangeButton">In Range</string>
     <string name="inGroupButton">In Network</string>
+    <string name="title_activity_topics">Topics</string>
 </resources>

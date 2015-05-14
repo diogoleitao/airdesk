@@ -55,7 +55,7 @@ public class UserPrivileges extends ActionBarActivity implements Updatable{
     public void updateUI() {
         workspace = manager.getCurrentWorkspace();
 
-        TextView workspaceView = (TextView)findViewById(R.id.workspaceNameText);
+        TextView workspaceView = (TextView)findViewById(R.id.topicText);
         workspaceView.setText("Workspace name: " + workspace.getName());
 
         userNameList = new ArrayList<String>(manager.getUsersFromWorkspace(workspace.getHash()));
