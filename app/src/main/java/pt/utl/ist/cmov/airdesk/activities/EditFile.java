@@ -32,7 +32,14 @@ public class EditFile extends ActionBarActivity implements Updatable{
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(this, ListWorkspaces.class);
+        manager.closeFile(workspace.getHash(), filename);
         startActivity(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        manager.closeFile(workspace.getHash(), filename);
     }
 
     @Override
@@ -82,14 +89,30 @@ public class EditFile extends ActionBarActivity implements Updatable{
 
     public void cancelFileEdit(View v) {
         Intent intent = new Intent(this, ListFiles.class);
+        manager.closeFile(workspace.getHash(), filename);
         startActivity(intent);
     }
 
     @Override
     public void updateUI() {
         workspace = manager.getCurrentWorkspace();
+
+        if(workspace==null){
+            Toast.makeText(getApplicationContext(),"The workspace was deleted!", Toast.LENGTH_LONG);
+            Intent intent = new Intent(this, ListWorkspaces.class);
+            startActivity(intent);
+        }
+
         filename = manager.getCurrentFile();
         file = manager.getFile(workspace.getHash(), filename);
+
+        if(file==null){
+            Toast.makeText(getApplicationContext(),"The file was deleted!", Toast.LENGTH_LONG);
+            Intent intent = new Intent(this, ListFiles.class);
+            startActivity(intent);
+        }
+
+
 
         TextView textView = (TextView)findViewById(R.id.fileText);
         textView.setText(file.getContent());

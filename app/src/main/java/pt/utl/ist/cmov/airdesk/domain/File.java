@@ -30,9 +30,18 @@ public class File implements Serializable, WorkspaceSubject {
      */
     private Date timestamp;
 
-    /**
-     *
-     */
+    public boolean open() {
+        boolean wasOpen = open;
+        this.open=true;
+        return wasOpen;
+    }
+
+    public void close() {
+        this.open = false;
+    }
+
+    boolean open = false;
+
     private ArrayList<Observer> observers = new ArrayList<Observer>();
 
     public File(String name) {

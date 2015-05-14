@@ -109,6 +109,20 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 }
 
                 break;
+            case FILE_OPEN:
+                workspaceHash = message.getArg1();
+                fileName = message.getArg2();
+                file = manager.getFile(workspaceHash, fileName);
+                if( file!= null)
+                    file.open();
+                break;
+            case FILE_CLOSE:
+                workspaceHash = message.getArg1();
+                fileName = message.getArg2();
+                file = manager.getFile(workspaceHash, fileName);
+                if( file!= null)
+                    file.close();
+                break;
             case FILE_DELETED:
                 workspaceHash = message.getArg1();
                 fileName = message.getArg2();

@@ -119,6 +119,10 @@ public class ListFiles extends ActionBarActivity implements Updatable {
                     int duration = Toast.LENGTH_SHORT;
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
+
+                } else if(manager.openFile(workspace.getHash(), fileNameList.get(position))){
+                        Toast.makeText(getApplicationContext(),"Someone is editing this file, try again later.", Toast.LENGTH_LONG).show();
+
                 } else {
                     Intent intent = new Intent(that, EditFile.class);
                     manager.setCurrentFile(fileNameList.get(position));

@@ -32,7 +32,7 @@ import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
 public class AirdeskManager implements Serializable {
 
-    static String filename = "AirdeskState";
+    static String filenameSaveApp = "AirdeskState";
 
 	/**
 	 * This class' singleton
@@ -86,7 +86,7 @@ public class AirdeskManager implements Serializable {
                 return instance;
 
             try {
-                FileInputStream fileInputStream = context.openFileInput(filename);
+                FileInputStream fileInputStream = context.openFileInput(filenameSaveApp);
                 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
                 loggedUser = (User) objectInputStream.readObject();
@@ -105,7 +105,7 @@ public class AirdeskManager implements Serializable {
 
     public void saveAppState(Context context) {
         try {
-            FileOutputStream fileOutputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = context.openFileOutput(filenameSaveApp, Context.MODE_PRIVATE);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 
             objectOutputStream.writeObject(loggedUser);
@@ -131,6 +131,21 @@ public class AirdeskManager implements Serializable {
 
     public File getFile(String workspaceHash, String name) {
         return loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().get(name);
+    }
+    public boolean openFile(String workspaceHash, String name) {
+        boolean open = loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().get(name).open();
+        if(!open){
+            BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_OPEN, workspaceHash, name);
+            message.setFile(getFile(workspaceHash, name));
+            GlobalService.broadcastMessage(message);
+        }
+        return open;
+    }
+    public void closeFile(String workspaceHash, String name) {
+        loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().get(name).close();
+        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_CLOSE, workspaceHash, name);
+        message.setFile(getFile(workspaceHash, name));
+        GlobalService.broadcastMessage(message);
     }
 
     public int getTotalQuota(String workspaceHash) {
