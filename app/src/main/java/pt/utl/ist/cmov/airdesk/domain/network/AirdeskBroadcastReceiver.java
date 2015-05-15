@@ -28,13 +28,13 @@ public class AirdeskBroadcastReceiver extends BroadcastReceiver {
             // This action is triggered when the WDSim Activity changes state:
             // - creating the Activity generates the WIFI_P2P_STATE_ENABLED event
             // - destroying the Activity generates the WIFI_P2P_STATE_DISABLED event
-
+/*
             int state = intent.getIntExtra(SimWifiP2pBroadcast.EXTRA_WIFI_STATE, -1);
             if (state == SimWifiP2pBroadcast.WIFI_P2P_STATE_ENABLED) {
                 Toast.makeText(context.getApplicationContext(), "WiFi Direct enabled", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context.getApplicationContext(), "WiFi Direct disabled", Toast.LENGTH_SHORT).show();
-            }
+            }*/
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 

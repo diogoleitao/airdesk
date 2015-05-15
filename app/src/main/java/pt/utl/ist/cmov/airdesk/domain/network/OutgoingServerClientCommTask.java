@@ -51,12 +51,12 @@ public class OutgoingServerClientCommTask extends AsyncTask<BroadcastMessage, Vo
 
     @Override
     protected void onPostExecute(String result) {
-        if (result != null) {
+        /*if (result != null) {
             Context context = service;
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, result, duration);
             toast.show();
-        }
+        }*/
     }
 
     @Override
