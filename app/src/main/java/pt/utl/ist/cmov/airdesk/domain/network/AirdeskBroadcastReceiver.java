@@ -1,6 +1,5 @@
 package pt.utl.ist.cmov.airdesk.domain.network;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,21 +8,15 @@ import android.widget.Toast;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
-import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
-import pt.utl.ist.cmov.airdesk.domain.WifiManager;
 
 public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "BroadcastReceiver";
-    private AirdeskManager manager;
     private GlobalService service;
-    private WifiManager wifiManager;
 
     public AirdeskBroadcastReceiver(GlobalService _context) {
         super();
-        manager = AirdeskManager.getInstance(_context);
         service = _context;
-        wifiManager = WifiManager.getInstance();
     }
 
     @Override

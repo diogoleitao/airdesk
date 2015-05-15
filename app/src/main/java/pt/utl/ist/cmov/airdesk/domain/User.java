@@ -12,7 +12,7 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
-public class User implements Serializable, Observer {
+public class User implements Serializable {
 
 
     /**
@@ -58,18 +58,16 @@ public class User implements Serializable, Observer {
 	public Workspace createWorkspace(int quota, String name, String hash) {
 		Workspace workspace = new Workspace(quota, name, getEmail(), hash);
         getOwnedWorkspaces().put(hash, workspace);
-        getWorkspace(hash).register(this);
         return workspace;
 	}
 
 
 	public void deleteWorkspace(String hash) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
         if (this.getOwnedWorkspaces().containsKey(hash)) {
-            this.getOwnedWorkspaces().remove(hash).unregister(this);
+            this.getOwnedWorkspaces().remove(hash);
         } else {
             if (getForeignWorkspaces().containsKey(hash)) {
                 if (this.getForeignWorkspaces().get(hash).getAccessLists().get(this.getEmail()).canDelete()) {
-                    this.getForeignWorkspaces().remove(hash).unregister(this);
                 }
                 else {
                     throw new UserDoesNotHavePermissionsToDeleteWorkspaceException();
@@ -80,7 +78,7 @@ public class User implements Serializable, Observer {
 
     public void deleteForeignWorkspace(String hash) {
         if (getForeignWorkspaces().containsKey(hash))
-                this.getForeignWorkspaces().remove(hash).unregister(this);
+                this.getForeignWorkspaces().remove(hash);
     }
 
 	/**
@@ -103,38 +101,6 @@ public class User implements Serializable, Observer {
         getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
 	}
 
-	/**
-	 * Remove AirdeskBroadcastReceiver given user from AirdeskBroadcastReceiver given workspace
-	 *
-	 * @param email
-	 * @param workspace
-	 */
-	public void removeUserFromWorkspace(String email, String workspace) {
-        getOwnedWorkspaces().get(workspace).getAccessLists().remove(email);
-    }
-
-	/**
-	 * Change AirdeskBroadcastReceiver given workspace's privacy
-	 *
-	 * @param workspace
-	 * @param privacy
-	 */
-	public void changeWorkspacePrivacy(String workspace, boolean privacy) {
-		getOwnedWorkspaces().get(workspace).setPrivacy(privacy);
-	}
-
-	public void mountWorkspace(Workspace workspace) {
-		if (!workspace.getOwner().equals(getEmail())) {
-			getForeignWorkspaces().put(workspace.getHash(), workspace);
-		}
-	}
-
-    public void unmountWorkspace(Workspace workspace) {
-        if (!workspace.getOwner().equals(getEmail())) {
-            getForeignWorkspaces().remove(workspace.getHash());
-        }
-    }
-
     public Workspace getWorkspace(String workspaceHash) {
         Workspace workspace;
 
@@ -152,7 +118,6 @@ public class User implements Serializable, Observer {
         Workspace workspace = getWorkspace(workspaceHash);
         if (workspace.getAccessLists().get(getEmail()).canDelete()) {
             workspace.removeFile(filename);
-            workspace.unregister(this);
         } else {
             throw new UserDoesNotHavePermissionsToDeleteFileException();
         }
@@ -161,7 +126,6 @@ public class User implements Serializable, Observer {
     public void deleteForeignFile(String workspaceHash, String filename) {
         Workspace workspace = getWorkspace(workspaceHash);
         workspace.removeFile(filename);
-        workspace.unregister(this);
     }
 
     public File createFile(String currentWorkspace, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
@@ -172,7 +136,6 @@ public class User implements Serializable, Observer {
             else {
                 File file = new File(fileName);
                 workspace.addFile(fileName, file);
-                file.register(this);
                 return file;
             }
         } else {

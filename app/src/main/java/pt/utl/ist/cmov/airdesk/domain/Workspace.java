@@ -9,7 +9,7 @@ import java.util.HashMap;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.TopicAlreadyAddedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
-public class Workspace implements Serializable, Observer, UserSubject {
+public class Workspace implements Serializable {
 
 	/**
 	 * The maximum size of the workspace (in kB)
@@ -76,12 +76,6 @@ public class Workspace implements Serializable, Observer, UserSubject {
 	 * Mapping between files' names and File objects
 	 */
 	private HashMap<String, File> files = new HashMap<String, File>();
-
-
-	/**
-	 * A list of Users observing the workspace
-	 */
-	private ArrayList<Observer> observers = new ArrayList<Observer>();
 
 	public Workspace(int quota, String name, String owner, String hash) {
 		this.setQuota(quota);
@@ -160,10 +154,6 @@ public class Workspace implements Serializable, Observer, UserSubject {
         return this.quotaOccupied;
 	}
 
-	public ArrayList<Observer> getObservers() {
-		return observers;
-	}
-
     public void updateQuotaOccupied(int fileSize) {
         this.quotaOccupied += fileSize;
     }
@@ -188,25 +178,6 @@ public class Workspace implements Serializable, Observer, UserSubject {
 		}
 	}
 
-
-
-
-	///////// USER SUBJECT METHODS /////////
-	@Override
-	public void register(Observer o) {
-		this.getObservers().add(o);
-	}
-
-	@Override
-	public void unregister(Observer o) {
-		this.getObservers().remove(o);
-	}
-
-	@Override
-	public void notifyObservers() {
-		WifiManager.broadcastWorkspaceUpdate(this);
-	}
-
 	public Date getTimestamp() {
 		return timestamp;
 	}
@@ -227,7 +198,6 @@ public class Workspace implements Serializable, Observer, UserSubject {
 		this.files = workspace.getFiles();
 		this.topics = workspace.getTopics();
 		this.isPrivate = workspace.isPrivate();
-		this.observers = workspace.getObservers();
 		this.lastOnlineTimestamp = workspace.getLastOnlineTimestamp();
 	}
 

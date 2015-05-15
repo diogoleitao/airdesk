@@ -45,16 +45,10 @@ public class AirdeskManager implements Serializable {
     private static HashMap<String, String> namesToHashes = new HashMap<String, String>();
 
     /**
-     *
-     */
-    private static WifiManager wifiManager;
-
-    /**
      * The currently logged in user email
 	 */
 	private static User loggedUser;
     private static Activity currentActivity;
-    private GlobalService globalService;
 
     public Handler getServiceHandler() {
         return serviceHandler;
@@ -80,7 +74,6 @@ public class AirdeskManager implements Serializable {
 	public static AirdeskManager getInstance(Context context) {
 		if (instance == null) {
 			instance = new AirdeskManager();
-            wifiManager = new WifiManager();
 
             if(context == null)
                 return instance;
@@ -374,10 +367,6 @@ public class AirdeskManager implements Serializable {
 
     public void setCurrentActivity(Activity currentActivity) {
         this.currentActivity = currentActivity;
-    }
-
-    public void setGlobalService(GlobalService globalService) {
-        this.globalService = globalService;
     }
 
     public void changeWorkspace(String hash, Workspace workspace) {

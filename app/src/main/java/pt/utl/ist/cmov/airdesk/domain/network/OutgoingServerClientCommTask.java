@@ -74,6 +74,9 @@ public class OutgoingServerClientCommTask extends AsyncTask<BroadcastMessage, Vo
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                // Termite nulls sockets when groups change?
             }
         }
         return "Message sent: " + message.getMessageType() + " to: " + message.getIp();

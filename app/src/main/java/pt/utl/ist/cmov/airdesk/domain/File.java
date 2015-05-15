@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Created by Diogo on 25/03/2015.
  */
-public class File implements Serializable, WorkspaceSubject {
+public class File implements Serializable {
 
 	/**
 	 * The name of the file
@@ -42,8 +42,6 @@ public class File implements Serializable, WorkspaceSubject {
 
     boolean open = false;
 
-    private ArrayList<Observer> observers = new ArrayList<Observer>();
-
     public File(String name) {
         this.setName(name);
         this.setContent("");
@@ -75,10 +73,6 @@ public class File implements Serializable, WorkspaceSubject {
         this.size = size;
     }
 
-    public ArrayList<Observer> getObservers() {
-        return observers;
-    }
-
 	public void save(String content) {
 		this.setContent(content);
         this.setSize(this.getContent().length() * 4);
@@ -87,26 +81,6 @@ public class File implements Serializable, WorkspaceSubject {
 
     public Date getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    ///////// WORKSPACE SUBJECT METHODS /////////
-    @Override
-    public void register(Observer o) {
-        this.getObservers().add(o);
-    }
-
-    @Override
-    public void unregister(Observer o) {
-        this.getObservers().remove(o);
-    }
-
-    @Override
-    public void notifyObservers() {
-        //WifiManager.broadcastFileUpdate(this.getName(), this.getObservers());
     }
 
 }

@@ -23,7 +23,6 @@ import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
-import pt.utl.ist.cmov.airdesk.domain.WifiManager;
 
 public class GlobalService extends Service implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener{
 
@@ -34,8 +33,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
     private SimWifiP2pManager.Channel mChannel = null;
     private Messenger mService = null;
     private boolean mBound = false;
-
-    private WifiManager wifiManager;
 
     public static List<String> ips;
     private ServerCommTask srvSocketTask;
@@ -87,9 +84,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             String devstr = "" + deviceName + " (" +
                     ((device == null)?"??":device.getVirtIp()) + ")\n";
             peersStr.append(devstr);
-
-            if((device == null))
-                wifiManager.addIP(device.getVirtIp());
         }
         Log.d(TAG, "Peer list: " + peersStr);
     }
@@ -104,8 +98,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
         ips = new ArrayList<String>();
         instance = this;
 
-        AirdeskManager.getInstance(null).setGlobalService(this);
-
         // register broadcast receiver
         // initialize the WDSim API
         SimWifiP2pSocketManager.Init(getApplicationContext());
@@ -118,8 +110,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
         AirdeskBroadcastReceiver receiver = new AirdeskBroadcastReceiver(this);
         registerReceiver(receiver, filter);
-
-        wifiManager = WifiManager.getInstance();
 
         Intent intent = new Intent(getApplicationContext(), SimWifiP2pService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
