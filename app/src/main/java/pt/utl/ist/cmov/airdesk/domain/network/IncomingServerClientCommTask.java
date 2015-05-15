@@ -95,10 +95,13 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
     }
 
     protected void dispatchMessage(BroadcastMessage message, SimWifiP2pSocket socket){
+
         BroadcastMessage messageOutput;
         String workspaceHash, fileName, user;
         Message msg;
         AirdeskManager manager = AirdeskManager.getInstance(context);
+        if(manager.getLoggedUser() == null)
+            return;
         registerHandler(manager.getServiceHandler());
         switch(message.getMessageType()){
             case I_AM_USER:

@@ -221,7 +221,9 @@ public class AirdeskManager implements Serializable {
     //////////////////////////////////
     public void login(String email) {
         loggedUser = new User(email);
-
+        // TODO: optimization: only the new peers online need to send this message. this is all peers that are online, even if there is only 1 new peer
+        BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.I_AM_USER, getLoggedUser().getEmail());
+        GlobalService.broadcastMessage(message);
     }
 
     // TODO FORWARD CHANGES TO USERS SUBSCRIBED
