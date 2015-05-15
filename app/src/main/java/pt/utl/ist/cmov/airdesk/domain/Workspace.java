@@ -36,6 +36,12 @@ public class Workspace implements Serializable, Observer, UserSubject {
 	 */
 	private String hash;
 
+	public ArrayList<String> getConflicts() {
+		return conflicts;
+	}
+
+	private ArrayList<String> conflicts;
+
 	public boolean isOnline() {
 		return online;
 	}
@@ -49,6 +55,7 @@ public class Workspace implements Serializable, Observer, UserSubject {
 	 * The timestamp of the file's last edit
 	 */
 	private Date timestamp;
+	private Date lastOnlineTimestamp;
 
 	/**
 	 * Mapping between user's nickname and their privileges regarding the workspace
@@ -82,6 +89,8 @@ public class Workspace implements Serializable, Observer, UserSubject {
 		this.setOwner(owner);
 		this.setHash(hash);
 		this.timestamp = Calendar.getInstance().getTime();
+		this.lastOnlineTimestamp = timestamp;
+		this.conflicts = new ArrayList<>();
 
         Privileges p = new Privileges(true, true, true, true);
         HashMap<String, Privileges> al = new HashMap<String, Privileges>();
@@ -219,6 +228,7 @@ public class Workspace implements Serializable, Observer, UserSubject {
 		this.topics = workspace.getTopics();
 		this.isPrivate = workspace.isPrivate();
 		this.observers = workspace.getObservers();
+		this.lastOnlineTimestamp = workspace.getLastOnlineTimestamp();
 	}
 
 	public void addFile(String fileName, File file) {
@@ -232,4 +242,23 @@ public class Workspace implements Serializable, Observer, UserSubject {
 		quotaOccupied -= getFiles().get(fileName).getSize();
 		files.remove(fileName);
 	}
+
+	public Date getLastOnlineTimestamp() {
+		return lastOnlineTimestamp;
+	}
+
+
+	public void setLastOnlineTimestamp(Date lastOnlineTimestamp) {
+		this.lastOnlineTimestamp = lastOnlineTimestamp;
+	}
+
+	public void addConflict(String name) {
+		this.conflicts.add(name);
+	}
+
+	public void fixedConflict(String name){
+		this.conflicts.remove(name);
+	}
+
+
 }

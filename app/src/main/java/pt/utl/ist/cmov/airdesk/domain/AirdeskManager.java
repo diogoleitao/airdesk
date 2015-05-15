@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import pt.utl.ist.cmov.airdesk.activities.Updatable;
@@ -269,29 +270,33 @@ public class AirdeskManager implements Serializable {
     }
 
     public void addNewFile(String workspaceHash, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
-        loggedUser.getAllWorkspaces().get(workspaceHash).addFile(fileName, loggedUser.createFile(workspaceHash, fileName));
+        getLoggedUser().getWorkspace(workspaceHash).addFile(fileName, loggedUser.createFile(workspaceHash, fileName));
         BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_ADDED_TO_WORKSPACE, workspaceHash, fileName);
+        message.setWorkspaceTimestamp(getLoggedUser().getWorkspace(workspaceHash).getTimestamp());
         GlobalService.broadcastMessage(message);
     }
 
     public void saveFile(String workspaceHash, String filename, String content) throws WorkspaceQuotaReachedException {
-        loggedUser.getWorkspace(workspaceHash).saveFile(filename, content);
+        getLoggedUser().getWorkspace(workspaceHash).saveFile(filename, content);
         BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_CHANGED, workspaceHash, filename);
         message.setFile(getFile(workspaceHash, filename));
+        message.setWorkspaceTimestamp(getLoggedUser().getWorkspace(workspaceHash).getTimestamp());
         GlobalService.broadcastMessage(message);
     }
 
     public void deleteFile(String workspaceHash, String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
-        loggedUser.deleteFile(workspaceHash, fileName);
+        getLoggedUser().deleteFile(workspaceHash, fileName);
         BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.FILE_DELETED, workspaceHash, fileName);
+        message.setWorkspaceTimestamp(getLoggedUser().getWorkspace(workspaceHash).getTimestamp());
         GlobalService.broadcastMessage(message);
     }
 
     public void changeUserPrivileges(String workspaceHash, String email, boolean[] privileges) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        loggedUser.changeUserPrivileges(email, privileges, workspaceHash);
+        getLoggedUser().changeUserPrivileges(email, privileges, workspaceHash);
         BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_PRIVILEGES_CHANGED, workspaceHash, email);
         Privileges privileges1 = new Privileges();
         privileges1.setAll(privileges);
+        message.setWorkspaceTimestamp(getLoggedUser().getWorkspace(workspaceHash).getTimestamp());
         message.setPrivileges(privileges1);
         GlobalService.broadcastMessage(message);
     }
@@ -338,7 +343,8 @@ public class AirdeskManager implements Serializable {
             ((Updatable)currentActivity).updateUI();
     }
 
-    public void deleteForeignFile(String workspaceHash, String filename){
+    public void deleteForeignFile(String workspaceHash, String filename, Date ownerTimestamp){
+        getLoggedUser().getWorkspace(workspaceHash).setLastOnlineTimestamp(ownerTimestamp);
         loggedUser.deleteForeignFile(workspaceHash, filename);
     }
 
@@ -347,47 +353,15 @@ public class AirdeskManager implements Serializable {
         namesToHashes.remove(workspaceHash);
     }
 
-    public void addForeignNewFile(String workspaceHash, String fileName){
+    public void addForeignNewFile(String workspaceHash, String fileName, Date ownerTimestamp){
         File file = new File(fileName);
-        loggedUser.getAllWorkspaces().get(workspaceHash).addFile(fileName, file);
+        getLoggedUser().getWorkspace(workspaceHash).setLastOnlineTimestamp(ownerTimestamp);
+        getLoggedUser().getWorkspace(workspaceHash).addFile(fileName, file);
     }
 
-    public void deleteWorkspaceBC(String workspaceHash) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
-        loggedUser.deleteWorkspace(workspaceHash);
-    }
-
-    public void addTopicToWorkspaceBC(String workspaceHash, String topic) throws TopicAlreadyAddedException {
-        loggedUser.getWorkspace(workspaceHash).addTopic(topic);
-    }
-
-    public void addNewFileBC(String workspaceHash, String fileName) throws FileAlreadyExistsException, UserDoesNotHavePermissionsToCreateFilesException {
-        loggedUser.getAllWorkspaces().get(workspaceHash).getFiles().put(fileName, loggedUser.createFile(workspaceHash, fileName));
-    }
-
-    public void saveFileBC(String workspaceHash, String fileName, String content) throws WorkspaceQuotaReachedException {
-        loggedUser.getWorkspace(workspaceHash).saveFile(fileName, content);
-    }
-
-    public void deleteFileBC(String workspaceHash, String fileName) throws UserDoesNotHavePermissionsToDeleteFileException {
-        loggedUser.deleteFile(workspaceHash, fileName);
-    }
-
-    public void applyGlobalPrivilegesBC(String workspaceHash, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
-        loggedUser.applyGlobalPrivileges(workspaceHash, choices);
-        //loggedUser.getAllWorkspaces().get(workspaceName).setPrivacy(isPrivate);
-    }
-
-    public void setWorkspacePrivacyBC(String workspaceHash, boolean isPrivate) {
-        loggedUser.getWorkspace(workspaceHash).setPrivacy(isPrivate);
-    }
-
-    public void matchWorkspaceTopicsBC(String workspaceHash, ArrayList<String> topics) {
-        for (String topic : topics) {
-            if (loggedUser.getWorkspace(workspaceHash).getTopics().contains(topic)) {
-                loggedUser.mountWorkspace(loggedUser.getAllWorkspaces().get(workspaceHash));
-                return;
-            }
-        }
+    public void saveForeignFile(String workspaceHash, String filename, String content, Date ownerTimestamp) throws WorkspaceQuotaReachedException {
+        getLoggedUser().getWorkspace(workspaceHash).setLastOnlineTimestamp(ownerTimestamp);
+        loggedUser.getWorkspace(workspaceHash).saveFile(filename, content);
     }
 
     public Workspace getCurrentWorkspace() {
@@ -405,12 +379,24 @@ public class AirdeskManager implements Serializable {
     public void changeWorkspace(String hash, Workspace workspace) {
         getLoggedUser().getOwnedWorkspaces().get(hash).update(workspace);
         BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_UPDATED, hash);
+        message.setWorkspaceTimestamp(workspace.getTimestamp());
         message.setWorkspace(workspace);
         GlobalService.broadcastMessage(message);
     }
 
-    public void updateWorkspace(String hash, Workspace workspace) {
+    public void updateWorkspace(String hash, Workspace workspace, Date ownerTimestamp) {
+        getLoggedUser().getWorkspace(hash).setLastOnlineTimestamp(ownerTimestamp);
         getLoggedUser().getForeignWorkspaces().get(hash).update(workspace);
     }
 
+    public void conflict(String workspaceHash, Workspace wMessage, Date ownerTimestamp) {
+        Workspace w = getLoggedUser().getForeignWorkspaces().get(workspaceHash);
+        w.setLastOnlineTimestamp(ownerTimestamp);
+        for(File f : w.getFiles().values()){
+            if(wMessage.getFiles().containsKey(f.getName()) && !f.getTimestamp().equals(wMessage.getFiles().get(f.getName()).getTimestamp())){
+                w.addConflict(f.getName());
+                f.save(f.getContent() + "\nForeign Version:\n" + wMessage.getFiles().get(f.getName()).getContent());
+            }
+        }
+    }
 }

@@ -16,7 +16,7 @@ import pt.utl.ist.cmov.airdesk.domain.File;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
-public class EditFile extends ActionBarActivity implements Updatable{
+public class EditFile extends ActionBarActivity implements Updatable {
 
     String filename;
     File file;

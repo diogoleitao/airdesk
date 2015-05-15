@@ -22,7 +22,7 @@ import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 
-public class Topics extends ActionBarActivity implements Updatable{
+public class Topics extends ActionBarActivity implements Updatable {
 
     private AirdeskManager manager;
     ArrayList<String> topicList;

@@ -108,4 +108,5 @@ public class File implements Serializable, WorkspaceSubject {
     public void notifyObservers() {
         //WifiManager.broadcastFileUpdate(this.getName(), this.getObservers());
     }
+
 }

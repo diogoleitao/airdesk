@@ -109,6 +109,27 @@ public class ListFiles extends ActionBarActivity implements Updatable {
             return;
         }
 
+        ArrayList<String> conflicts = workspace.getConflicts();
+        if(!conflicts.isEmpty()){
+            String complete = "";
+            for(String s : conflicts){
+                complete += ", " + s;
+            }
+
+            workspace.getConflicts().clear();
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Conflicts in files")
+                    .setMessage("Conflicts were detected in files: " + complete.substring(2))
+                    .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // nothing
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+
         fileNameList = manager.getFilesFromWorkspace(workspace.getHash());
 
         fileListView = (ListView) findViewById(R.id.filelist);
