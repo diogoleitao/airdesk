@@ -10,13 +10,19 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
 import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 import pt.utl.ist.cmov.airdesk.domain.File;
+import pt.utl.ist.cmov.airdesk.domain.Privileges;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
 public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
     SimWifiP2pSocket s;
@@ -268,6 +274,35 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                break;
+            case WORKSPACE_TOPICS_REQUEST:
+                List<String> topics = message.getTopics();
+                user = message.getArg1();
+                List<Workspace> matchingWorkspaces = new ArrayList<Workspace>();
+                for(String topic : topics){
+                    for(Map.Entry<String, Workspace> workspaceEntry : manager.getOwnedWorkspaces().entrySet()){
+                        if(workspaceEntry.getValue().getTopics().contains(topic)){
+                            matchingWorkspaces.add(workspaceEntry.getValue());
+                        }
+                    }
+                }
+                for(Workspace workspace1 : matchingWorkspaces){
+                    try {
+                        manager.getLoggedUser().addUserToWorkspace(user, workspace1.getHash());
+                        workspace1.getAccessLists().put(user, new Privileges());
+                        BroadcastMessage messageInvite = new BroadcastMessage(BroadcastMessage.MessageTypes.INVITATION_TO_WORKSPACE, workspace1.getHash(), user);
+                        messageInvite.setWorkspace(workspace1);
+                        GlobalService.broadcastMessage(messageInvite);
+                    } catch (UserAlreadyHasPermissionsInWorkspaceException e) {
+                        // He has already asked us for it before
+                    }
+                }
+                break;
+            case WORKSPACE_TOPICS_CHANGED:
+                // There was a topic change, let's flood the network with requests for workspace with topics
+                BroadcastMessage messageTopics = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_TOPICS_REQUEST, AirdeskManager.getInstance(context).getLoggedUser().getEmail());
+                messageTopics.setTopics(AirdeskManager.getInstance(context).getLoggedUser().getTopics());
+                GlobalService.broadcastMessage(messageTopics);
                 break;
         }
     }
