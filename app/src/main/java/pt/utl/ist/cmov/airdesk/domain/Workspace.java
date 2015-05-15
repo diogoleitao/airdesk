@@ -11,29 +11,14 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
 public class Workspace implements Serializable {
 
-	/**
-	 * The maximum size of the workspace (in kB)
-	 */
 	private int quota;
 
-    /**
-	 * The total quota occupied (in kB)
-	 */
 	private int quotaOccupied;
 
-	/**
-	 * The name of the workspace
-	 */
 	private String name;
 
-	/**
-	 * The owner's/creator's nickname
-	 */
 	private String owner;
 
-	/**
-	 * A hash that serves as an GUID
-	 */
 	private String hash;
 
 	public ArrayList<String> getConflicts() {
@@ -51,30 +36,17 @@ public class Workspace implements Serializable {
 	}
 
 	public boolean online = false;
-	/**
-	 * The timestamp of the file's last edit
-	 */
+
 	private Date timestamp;
+
 	private Date lastOnlineTimestamp;
 
-	/**
-	 * Mapping between user's nickname and their privileges regarding the workspace
-	 */
 	private HashMap<String, Privileges> accessLists = new HashMap<String, Privileges>();
 
-	/**
-	 * A list of the topics that the workspace covers
-	 */
 	private ArrayList<String> topics = new ArrayList<String>();
 
-	/**
-	 * If true, the workspace is private; false, if it is public
-	 */
 	private boolean isPrivate;
 
-	/**
-	 * Mapping between files' names and File objects
-	 */
 	private HashMap<String, File> files = new HashMap<String, File>();
 
 	public Workspace(int quota, String name, String owner, String hash) {
@@ -86,11 +58,11 @@ public class Workspace implements Serializable {
 		this.lastOnlineTimestamp = timestamp;
 		this.conflicts = new ArrayList<>();
 
-        Privileges p = new Privileges(true, true, true, true);
-        HashMap<String, Privileges> al = new HashMap<String, Privileges>();
-        al.put(owner, p);
+		Privileges p = new Privileges(true, true, true, true);
+		HashMap<String, Privileges> al = new HashMap<String, Privileges>();
+		al.put(owner, p);
 
-        this.setAccessLists(al);
+		this.setAccessLists(al);
 	}
 
 	public int getQuota() {
@@ -150,15 +122,15 @@ public class Workspace implements Serializable {
 		return files;
 	}
 
-    public int getQuotaOccupied() {
-        return this.quotaOccupied;
+	public int getQuotaOccupied() {
+		return this.quotaOccupied;
 	}
 
-    public void updateQuotaOccupied(int fileSize) {
-        this.quotaOccupied += fileSize;
-    }
+	public void updateQuotaOccupied(int fileSize) {
+		this.quotaOccupied += fileSize;
+	}
 
-    public void addTopic(String topic) throws TopicAlreadyAddedException {
+	public void addTopic(String topic) throws TopicAlreadyAddedException {
 		if (this.getTopics().contains(topic)) {
 			throw new TopicAlreadyAddedException();
 		} else {
@@ -166,15 +138,15 @@ public class Workspace implements Serializable {
 		}
 	}
 
-    public void saveFile(String currentFile, String content) throws WorkspaceQuotaReachedException {
-        int oldSize = getFiles().get(currentFile).getSize();
-        int size = content.length() * 4 - oldSize;
-        if ((getQuotaOccupied() + size) > getQuota()) {
-            throw new WorkspaceQuotaReachedException();
-        } else {
-            getFiles().get(currentFile).save(content);
+	public void saveFile(String currentFile, String content) throws WorkspaceQuotaReachedException {
+		int oldSize = getFiles().get(currentFile).getSize();
+		int size = content.length() * 4 - oldSize;
+		if ((getQuotaOccupied() + size) > getQuota()) {
+			throw new WorkspaceQuotaReachedException();
+		} else {
+			getFiles().get(currentFile).save(content);
 			this.timestamp = Calendar.getInstance().getTime();
-            updateQuotaOccupied(size);
+			updateQuotaOccupied(size);
 		}
 	}
 
@@ -191,7 +163,6 @@ public class Workspace implements Serializable {
 		this.quotaOccupied = workspace.getQuotaOccupied();
 		this.setName(workspace.getName());
 		this.setOwner(workspace.getOwner());
-		//this.setHash(workspace.getHash()); should be the same
 		this.setAccessLists(workspace.getAccessLists());
 		this.setTimestamp(workspace.getTimestamp());
 		this.online = workspace.isOnline();
@@ -216,7 +187,6 @@ public class Workspace implements Serializable {
 	public Date getLastOnlineTimestamp() {
 		return lastOnlineTimestamp;
 	}
-
 
 	public void setLastOnlineTimestamp(Date lastOnlineTimestamp) {
 		this.lastOnlineTimestamp = lastOnlineTimestamp;

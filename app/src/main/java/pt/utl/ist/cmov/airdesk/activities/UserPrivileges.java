@@ -23,9 +23,13 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCha
 public class UserPrivileges extends ActionBarActivity implements Updatable{
 
     ArrayAdapter<String> adapter;
+
     ListView userListView;
+
     ArrayList<String> userNameList;
+
     Workspace workspace;
+
     AirdeskManager manager;
 
     @Override

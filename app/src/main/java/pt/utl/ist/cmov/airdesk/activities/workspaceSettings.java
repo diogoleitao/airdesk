@@ -4,8 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
@@ -26,7 +26,9 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToCha
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
 
 public class workspaceSettings extends ActionBarActivity implements Updatable {
+
     Workspace workspace;
+
     AirdeskManager manager;
 
     @Override
@@ -100,14 +102,14 @@ public class workspaceSettings extends ActionBarActivity implements Updatable {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             ((TextView)findViewById(R.id.inviteUserText)).setText("");
-            
+
             boolean[] currentGlobalPrivileges = manager.getAllPrivilegesFromWorkspace(workspace.getHash());
 
             ((CheckBox) findViewById(R.id.readFilesBox)).setChecked(currentGlobalPrivileges[0]);
             ((CheckBox) findViewById(R.id.writeFilesBox)).setChecked(currentGlobalPrivileges[1]);
             ((CheckBox) findViewById(R.id.createFilesBox)).setChecked(currentGlobalPrivileges[2]);
             ((CheckBox) findViewById(R.id.deleteFilesBox)).setChecked(currentGlobalPrivileges[3]);
-            
+
         } catch (UserAlreadyHasPermissionsInWorkspaceException | UserDoesNotHavePermissionsToChangePrivilegesException e) {
             Context context = getApplicationContext();
             CharSequence text = e.getMessage();

@@ -2,8 +2,8 @@ package pt.utl.ist.cmov.airdesk.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -16,8 +16,8 @@ import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 public class MainActivity extends ActionBarActivity {
 
     String email;
-    AirdeskManager manager;
 
+    AirdeskManager manager;
 
     @Override
     protected void onPause() {
@@ -40,7 +40,6 @@ public class MainActivity extends ActionBarActivity {
             intent = new Intent(this, ListWorkspaces.class);
             startActivity(intent);
         }
-
     }
 
     @Override

@@ -14,34 +14,29 @@ import pt.utl.ist.cmov.airdesk.domain.network.GlobalService;
 
 public class User implements Serializable {
 
-
-    /**
-     * The user's email, used as a GUID
-     */
-	private String email;
-
+    private String email;
 
     private HashMap<String, Workspace> ownedWorkspaces = new HashMap<String, Workspace>();
 
-
     private HashMap<String, Workspace> foreignWorkspaces = new HashMap<String, Workspace>();
+
     private ArrayList<String> topics = new ArrayList<String>();
 
     public User(String email) {
-		this.setEmail(email);
-	}
+        this.setEmail(email);
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public HashMap<String, Workspace> getOwnedWorkspaces() {
-		return ownedWorkspaces;
-	}
+        return ownedWorkspaces;
+    }
 
     public HashMap<String, Workspace> getForeignWorkspaces() {
         return foreignWorkspaces;
@@ -54,41 +49,31 @@ public class User implements Serializable {
         return result;
     }
 
-
-	public Workspace createWorkspace(int quota, String name, String hash) {
-		Workspace workspace = new Workspace(quota, name, getEmail(), hash);
+    public Workspace createWorkspace(int quota, String name, String hash) {
+        Workspace workspace = new Workspace(quota, name, getEmail(), hash);
         getOwnedWorkspaces().put(hash, workspace);
         return workspace;
-	}
+    }
 
-
-	public void deleteWorkspace(String hash) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
+    public void deleteWorkspace(String hash) throws UserDoesNotHavePermissionsToDeleteWorkspaceException {
         if (this.getOwnedWorkspaces().containsKey(hash)) {
             this.getOwnedWorkspaces().remove(hash);
         } else {
             if (getForeignWorkspaces().containsKey(hash)) {
-                if (this.getForeignWorkspaces().get(hash).getAccessLists().get(this.getEmail()).canDelete()) {
-                }
+                if (this.getForeignWorkspaces().get(hash).getAccessLists().get(this.getEmail()).canDelete()) {}
                 else {
                     throw new UserDoesNotHavePermissionsToDeleteWorkspaceException();
                 }
             }
         }
-	}
+    }
 
     public void deleteForeignWorkspace(String hash) {
         if (getForeignWorkspaces().containsKey(hash))
-                this.getForeignWorkspaces().remove(hash);
+            this.getForeignWorkspaces().remove(hash);
     }
 
-	/**
-	 * Add AirdeskBroadcastReceiver user to AirdeskBroadcastReceiver given workspace when the owner doesn't specify
-	 * the user's privileges
-	 *
-	 * @param email
-	 * @param workspace
-	 */
-	public void addUserToWorkspace(String email, String workspace) throws UserAlreadyHasPermissionsInWorkspaceException {
+    public void addUserToWorkspace(String email, String workspace) throws UserAlreadyHasPermissionsInWorkspaceException {
         if (email.equals(this.getEmail())) {
             Privileges privileges = new Privileges(true, true, true, true);
             getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
@@ -99,7 +84,7 @@ public class User implements Serializable {
             throw new UserAlreadyHasPermissionsInWorkspaceException();
         Privileges privileges = new Privileges();
         getOwnedWorkspaces().get(workspace).getAccessLists().put(email, privileges);
-	}
+    }
 
     public Workspace getWorkspace(String workspaceHash) {
         Workspace workspace;

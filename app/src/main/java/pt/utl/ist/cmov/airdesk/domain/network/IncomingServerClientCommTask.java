@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -20,13 +19,15 @@ import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 import pt.utl.ist.cmov.airdesk.domain.File;
 import pt.utl.ist.cmov.airdesk.domain.Privileges;
 import pt.utl.ist.cmov.airdesk.domain.Workspace;
-import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 import pt.utl.ist.cmov.airdesk.domain.exceptions.UserAlreadyHasPermissionsInWorkspaceException;
-import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteWorkspaceException;
+import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 
 public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
+
     SimWifiP2pSocket s;
+
     Context context;
+
     private Handler handler;
 
     public IncomingServerClientCommTask(Context _context){
@@ -37,7 +38,6 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
     @Override
     protected Void doInBackground(SimWifiP2pSocket... params) {
         ObjectInputStream sockIn = null;
-        String st;
         BroadcastMessage message = null;
 
         s = params[0];
@@ -65,18 +65,10 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
     }
 
     @Override
-    protected void onPreExecute() {
-        /*CharSequence text = "Connecting...";
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();*/
-    }
+    protected void onPreExecute() {}
 
     @Override
-    protected void onProgressUpdate(String... messages) {
-        Toast toast = Toast.makeText(context, "GOT MESSAGE! " + messages[0], Toast.LENGTH_SHORT);
-        toast.show();
-    }
+    protected void onProgressUpdate(String... messages) {}
 
     @Override
     protected void onPostExecute(Void result) {
@@ -114,7 +106,6 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                         messageOutput.setWorkspaceTimestamp(w.getTimestamp());
                         messageOutput.setWorkspace(w);
                         GlobalService.broadcastMessage(messageOutput);
-                        // TODO: possible optimization, send all shared workspaces and timespams in one broadcast. dont do 1 message per workspace
                     }
                 }
                 break;
@@ -285,7 +276,8 @@ public class IncomingServerClientCommTask extends AsyncTask<SimWifiP2pSocket, St
                 for(String topic : topics){
                     for(Map.Entry<String, Workspace> workspaceEntry : manager.getOwnedWorkspaces().entrySet()){
                         if(workspaceEntry.getValue().getTopics().contains(topic)){
-                            matchingWorkspaces.add(workspaceEntry.getValue());
+                            if (!workspaceEntry.getValue().isPrivate())
+                                matchingWorkspaces.add(workspaceEntry.getValue());
                         }
                     }
                 }

@@ -3,10 +3,9 @@ package pt.utl.ist.cmov.airdesk.activities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,19 +13,20 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import pt.utl.ist.cmov.airdesk.R;
 import pt.utl.ist.cmov.airdesk.domain.AirdeskManager;
-import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDeleteFileException;
 
 public class Topics extends ActionBarActivity implements Updatable {
 
     private AirdeskManager manager;
+
     ArrayList<String> topicList;
+
     ArrayAdapter<String> adapter;
+
     ListView topicListView;
 
     @Override
@@ -87,7 +87,6 @@ public class Topics extends ActionBarActivity implements Updatable {
         manager.getLoggedUser().addTopic(topic);
         adapter.notifyDataSetChanged();
         topicText.setText("");
-
     }
 
     @Override

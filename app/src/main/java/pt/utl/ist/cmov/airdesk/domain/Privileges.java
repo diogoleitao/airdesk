@@ -4,24 +4,12 @@ import java.io.Serializable;
 
 public class Privileges implements Serializable {
 
-	/**
-	 * True if AirdeskBroadcastReceiver user can read AirdeskBroadcastReceiver file; false otherwise
-	 */
 	private boolean read;
 
-	/**
-	 * True if AirdeskBroadcastReceiver user can write to AirdeskBroadcastReceiver file; false otherwise
-	 */
 	private boolean write;
 
-	/**
-	 * True if AirdeskBroadcastReceiver user can create AirdeskBroadcastReceiver file; false otherwise
-	 */
 	private boolean create = false;
 
-	/**
-	 * True if AirdeskBroadcastReceiver user can delete AirdeskBroadcastReceiver file; false otherwise
-	 */
 	private boolean delete = false;
 
 	public Privileges() {
@@ -68,15 +56,15 @@ public class Privileges implements Serializable {
 		this.delete = delete;
 	}
 
-    public boolean[] getAll() {
-        boolean[] privileges = new boolean[4];
-        privileges[0] = canRead();
-        privileges[1] = canWrite();
-        privileges[2] = canCreate();
-        privileges[3] = canDelete();
+	public boolean[] getAll() {
+		boolean[] privileges = new boolean[4];
+		privileges[0] = canRead();
+		privileges[1] = canWrite();
+		privileges[2] = canCreate();
+		privileges[3] = canDelete();
 
-        return privileges;
-    }
+		return privileges;
+	}
 
 	public void setAll(boolean[] privileges) {
 		setReadPrivilege(privileges[0]);

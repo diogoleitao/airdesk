@@ -23,11 +23,17 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceAlreadyExistsException
 public class ListWorkspaces extends ActionBarActivity implements Updatable{
 
     ArrayAdapter<String> adapter;
+
     ArrayAdapter<String> adapterForeign;
+
     ListView workspaceListView;
+
     ListView foreignWorkspaceListView;
+
     ArrayList<String> workspaceList;
+
     ArrayList<String> foreignWorkspaceList;
+
     AirdeskManager manager;
 
     @Override
@@ -37,10 +43,7 @@ public class ListWorkspaces extends ActionBarActivity implements Updatable{
     }
 
     @Override
-    public void onBackPressed() {
-
-    }
-
+    public void onBackPressed() {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
