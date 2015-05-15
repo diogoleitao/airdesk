@@ -2,8 +2,8 @@ package pt.utl.ist.cmov.airdesk.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -19,8 +19,11 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.WorkspaceQuotaReachedException;
 public class EditFile extends ActionBarActivity implements Updatable {
 
     String filename;
+
     File file;
+
     Workspace workspace;
+
     AirdeskManager manager;
 
     @Override
@@ -51,7 +54,6 @@ public class EditFile extends ActionBarActivity implements Updatable {
         manager.setCurrentActivity(this);
         updateUI();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

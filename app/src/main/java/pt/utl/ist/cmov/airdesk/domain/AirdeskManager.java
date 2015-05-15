@@ -34,20 +34,12 @@ public class AirdeskManager implements Serializable {
 
     static String filenameSaveApp = "AirdeskState";
 
-	/**
-	 * This class' singleton
-	 */
-	private static AirdeskManager instance = null;
+    private static AirdeskManager instance = null;
 
-    /**
-     * Mapping between workspaces' hashes and Workspace names
-     */
     private static HashMap<String, String> namesToHashes = new HashMap<String, String>();
 
-    /**
-     * The currently logged in user email
-	 */
-	private static User loggedUser;
+    private static User loggedUser;
+
     private static Activity currentActivity;
 
     public Handler getServiceHandler() {
@@ -58,10 +50,7 @@ public class AirdeskManager implements Serializable {
         this.currentFile = currentFile;
     }
 
-    /**
-	 * The currently opened file name
-	 */
-	private String currentFile = "";
+    private String currentFile = "";
 
     public void setCurrentWorkspace(String currentWorkspace) {
         this.currentWorkspace = namesToHashes.get(currentWorkspace);
@@ -71,9 +60,9 @@ public class AirdeskManager implements Serializable {
 
     private AirdeskManager() {}
 
-	public static AirdeskManager getInstance(Context context) {
-		if (instance == null) {
-			instance = new AirdeskManager();
+    public static AirdeskManager getInstance(Context context) {
+        if (instance == null) {
+            instance = new AirdeskManager();
 
             if(context == null)
                 return instance;
@@ -93,8 +82,8 @@ public class AirdeskManager implements Serializable {
                 e.printStackTrace();
             }
         }
-		return instance;
-	}
+        return instance;
+    }
 
     public void saveAppState(Context context) {
         try {
@@ -111,13 +100,10 @@ public class AirdeskManager implements Serializable {
         }
     }
 
-    /////////////////////////////
-    ////////// GETTERS //////////
-    /////////////////////////////
     public User getLoggedUser() {
         return loggedUser;
     }
-    
+
     public String getCurrentFile() {
         return currentFile;
     }
@@ -215,18 +201,12 @@ public class AirdeskManager implements Serializable {
         return privileges;
     }
 
-
-    //////////////////////////////////
-    ////////// DOMAIN LOGIC //////////
-    //////////////////////////////////
     public void login(String email) {
         loggedUser = new User(email);
-        // TODO: optimization: only the new peers online need to send this message. this is all peers that are online, even if there is only 1 new peer
         BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.I_AM_USER, getLoggedUser().getEmail());
         GlobalService.broadcastMessage(message);
     }
 
-    // TODO FORWARD CHANGES TO USERS SUBSCRIBED
     public void addWorkspace(String workspaceName, int quota) throws WorkspaceAlreadyExistsException {
         for (String w : loggedUser.getAllWorkspaces().keySet()) {
             if (w.equals(namesToHashes.get(workspaceName))) {
@@ -320,17 +300,12 @@ public class AirdeskManager implements Serializable {
             throw new UserDoesNotHavePermissionsToChangePrivilegesException();
     }
 
-
-    ///////////////////////////////////////////////
-    ////////// NETWORK INTERFACE METHODS //////////
-    ///////////////////////////////////////////////
-
     public void addForeignWorkspace(Workspace workspace){
         loggedUser.getForeignWorkspaces().put(workspace.getHash(), workspace);
         namesToHashes.put(workspace.getName(), workspace.getHash());
     }
 
-     private Handler serviceHandler = new Handler() {
+    private Handler serviceHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             updateUI();

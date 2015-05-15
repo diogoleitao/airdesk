@@ -27,27 +27,27 @@ import pt.utl.ist.cmov.airdesk.domain.BroadcastMessage;
 public class GlobalService extends Service implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener{
 
     public static final String TAG = "airdesk";
+
     public static final int SERVICE_PORT = 10001;
 
     private SimWifiP2pManager mManager = null;
+
     private SimWifiP2pManager.Channel mChannel = null;
+
     private Messenger mService = null;
-    private boolean mBound = false;
 
     public static List<String> ips;
+
     private ServerCommTask srvSocketTask;
+
     public List<IncomingServerClientCommTask> clientSocketTasks;
+
     public static GlobalService instance;
 
     @Override
     public IBinder onBind(Intent arg0) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("it is not implemented");
     }
-
-	/*
-	 * Listeners associated to WDSim
-	 */
 
     @Override
     public void onPeersAvailable(SimWifiP2pDeviceList peers) {
@@ -62,7 +62,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             peersStr.append(devstr);
             ips.add(device.getVirtIp());
 
-            // TODO: optimization: only the new peers online need to send this message. this is all peers that are online, even if there is only 1 new peer
             if (AirdeskManager.getInstance(this).getLoggedUser() != null){
                 BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.I_AM_USER, AirdeskManager.getInstance(this).getLoggedUser().getEmail());
                 GlobalService.broadcastMessage(message);
@@ -90,12 +89,9 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
         Log.d(TAG, "Peer list: " + peersStr);
     }
 
-
     @Override
     public void onCreate() {
-        // TODO Auto-generated method stub
         super.onCreate();
-
 
         ips = new ArrayList<String>();
         instance = this;
@@ -115,7 +111,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
 
         Intent intent = new Intent(getApplicationContext(), SimWifiP2pService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        mBound = true;
 
         clientSocketTasks = new ArrayList<IncomingServerClientCommTask>();
         // spawn the chat server background task
@@ -126,15 +121,12 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
         srvSocketTask.cancel(true);
         super.onDestroy();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // TODO Auto-generated method stub
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -146,7 +138,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             mService = new Messenger(service);
             mManager = new SimWifiP2pManager(mService);
             mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
-            mBound = true;
         }
 
         @Override
@@ -154,7 +145,6 @@ public class GlobalService extends Service implements SimWifiP2pManager.PeerList
             mService = null;
             mManager = null;
             mChannel = null;
-            mBound = false;
         }
     };
 

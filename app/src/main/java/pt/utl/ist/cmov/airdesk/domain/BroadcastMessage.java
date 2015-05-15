@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Tiago on 06/05/2015.
- */
 public class BroadcastMessage implements Serializable{
 
     private String ip;
@@ -114,6 +111,6 @@ public class BroadcastMessage implements Serializable{
         FILE_CHANGED, FILE_DELETED, FILE_ADDED_TO_WORKSPACE, WORKSPACE_DELETED,
         INVITATION_TO_WORKSPACE, REQUEST_FILE, REQUEST_WORKSPACE, FILE_OPEN, FILE_CLOSE, I_AM_USER,
         WORKSPACE_TIMESTAMP, WORKSPACE_UPDATED, WORKSPACE_PRIVILEGES_CHANGED, OWNERS_VERSION, WORKSPACE_TOPICS_REQUEST,
-        WORKSPACES_WITH_TOPICS, WORKSPACE_TOPICS_CHANGED
+        WORKSPACE_TOPICS_CHANGED
     }
 }

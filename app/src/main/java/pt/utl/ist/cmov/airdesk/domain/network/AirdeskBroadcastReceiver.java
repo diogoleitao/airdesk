@@ -12,6 +12,7 @@ import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 public class AirdeskBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "BroadcastReceiver";
+
     private GlobalService service;
 
     public AirdeskBroadcastReceiver(GlobalService _context) {

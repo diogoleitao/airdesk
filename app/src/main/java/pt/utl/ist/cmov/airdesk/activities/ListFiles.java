@@ -4,8 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,9 +28,13 @@ import pt.utl.ist.cmov.airdesk.domain.exceptions.UserDoesNotHavePermissionsToDel
 public class ListFiles extends ActionBarActivity implements Updatable {
 
     ArrayAdapter<String> adapter;
+
     ListView fileListView;
+
     ArrayList<String> fileNameList;
+
     Workspace workspace;
+
     AirdeskManager manager;
 
     @Override
@@ -149,7 +153,7 @@ public class ListFiles extends ActionBarActivity implements Updatable {
                     toast.show();
 
                 } else if(manager.openFile(workspace.getHash(), fileNameList.get(position))){
-                        Toast.makeText(getApplicationContext(),"Someone is editing this file, try again later.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Someone is editing this file, try again later.", Toast.LENGTH_LONG).show();
 
                 } else {
                     Intent intent = new Intent(that, EditFile.class);
