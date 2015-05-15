@@ -180,8 +180,10 @@ public class Workspace implements Serializable {
 
 	public void removeFile(String fileName) {
 		this.timestamp = Calendar.getInstance().getTime();
-		quotaOccupied -= getFiles().get(fileName).getSize();
-		files.remove(fileName);
+		if( files.get(fileName) != null) {
+			quotaOccupied -= getFiles().get(fileName).getSize();
+			files.remove(fileName);
+		}
 	}
 
 	public Date getLastOnlineTimestamp() {

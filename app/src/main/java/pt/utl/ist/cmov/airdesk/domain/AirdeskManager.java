@@ -282,6 +282,14 @@ public class AirdeskManager implements Serializable {
 
     public void applyGlobalPrivileges(String workspaceHash, boolean[] choices) throws UserDoesNotHavePermissionsToChangePrivilegesException {
         loggedUser.applyGlobalPrivileges(workspaceHash, choices);
+        for(String email : loggedUser.getAllWorkspaces().get(workspaceHash).getAccessLists().keySet()){
+            BroadcastMessage message = new BroadcastMessage(BroadcastMessage.MessageTypes.WORKSPACE_PRIVILEGES_CHANGED, workspaceHash, email);
+            Privileges privileges1 = new Privileges();
+            privileges1.setAll(choices);
+            message.setWorkspaceTimestamp(getLoggedUser().getWorkspace(workspaceHash).getTimestamp());
+            message.setPrivileges(privileges1);
+            GlobalService.broadcastMessage(message);
+        }
     }
 
     public void setWorkspacePrivacy(String workspaceHash, boolean isPrivate) {
